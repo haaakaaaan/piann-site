@@ -1,21 +1,225 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>piann.com</title>
-    <style>
-      body{margin:0;font-family:system-ui,Arial,sans-serif;display:grid;place-items:center;height:100vh}
-      .card{text-align:center;padding:24px;border:1px solid #eee;border-radius:12px}
-      h1{margin:0 0 8px}
-      p{margin:0;color:#555}
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>hian on!</h1>
-      <p>Bu benim ilk web sitem. (GitHub Pages)</p>
-    </div>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Din Oylama</title>
+  <style>
+    :root { --card:#ffffff; --line:#eee; --muted:#666; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, Arial, sans-serif; background:#f7f7f7; }
+    header { padding:18px 16px; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; }
+    main { max-width:900px; margin: 24px auto; padding: 0 16px 48px; }
+    h1{ margin:0; font-size:22px; }
+    .muted{ color:var(--muted); font-size:14px; }
+    .grid { display:grid; gap:14px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+    .row { display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; }
+    .box {
+      flex:1 1 180px; min-width:180px; height:110px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid #ddd; border-radius:12px; background:#fff;
+      cursor:pointer; user-select:none; font-size:18px; font-weight:600;
+      transition: transform .08s ease, outline-color .08s ease;
+    }
+    .box:hover { outline:3px solid #e8eefc; transform: translateY(-1px); }
+    .btn { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .hidden{ display:none; }
+    .ok { color:#0a7; }
+    .err{ color:#c00; }
+    .rank-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px dashed var(--line); }
+    .badge{ width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid #ddd; background:#fff; font-weight:600; }
+    .bar{ height:10px; background:#e9ecef; border-radius:6px; overflow:hidden; flex:1; }
+    .fill{ height:100%; background:#9ec5fe; }
+    footer { text-align:center; color:#999; font-size:12px; padding:18px 0 36px; }
+    .top1{ background:#fff7e6; } /* Lider satıra ufak vurgu */
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Din Oylama</h1>
+    <div class="muted">Google ile giriş yap → bir seçenek seç → canlı sıralamayı izle. (Sign in → pick one → live ranking)</div>
+  </header>
 
+  <main class="grid">
+    <!-- Auth -->
+    <section class="card" id="authCard">
+      <div class="row">
+        <button id="btnSignIn" class="btn">Google ile giriş yap</button>
+        <button id="btnSignOut" class="btn hidden">Çıkış</button>
+        <span id="authInfo" class="muted"></span>
+      </div>
+    </section>
+
+    <!-- Vote -->
+    <section class="card hidden" id="voteCard">
+      <h2 style="margin:4px 0 8px">Hangi gruba aitsin?</h2>
+      <div class="row">
+        <div class="box" data-key="islam">İslam</div>
+        <div class="box" data-key="hristiyanlik">Hristiyanlık</div>
+        <div class="box" data-key="musevilik">Musevilik</div>
+        <div class="box" data-key="inanmiyorum">İnanmıyorum</div>
+      </div>
+      <div id="voteMsg" class="muted" style="margin-top:8px"></div>
+    </section>
+
+    <!-- Results -->
+    <section class="card hidden" id="resultsCard">
+      <div class="row" style="align-items:center; justify-content:space-between">
+        <h2 style="margin:4px 0 8px">Canlı Sıralama</h2>
+        <div id="total" class="muted">Toplam: 0</div>
+      </div>
+      <div id="rankList"></div>
+    </section>
+  </main>
+
+  <footer>© piann.com</footer>
+
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    /* 🔧 BURAYI KENDİ FIREBASE CONFIG'İNLE DOLDUR (PASTE YOUR CONFIG HERE) */
+    const firebaseConfig = {
+      apiKey: "YOUR_KEY",
+      authDomain: "YOUR_APP.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_APP.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+    // --- Firebase init ---
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // --- UI refs ---
+    const btnSignIn = document.getElementById('btnSignIn');
+    const btnSignOut = document.getElementById('btnSignOut');
+    const authInfo = document.getElementById('authInfo');
+    const voteCard = document.getElementById('voteCard');
+    const resultsCard = document.getElementById('resultsCard');
+    const voteMsg = document.getElementById('voteMsg');
+    const totalEl = document.getElementById('total');
+    const rankList = document.getElementById('rankList');
+    const boxes = Array.from(document.querySelectorAll('.box'));
+    const NAMES = {
+      islam:'İslam', hristiyanlik:'Hristiyanlık', musevilik:'Musevilik', inanmiyorum:'İnanmıyorum'
+    };
+
+    // --- Auth actions ---
+    btnSignIn.onclick = async () => {
+      try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+      catch(e){ alert('Giriş hatası: ' + e.message); }
+    };
+    btnSignOut.onclick = () => auth.signOut();
+
+    auth.onAuthStateChanged(async (user)=>{
+      if(user){
+        btnSignIn.classList.add('hidden');
+        btnSignOut.classList.remove('hidden');
+        authInfo.textContent = (user.displayName || user.email) + ' olarak giriş yaptınız. (Signed in)';
+        voteCard.classList.remove('hidden');
+        resultsCard.classList.remove('hidden');
+        initVoteFlow(user.uid);
+        subscribeResults();
+      }else{
+        btnSignIn.classList.remove('hidden');
+        btnSignOut.classList.add('hidden');
+        authInfo.textContent = '';
+        voteCard.classList.add('hidden');
+        resultsCard.classList.add('hidden');
+        if(unsubResults){ unsubResults(); unsubResults=null; }
+      }
+    });
+
+    // --- Vote flow ---
+    function setBoxesEnabled(on){
+      boxes.forEach(b=>{
+        b.style.pointerEvents = on ? 'auto':'none';
+        b.style.opacity = on ? '1':'0.6';
+      });
+    }
+
+    async function initVoteFlow(uid){
+      voteMsg.className='muted'; voteMsg.textContent='Oyunu seç ve tıkla. (Pick your vote)';
+      setBoxesEnabled(true);
+      const snap = await db.collection('users').doc(uid).get();
+      if(snap.exists){
+        setBoxesEnabled(false);
+        voteMsg.className='muted ok';
+        voteMsg.textContent='Daha önce oy verdin: ' + NAMES[snap.data().choice] + ' (Already voted)';
+      }else{
+        boxes.forEach(el=>{
+          el.onclick = () => handleVote(uid, el.dataset.key);
+        });
+      }
+    }
+
+    async function handleVote(uid, choice){
+      try{
+        await db.runTransaction(async (tx)=>{
+          const uRef = db.collection('users').doc(uid);
+          const sRef = db.collection('stats').doc('votes');
+
+          const uSnap = await tx.get(uRef);
+          if(uSnap.exists){ throw new Error('Bu kullanıcı zaten oy vermiş. (Already voted)'); }
+
+          const sSnap = await tx.get(sRef);
+          const base = sSnap.exists ? sSnap.data() : {islam:0, hristiyanlik:0, musevilik:0, inanmiyorum:0};
+          const inc = firebase.firestore.FieldValue.increment(1);
+
+          tx.set(uRef, { choice, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          tx.set(sRef, {
+            islam: choice==='islam' ? inc : (base.islam||0),
+            hristiyanlik: choice==='hristiyanlik' ? inc : (base.hristiyanlik||0),
+            musevilik: choice==='musevilik' ? inc : (base.musevilik||0),
+            inanmiyorum: choice==='inanmiyorum' ? inc : (base.inanmiyorum||0)
+          }, { merge:true });
+        });
+        setBoxesEnabled(false);
+        voteMsg.className='muted ok';
+        voteMsg.textContent='Teşekkürler! Oyun kaydedildi: ' + NAMES[choice] + ' (Saved)';
+      }catch(e){
+        voteMsg.className='muted err';
+        voteMsg.textContent='Hata: ' + e.message;
+      }
+    }
+
+    // --- Live results ---
+    let unsubResults=null;
+    function subscribeResults(){
+      const ref = db.collection('stats').doc('votes');
+      unsubResults = ref.onSnapshot(s=>{
+        const data = s.exists ? s.data() : {islam:0,hristiyanlik:0,musevilik:0,inanmiyorum:0};
+        renderRanking(data);
+      });
+    }
+
+    function renderRanking(counts){
+      const pairs = Object.entries(counts);
+      const total = pairs.reduce((a,[,v])=>a+(v||0),0);
+      totalEl.textContent = 'Toplam: ' + total + ' (Total votes)';
+
+      const sorted = pairs.sort((a,b)=>(b[1]||0)-(a[1]||0));
+      rankList.innerHTML='';
+      sorted.forEach(([key,val],i)=>{
+        const pct = total>0 ? Math.round((val||0)*100/total) : 0;
+        const row = document.createElement('div');
+        row.className='rank-row' + (i===0 ? ' top1':'');
+
+        const medal = i===0?'🏆':(i===1?'🥈':(i===2?'🥉':''));
+        row.innerHTML = `
+          <div class="badge">${i+1}</div>
+          <div style="width:190px">${medal} ${NAMES[key]}: <b>${val||0}</b> (${pct}%)</div>
+          <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+        `;
+        rankList.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>
