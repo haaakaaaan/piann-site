@@ -82,15 +82,16 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    /* 🔧 BURAYI KENDİ FIREBASE CONFIG'İNLE DOLDUR (PASTE YOUR CONFIG HERE) */
+    /* Firebase config — SENİN değerlerinle dolu */
     const firebaseConfig = {
-      apiKey: "YOUR_KEY",
-      authDomain: "YOUR_APP.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_APP.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
+      apiKey: "AIzaSyBk9XhJYmC6fyRBF1ZqY8vm-UNxkiurkrY",
+      authDomain: "piann-vote.firebaseapp.com",
+      projectId: "piann-vote",
+      storageBucket: "piann-vote.firebasestorage.app",
+      messagingSenderId: "999811556631",
+      appId: "1:999811556631:web:1c601ae8be0d0971bdc352"
     };
+
     // --- Firebase init ---
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -106,9 +107,7 @@
     const totalEl = document.getElementById('total');
     const rankList = document.getElementById('rankList');
     const boxes = Array.from(document.querySelectorAll('.box'));
-    const NAMES = {
-      islam:'İslam', hristiyanlik:'Hristiyanlık', musevilik:'Musevilik', inanmiyorum:'İnanmıyorum'
-    };
+    const NAMES = { islam:'İslam', hristiyanlik:'Hristiyanlık', musevilik:'Musevilik', inanmiyorum:'İnanmıyorum' };
 
     // --- Auth actions ---
     btnSignIn.onclick = async () => {
@@ -153,9 +152,7 @@
         voteMsg.className='muted ok';
         voteMsg.textContent='Daha önce oy verdin: ' + NAMES[snap.data().choice] + ' (Already voted)';
       }else{
-        boxes.forEach(el=>{
-          el.onclick = () => handleVote(uid, el.dataset.key);
-        });
+        boxes.forEach(el=>{ el.onclick = () => handleVote(uid, el.dataset.key); });
       }
     }
 
