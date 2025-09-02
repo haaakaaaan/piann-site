@@ -1,143 +1,122 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>piann — oylama</title>
-
-  <!-- Yazı tipi (opsiyonel ama şık) -->
+  <title>piann — puan & sıralama</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
   <style>
-    :root{
-      --bg: linear-gradient(180deg,#f7f9fc 0%, #eef2f7 100%);
-      --card:#fff; --line:#e8ecf2; --muted:#6b7280; --text:#0f172a;
-      --brand:#111827; --accent:#3b82f6; --accent-2:#9ec5fe;
-    }
-    *{ box-sizing:border-box }
-    html,body{ height:100% }
+    :root{ --bg:#0f172a; --panel:#0b1220; --line:#1e293b; --fg:#e2e8f0; --muted:#94a3b8; --accent:#60a5fa; --green:#34d399; }
+    *{box-sizing:border-box} html,body{height:100%}
     body{
-      margin:0; font-family: Inter, system-ui, -apple-system, Arial, sans-serif;
-      color:var(--text); background:var(--bg);
+      margin:0; font-family:Inter,system-ui,Arial,sans-serif; color:var(--fg);
+      background:
+        radial-gradient(1000px 500px at 90% -10%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(900px 500px at -10% 100%, rgba(52,211,153,.15), transparent 55%),
+        var(--bg);
     }
-
-    /* Üst bar (çok sade) */
-    .nav{
-      position:sticky; top:0; z-index:10;
-      background:rgba(255,255,255,.85); backdrop-filter: blur(6px);
-      border-bottom:1px solid var(--line);
-    }
-    .nav-inner{
-      max-width:960px; margin:0 auto; padding:12px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .brand{ font-weight:700; letter-spacing:.2px; color:var(--brand) }
-
-    /* Ana alan */
-    .wrap{ max-width:960px; margin:28px auto 72px; padding:0 16px; }
-    .layout{ display:grid; grid-template-columns: 1.05fr .95fr; gap:20px; }
-    @media (max-width: 900px){ .layout{ grid-template-columns: 1fr; } }
-
-    .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow: 0 6px 20px rgba(15,23,42,.06); }
-    .card-body{ padding:18px; }
-    .muted{ color:var(--muted); font-size:14px }
-    .section-title{ margin:0 0 6px; font-size:18px; font-weight:700 }
-
-    /* Auth alanı */
-    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
-    .btn{
-      padding:10px 14px; border:1px solid var(--line); background:#fff;
-      border-radius:12px; cursor:pointer; font-weight:600;
-      transition: transform .08s ease, box-shadow .08s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(17,24,39,.06) }
-    .btn:disabled{ opacity:.55; cursor:not-allowed }
-
-    /* Seçenek kartları */
-    .choices{ display:grid; grid-template-columns: repeat(2, minmax(160px, 1fr)); gap:12px; margin-top:8px }
-    @media (max-width:560px){ .choices{ grid-template-columns: 1fr; } }
-    .choice{
-      height:92px; border:1px solid var(--line); border-radius:14px; background:#fff;
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      font-weight:700; font-size:18px; cursor:pointer; user-select:none;
-      transition: outline-color .1s ease, transform .08s ease;
-    }
-    .choice:hover{ outline:3px solid var(--accent-2); transform: translateY(-1px) }
-    .emoji{ font-size:22px }
-
-    /* Liderlik tablosu */
-    .leader-row{
-      display:flex; align-items:center; gap:12px; padding:12px 0;
-      border-bottom:1px dashed var(--line);
-    }
-    .badge{
-      width:32px; height:32px; border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      border:1px solid var(--line); background:#fff; font-weight:700
-    }
-    .bar{ height:10px; background:#eef2f7; border-radius:6px; overflow:hidden; flex:1 }
-    .fill{ height:100%; background:var(--accent); }
-    .top1{ background:#fff9ed } /* lider satıra nazik vurgu */
-
-    .hidden{ display:none }
-    .ok{ color:#10b981 } .err{ color:#ef4444 }
-
-    footer{ text-align:center; color:#9ca3af; font-size:12px; margin:36px 0 }
+    a{color:#93c5fd; text-decoration:none}
+    .nav{position:sticky; top:0; z-index:10; background:rgba(2,6,23,.72); backdrop-filter:blur(8px); border-bottom:1px solid #0b1220}
+    .nav-inner{max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; gap:12px; align-items:center}
+    .brand{font-weight:700; letter-spacing:.2px}
+    .spacer{flex:1}
+    .btn{padding:10px 14px; border:1px solid rgba(255,255,255,.12); background:var(--panel); color:#fff; border-radius:12px; cursor:pointer; font-weight:600}
+    .btn.accent{ background:linear-gradient(90deg,#1e293b,#0ea5e9); border-color:rgba(96,165,250,.5) }
+    .btn.small{ padding:8px 10px; font-size:14px }
+    .wrap{max-width:1100px; margin:26px auto 64px; padding:0 16px}
+    .card{ background:rgba(11,18,32,.78); border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.35) }
+    .hd{ padding:14px 16px; border-bottom:1px solid var(--line); font-weight:700 }
+    .bd{ padding:16px }
+    .muted{ color:var(--muted) }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
+    table{ width:100%; border-collapse:collapse }
+    th,td{ padding:10px 8px; border-bottom:1px solid #142033; text-align:left; font-size:14px }
+    th{ color:#cbd5e1; font-weight:700 }
+    .pill{font-size:12px;color:#cbd5e1;background:#101827;border:1px solid #1f2937;border-radius:999px;padding:4px 8px}
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+    input[type=text]{background:#0b1220;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;min-width:220px}
+    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.1);background:#0a0f1c}
+    .center{ text-align:center }
   </style>
 </head>
 <body>
+  <!-- NAV -->
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">piann</div>
-      <div class="muted" id="miniInfo"></div>
+      <a href="#/" class="btn small">Ana sayfa</a>
+      <a href="#/rank" class="btn small">Liderboard</a>
+      <span class="spacer"></span>
+      <span class="muted" id="memberCount">Üye: —</span>
+      <span class="spacer" style="flex:0"></span>
+      <button id="btnSignIn" class="btn accent small">Google ile giriş yap</button>
+      <a id="btnMyProfile" href="#/" class="btn small" style="display:none">Profilim</a>
+      <button id="btnSignOut" class="btn small" style="display:none">Çıkış</button>
     </div>
   </div>
 
-  <div class="wrap">
-    <div class="layout">
-      <!-- Sol: oy kartı -->
-      <section class="card">
-        <div class="card-body">
-          <div class="row" style="justify-content:space-between; margin-bottom:8px">
-            <h2 class="section-title">Katıl</h2>
-            <div class="row">
-              <button id="btnSignIn" class="btn">Google ile giriş yap</button>
-              <button id="btnSignOut" class="btn hidden">Çıkış</button>
+  <main class="wrap">
+    <!-- ROUTES -->
+    <section id="pageHome" class="card" style="display:none">
+      <div class="hd">Hoş geldin</div>
+      <div class="bd">
+        <div class="grid">
+          <div>
+            <p class="muted">Google ile giriş yap, profilin otomatik oluşsun. Diğer üyeler 0–100 arası (5 ondalık) puan verebilir. Profil puanın, verilen tüm puanların <b>aritmetik ortalaması</b>dır.</p>
+            <div class="row" style="margin-top:8px">
+              <button id="homeGoProfile" class="btn">Profilime git</button>
+              <a href="#/rank" class="btn">Liderboard’u gör</a>
             </div>
           </div>
-          <div id="who" class="muted" style="margin-bottom:4px"></div>
+          <div>
+            <h3 style="margin:0 0 8px">Top 10</h3>
+            <div id="homeTop10" class="muted">Yükleniyor…</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-          <div id="voteCard" class="hidden">
-            <div class="muted">Bir seçenek seç ve tıkla.</div>
-            <div class="choices">
-              <div class="choice" data-key="islam"><span class="emoji">☪️</span> İslam</div>
-              <div class="choice" data-key="hristiyanlik"><span class="emoji">✝️</span> Hristiyanlık</div>
-              <div class="choice" data-key="musevilik"><span class="emoji">✡️</span> Musevilik</div>
-              <div class="choice" data-key="inanmiyorum"><span class="emoji">🚫</span> İnanmıyorum</div>
+    <section id="pageRank" class="card" style="display:none">
+      <div class="hd">Liderboard</div>
+      <div class="bd">
+        <div class="row" style="justify-content:space-between">
+          <div class="muted">Üyeler ortalama puana göre sıralı.</div>
+          <div class="row"><span class="pill" id="rankTotal">Toplam üye: —</span></div>
+        </div>
+        <div style="height:10px"></div>
+        <div id="rankTableWrap">Yükleniyor…</div>
+      </div>
+    </section>
+
+    <section id="pageProfile" class="card" style="display:none">
+      <div class="hd" id="profHeader">Profil</div>
+      <div class="bd">
+        <div class="row" style="align-items:flex-start; gap:16px">
+          <img id="profAvatar" class="avatar" alt="">
+          <div>
+            <div id="profName" style="font-weight:700; font-size:18px">—</div>
+            <div class="muted">
+              <span class="pill" id="profAvg">Ortalama: —</span>
+              <span class="pill" id="profCount">Oy: —</span>
+              <span class="pill" id="profRank">Sıra: —</span>
             </div>
-            <div id="voteMsg" class="muted" style="margin-top:10px"></div>
           </div>
         </div>
-      </section>
 
-      <!-- Sağ: canlı sonuçlar -->
-      <section class="card">
-        <div class="card-body">
-          <div class="row" style="justify-content:space-between">
-            <h2 class="section-title">Canlı Sıralama</h2>
-            <div id="total" class="muted">Toplam: 0</div>
-          </div>
-          <div id="resultsCard">
-            <div id="rankList"></div>
-          </div>
+        <div style="height:12px"></div>
+        <div id="rateBox" class="row">
+          <input id="scoreInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" />
+          <button id="btnRate" class="btn">Puanla / Güncelle</button>
+          <span id="rateMsg" class="muted"></span>
         </div>
-      </section>
-    </div>
-  </div>
+      </div>
+    </section>
+  </main>
 
-  <footer>© piann.com</footer>
+  <footer class="center muted">© piann.com</footer>
 
   <!-- Firebase SDK (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -145,7 +124,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    /* Firebase config (piann-c58b8) */
+    /* Firebase config — piann-c58b8 */
     const firebaseConfig = {
       apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
       authDomain: "piann-c58b8.firebaseapp.com",
@@ -154,137 +133,205 @@
       messagingSenderId: "1086334896697",
       appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
     };
-
-    // --- Init
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // --- UI refs
-    const btnSignIn = document.getElementById('btnSignIn');
-    const btnSignOut = document.getElementById('btnSignOut');
-    const who = document.getElementById('who');
-    const miniInfo = document.getElementById('miniInfo');
-    const voteCard = document.getElementById('voteCard');
-    const voteMsg = document.getElementById('voteMsg');
-    const totalEl = document.getElementById('total');
-    const rankList = document.getElementById('rankList');
-    const boxes = Array.from(document.querySelectorAll('.choice'));
+    /* ==== Yardımcılar ==== */
+    const $ = (s)=>document.querySelector(s);
+    const pages = {home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile')};
+    const elMemberCount = $('#memberCount');
+    const btnIn = $('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile'), homeGoProfile=$('#homeGoProfile');
 
-    const NAMES = { islam:'İslam', hristiyanlik:'Hristiyanlık', musevilik:'Musevilik', inanmiyorum:'İnanmıyorum' };
-
-    // --- Auth
-    btnSignIn.onclick = async () => {
-      try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-      catch(e){ alert('Giriş hatası: ' + e.message); }
+    function showPage(name){
+      pages.home.style.display = name==='home' ? 'block':'none';
+      pages.rank.style.display = name==='rank' ? 'block':'none';
+      pages.profile.style.display = name==='profile' ? 'block':'none';
+    }
+    const toComma = (n)=> n.toFixed(5).replace('.', ',');
+    const parseScore = (s)=>{
+      if(!s) return null;
+      s = String(s).trim().replace(',', '.');
+      const v = Number(s);
+      if(!isFinite(v)) return null;
+      const r = Math.round(v*100000)/100000;   // 5 ondalığa yuvarla
+      if(!(r>0 && r<=100)) return null;        // 0 hariç, 100 dahil
+      const micro = Math.round(r*100000);      // 1 .. 10,000,000 int
+      return {val:r, micro};
     };
-    btnSignOut.onclick = () => auth.signOut();
 
-    auth.onAuthStateChanged(async (user)=>{
-      if(user){
-        btnSignIn.classList.add('hidden');
-        btnSignOut.classList.remove('hidden');
-        const name = user.displayName || user.email;
-        who.textContent = `${name} olarak giriş yaptınız.`;
-        miniInfo.textContent = 'Giriş yapıldı';
-        voteCard.classList.remove('hidden');
-        setupVoteGuard(user.uid);
-        subscribeResults();
+    /* ==== Auth ==== */
+    let me=null;
+    auth.onAuthStateChanged(async (u)=>{
+      me = u;
+      if(u){
+        btnIn.style.display='none'; btnOut.style.display='inline-block'; btnMy.style.display='inline-block';
+        btnMy.href = '#/u/'+u.uid; homeGoProfile.onclick = ()=>location.hash = '#/u/'+u.uid;
+        await ensureUserDoc(u);
       }else{
-        btnSignIn.classList.remove('hidden');
-        btnSignOut.classList.add('hidden');
-        who.textContent = '';
-        miniInfo.textContent = '';
-        voteCard.classList.add('hidden');
-        cleanupResults();
+        btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
+        homeGoProfile.onclick = ()=>alert('Önce giriş yap');
       }
+      router(); // sayfayı güncelle
     });
+    btnIn.onclick = async ()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert(e.message); } };
+    btnOut.onclick = ()=> auth.signOut();
 
-    function setBoxesEnabled(on){
-      boxes.forEach(b=>{
-        b.style.pointerEvents = on ? 'auto':'none';
-        b.style.opacity = on ? '1' : '.6';
-      });
-    }
-
-    async function setupVoteGuard(uid){
-      voteMsg.className='muted';
-      voteMsg.textContent='Oyunu seç ve tıkla.';
-      setBoxesEnabled(true);
-
-      const u = await db.collection('users').doc(uid).get();
-      if(u.exists){
-        setBoxesEnabled(false);
-        voteMsg.className='muted ok';
-        voteMsg.textContent='Daha önce oy verdin: ' + NAMES[u.data().choice];
-      }else{
-        boxes.forEach(el => { el.onclick = () => handleVote(uid, el.dataset.key); });
+    async function ensureUserDoc(u){
+      const ref = db.collection('users').doc(u.uid);
+      const snap = await ref.get();
+      if(!snap.exists){
+        await ref.set({
+          displayName: u.displayName || u.email || null,
+          photoURL: u.photoURL || null,
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          ratingCount: 0, ratingSumMicro: 0, avgMicroCache: 0
+        }, { merge:true });
       }
     }
 
-    async function handleVote(uid, choice){
+    /* ==== Ana sayfa ==== */
+    async function renderHome(){
+      showPage('home');
       try{
-        await db.runTransaction(async (tx)=>{
-          const uRef = db.collection('users').doc(uid);
-          const sRef = db.collection('stats').doc('votes');
+        const s = await db.collection('users').get();
+        elMemberCount.textContent = 'Üye: ' + s.size;
+      }catch{ elMemberCount.textContent = 'Üye: —'; }
 
-          const uSnap = await tx.get(uRef);
-          if(uSnap.exists) throw new Error('Bu kullanıcı zaten oy vermiş.');
+      const topBox = $('#homeTop10');
+      const qs = await db.collection('users').get();
+      const arr = [];
+      qs.forEach(d=>{
+        const u = d.data(); const count=u.ratingCount||0; const sum=u.ratingSumMicro||0;
+        const avg = count? (sum/count)/100000 : 0;
+        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count});
+      });
+      arr.sort((a,b)=> b.avg - a.avg || b.count - a.count);
+      const top = arr.slice(0,10);
+      if(top.length===0){ topBox.textContent='Henüz veri yok.'; return; }
+      let html = '<table><thead><tr><th>#</th><th>Ad</th><th>Ortalama</th><th>Oy</th></tr></thead><tbody>';
+      top.forEach((u,i)=>{
+        html += `<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma(u.avg)}</td><td>${u.count}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      topBox.innerHTML = html;
+    }
 
-          const sSnap = await tx.get(sRef);
-          const base = sSnap.exists ? sSnap.data() : {islam:0,hristiyanlik:0,musevilik:0,inanmiyorum:0};
-          const inc = firebase.firestore.FieldValue.increment(1);
+    /* ==== Rank ==== */
+    async function renderRank(){
+      showPage('rank');
+      const wrap = $('#rankTableWrap');
+      wrap.textContent = 'Yükleniyor…';
+      const qs = await db.collection('users').get();
+      $('#rankTotal').textContent = 'Toplam üye: ' + qs.size;
+      const arr = [];
+      qs.forEach(d=>{
+        const u = d.data(); const count=u.ratingCount||0; const sum=u.ratingSumMicro||0;
+        const avg = count? (sum/count)/100000 : 0;
+        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count});
+      });
+      arr.sort((a,b)=> b.avg - a.avg || b.count - a.count);
+      let html = '<table><thead><tr><th>#</th><th>Ad</th><th>Ortalama</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+      arr.forEach((u,i)=>{
+        html += `<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma(u.avg)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`;
+      });
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+    }
 
-          tx.set(uRef, { choice, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-          tx.set(sRef, {
-            islam: choice==='islam' ? inc : (base.islam||0),
-            hristiyanlik: choice==='hristiyanlik' ? inc : (base.hristiyanlik||0),
-            musevilik: choice==='musevilik' ? inc : (base.musevilik||0),
-            inanmiyorum: choice==='inanmıyorum' ? inc : (base.inanmiyorum||0)
-          }, { merge:true });
+    /* ==== Profil ==== */
+    async function renderProfile(uid){
+      showPage('profile');
+      const header = $('#profHeader');
+      const nameEl = $('#profName'), avgEl = $('#profAvg'), cntEl = $('#profCount'), rankEl = $('#profRank');
+      const av = $('#profAvatar'); const input=$('#scoreInput'); const btn=$('#btnRate'); const msg=$('#rateMsg');
+
+      if(!uid){ pages.profile.innerHTML='<div class="bd">Profil bulunamadı.</div>'; return; }
+
+      const ref = db.collection('users').doc(uid);
+      const doc = await ref.get();
+      if(!doc.exists){ pages.profile.innerHTML='<div class="bd">Bu kullanıcı listede değil.</div>'; return; }
+      const u = doc.data();
+      const count=u.ratingCount||0, sum=u.ratingSumMicro||0;
+      const avg = count? (sum/count)/100000 : 0;
+
+      nameEl.textContent = u.displayName || '(İsimsiz kullanıcı)';
+      av.src = u.photoURL || '';
+      avgEl.textContent = 'Ortalama: ' + toComma(avg);
+      cntEl.textContent = 'Oy: ' + count;
+      header.textContent = (me && uid===me.uid) ? 'Profilim' : 'Profil';
+
+      // Sıra
+      try{
+        const qs = await db.collection('users').get();
+        const arr = [];
+        qs.forEach(d=>{
+          const x=d.data(); const c=x.ratingCount||0, s=x.ratingSumMicro||0;
+          const a=c?(s/c)/100000:0;
+          arr.push({id:d.id, avg:a, count:c});
         });
+        arr.sort((a,b)=> b.avg - a.avg || b.count - a.count);
+        const idx = arr.findIndex(x=>x.id===uid);
+        rankEl.textContent = 'Sıra: ' + (idx>=0? (idx+1) : '—') + ' / ' + arr.length;
+      }catch{ rankEl.textContent = 'Sıra: —'; }
 
-        setBoxesEnabled(false);
-        voteMsg.className='muted ok';
-        voteMsg.textContent='Teşekkürler! Oyun kaydedildi: ' + NAMES[choice];
-      }catch(e){
-        voteMsg.className='muted err';
-        voteMsg.textContent = 'Hata: ' + e.message;
-      }
+      // Kendi profilini puanlama engeli
+      const canRate = me && me.uid !== uid;
+      $('#rateBox').style.display = canRate ? 'flex' : 'none';
+      if(!canRate){ return; }
+
+      btn.onclick = async ()=>{
+        msg.textContent='';
+        const parsed = parseScore(input.value);
+        if(!parsed){ msg.textContent='Geçersiz değer. 0<puan≤100 ve 5 ondalık olmalı.'; return; }
+        try{
+          await db.runTransaction(async (tx)=>{
+            const userRef = db.collection('users').doc(uid);
+            const rateRef = userRef.collection('ratings').doc(me.uid);
+            const uSnap = await tx.get(userRef);
+            if(!uSnap.exists) throw new Error('Kullanıcı yok');
+
+            const rSnap = await tx.get(rateRef);
+            const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
+            const deltaSum = parsed.micro - old;
+            const deltaCount = rSnap.exists ? 0 : 1;
+
+            tx.set(rateRef, {
+              micro: parsed.micro,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge:true });
+
+            const oldSum = uSnap.data().ratingSumMicro||0;
+            const oldCnt = uSnap.data().ratingCount||0;
+            const newSum = oldSum + deltaSum;
+            const newCnt = oldCnt + deltaCount;
+            const newAvgMicro = newCnt>0 ? Math.floor(newSum / newCnt) : 0;
+
+            tx.set(userRef, {
+              ratingSumMicro: newSum,
+              ratingCount: newCnt,
+              avgMicroCache: newAvgMicro
+            }, { merge:true });
+          });
+          msg.textContent='Kaydedildi ✔';
+          renderProfile(uid);
+        }catch(e){
+          msg.textContent='Hata: ' + e.message;
+        }
+      };
     }
 
-    // --- Live results
-    let unsubResults=null;
-    function subscribeResults(){
-      const ref = db.collection('stats').doc('votes');
-      unsubResults = ref.onSnapshot(s=>{
-        const data = s.exists ? s.data() : {islam:0,hristiyanlik:0,musevilik:0,inanmiyorum:0};
-        renderRanking(data);
-      });
+    /* ==== Router ==== */
+    function router(){
+      const h = location.hash || '#/';
+      if(h==='#/' || h==='#'){ renderHome(); return; }
+      if(h.startsWith('#/rank')){ renderRank(); return; }
+      if(h.startsWith('#/u/')){ renderProfile(h.split('/')[2]); return; }
+      renderHome();
     }
-    function cleanupResults(){ if (unsubResults){unsubResults();unsubResults=null;} }
-
-    function renderRanking(counts){
-      const pairs = Object.entries(counts);
-      const total = pairs.reduce((a,[,v])=>a+(v||0),0);
-      totalEl.textContent = 'Toplam: ' + total;
-
-      const sorted = pairs.sort((a,b)=>(b[1]||0)-(a[1]||0));
-      rankList.innerHTML='';
-      sorted.forEach(([key,val],i)=>{
-        const pct = total>0 ? Math.round((val||0)*100/total) : 0;
-        const row = document.createElement('div');
-        row.className='leader-row' + (i===0 ? ' top1':'');
-
-        const medal = i===0?'🏆':(i===1?'🥈':(i===2?'🥉':''));
-        row.innerHTML = `
-          <div class="badge">${i+1}</div>
-          <div style="width:190px">${medal} ${NAMES[key]}: <b>${val||0}</b> (${pct}%)</div>
-          <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
-        `;
-        rankList.appendChild(row);
-      });
-    }
+    window.addEventListener('hashchange', router);
+    router();
   </script>
 </body>
 </html>
