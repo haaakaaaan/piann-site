@@ -8,38 +8,52 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{ --bg:#0f172a; --panel:#0b1220; --line:#1e293b; --fg:#e2e8f0; --muted:#94a3b8; --accent:#60a5fa; --green:#34d399; }
+    :root{
+      --bg1:#0A66C2;        /* LinkedIn Blue */
+      --bg2:#004182;        /* koyu LinkedIn */
+      --panel:rgba(6,14,28,.9);
+      --line:#1e293b;
+      --fg:#e8eef6;
+      --muted:#c9d6e6;
+      --accent:#0A66C2;
+      --accent-2:#70B5F9;
+      --green:#34d399;
+    }
     *{box-sizing:border-box} html,body{height:100%}
     body{
       margin:0; font-family:Inter,system-ui,Arial,sans-serif; color:var(--fg);
       background:
-        radial-gradient(1000px 500px at 90% -10%, rgba(96,165,250,.25), transparent 60%),
-        radial-gradient(900px 500px at -10% 100%, rgba(52,211,153,.15), transparent 55%),
-        var(--bg);
+        radial-gradient(900px 500px at 100% 0%, rgba(255,255,255,.15), transparent 60%),
+        radial-gradient(900px 500px at 0% 100%, rgba(255,255,255,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
     }
-    a{color:#93c5fd; text-decoration:none}
-    .nav{position:sticky; top:0; z-index:10; background:rgba(2,6,23,.72); backdrop-filter:blur(8px); border-bottom:1px solid #0b1220}
+    a{color:#e3f2ff; text-decoration:none}
+    .nav{position:sticky; top:0; z-index:10; background:rgba(0,17,39,.45); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.08)}
     .nav-inner{max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; gap:12px; align-items:center}
     .brand{font-weight:700; letter-spacing:.2px}
     .spacer{flex:1}
-    .btn{padding:10px 14px; border:1px solid rgba(255,255,255,.12); background:var(--panel); color:#fff; border-radius:12px; cursor:pointer; font-weight:600}
-    .btn.accent{ background:linear-gradient(90deg,#1e293b,#0ea5e9); border-color:rgba(96,165,250,.5) }
+    .btn{padding:10px 14px; border:1px solid rgba(255,255,255,.18); background:var(--panel); color:#fff; border-radius:12px; cursor:pointer; font-weight:600}
+    .btn.accent{ background:linear-gradient(90deg,#004182,#0A66C2); border-color:rgba(255,255,255,.25) }
     .btn.small{ padding:8px 10px; font-size:14px }
     .wrap{max-width:1100px; margin:26px auto 64px; padding:0 16px}
-    .card{ background:rgba(11,18,32,.78); border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.35) }
-    .hd{ padding:14px 16px; border-bottom:1px solid var(--line); font-weight:700 }
+    .card{ background:rgba(6,14,28,.82); border:1px solid rgba(255,255,255,.10); border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.35) }
+    .hd{ padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08); font-weight:700 }
     .bd{ padding:16px }
     .muted{ color:var(--muted) }
     .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px }
     @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
     table{ width:100%; border-collapse:collapse }
-    th,td{ padding:10px 8px; border-bottom:1px solid #142033; text-align:left; font-size:14px }
-    th{ color:#cbd5e1; font-weight:700 }
-    .pill{font-size:12px;color:#cbd5e1;background:#101827;border:1px solid #1f2937;border-radius:999px;padding:4px 8px}
+    th,td{ padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; font-size:14px }
+    th{ color:#f0f6ff; font-weight:700 }
+    .pill{font-size:12px;color:#dce9f8;background:#0c203e;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px 8px}
     .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-    input[type=text]{background:#0b1220;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;min-width:220px}
-    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.1);background:#0a0f1c}
+    input[type=text]{background:#0b1220;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px 12px;min-width:220px}
+    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.18);background:#0a0f1c}
     .center{ text-align:center }
+
+    /* rating list bars */
+    .bar{ height:10px; background:#0b244a; border-radius:6px; overflow:hidden; flex:1 }
+    .fill{ height:100%; background:#70B5F9 } /* açık linkedin mavisi */
   </style>
 </head>
 <body>
@@ -172,7 +186,7 @@
         btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
         homeGoProfile.onclick = ()=>alert('Önce giriş yap');
       }
-      router(); // sayfayı güncelle
+      router();
     });
     btnIn.onclick = async ()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert(e.message); } };
     btnOut.onclick = ()=> auth.signOut();
@@ -261,7 +275,6 @@
       cntEl.textContent = 'Oy: ' + count;
       header.textContent = (me && uid===me.uid) ? 'Profilim' : 'Profil';
 
-      // Sıra
       try{
         const qs = await db.collection('users').get();
         const arr = [];
@@ -275,7 +288,6 @@
         rankEl.textContent = 'Sıra: ' + (idx>=0? (idx+1) : '—') + ' / ' + arr.length;
       }catch{ rankEl.textContent = 'Sıra: —'; }
 
-      // Kendi profilini puanlama engeli
       const canRate = me && me.uid !== uid;
       $('#rateBox').style.display = canRate ? 'flex' : 'none';
       if(!canRate){ return; }
