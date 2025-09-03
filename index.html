@@ -11,6 +11,8 @@
       --card:#ffffff; --line:#e6e9ef;
       --accent:#0A66C2; --accent-600:#0857A6;
       --ok:#10b981; --err:#ef4444;
+      /* ▶ container genişliği (istersen 1600px yap) */
+      --container: min(1400px, 96vw);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -19,29 +21,29 @@
     /* NAV (sol–orta–sağ) */
     .nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
     .nav-inner{
-      max-width:1080px;margin:0 auto;padding:10px 16px;
-      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+      max-width:var(--container); margin:0 auto; padding:12px 20px;
+      display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
     }
     .left,.right{display:flex;gap:10px;align-items:center}
     .right{justify-content:flex-end}
     .brand{font-weight:800;letter-spacing:.2px}
     .nav a,.nav button{color:var(--text);text-decoration:none}
 
-    /* Subbar (piann altında hoş geldin & sayaçlar) */
+    /* Subbar */
     .subbar{background:#fff;border-bottom:1px solid var(--line)}
     .subbar-inner{
-      max-width:1080px;margin:0 auto;padding:6px 16px 12px;text-align:center
+      max-width:var(--container); margin:0 auto; padding:8px 20px 14px; text-align:center
     }
     .welcome{font-weight:600}
     .counts{color:var(--muted);font-size:14px;margin-top:2px}
 
     /* LAYOUT */
-    .wrap{max-width:1080px;margin:24px auto 64px;padding:0 16px}
+    .wrap{max-width:var(--container); margin:26px auto 64px; padding:0 20px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
     .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
     .bd{padding:16px}
     .muted{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
     /* BUTTONS + INPUTS */
@@ -107,8 +109,8 @@
         <div class="grid">
           <div>
             <p class="muted">
-              Tek gösterilen puan (0–100): <b>Güvenli puan</b>  
-              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.  
+              Tek gösterilen puan (0–100): <b>Güvenli puan</b>
+              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.
               <b>Not:</b> En az 1 oy almayan profiller sıralamaya dahil edilmez.
             </p>
             <div class="row" style="margin-top:8px">
@@ -163,7 +165,6 @@
           <span class="pill" id="profRank">Sıra: —</span>
         </div>
 
-        <!-- Puanlama kutusu (başkasının profilinde) -->
         <div id="rateBox" class="row" style="display:none">
           <input id="scoreInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px" />
           <button id="btnRate" class="btn primary">Puanla / Güncelle</button>
@@ -229,7 +230,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    /* Firebase config — piann-c58b8 */
+    /* Firebase config — piann-c58b8 (API key’ini domainle kısıtladığın için burada görünmesi sorun değil) */
     const firebaseConfig = {
       apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
       authDomain: "piann-c58b8.firebaseapp.com",
@@ -249,10 +250,10 @@
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
     function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
 
-    // Güvenli puan (LCB): mean − 1.96 * (sd / sqrt(n))
+    // Güvenli puan (LCB)
     function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
       if(!n || n<=0) return 0;
-      const mean = (sumMicro / n) / 100000; // 0..100
+      const mean = (sumMicro / n) / 100000;
       let sd;
       if(n>1){
         const ex2 = (sumSqMicro / n) / 1e10;
@@ -312,7 +313,6 @@
     btnOut.onclick = ()=> auth.signOut();
 
     async function ensureUserDocs(u){
-      // users
       const uRef = db.collection('users').doc(u.uid);
       const uSnap= await uRef.get();
       if(!uSnap.exists){
@@ -327,7 +327,6 @@
           scoreLCB:0
         }, {merge:true});
       }
-      // profiles
       const pRef = db.collection('profiles').doc(u.uid);
       const pSnap= await pRef.get();
       if(!pSnap.exists){
@@ -370,7 +369,7 @@
       const arr=[];
       qs.forEach(d=>{
         const u=d.data();
-        const c=u.ratingCount||0; if(c<=0) return; // en az 1 oy
+        const c=u.ratingCount||0; if(c<=0) return;
         const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
         const score = lcbScoreFromAggregates(sum, sumsq, c);
         arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
@@ -411,7 +410,6 @@
       showPage('profile'); currentProfileUid=uid;
       refreshCounts();
 
-      // kullanıcı aggregate
       const uRef = db.collection('users').doc(uid);
       const uDoc = await uRef.get();
       if(!uDoc.exists){ $('#pageProfile .bd').innerHTML='<p class="muted">Kullanıcı bulunamadı.</p>'; return; }
@@ -423,7 +421,6 @@
         $('#profScore').textContent = 'Puan: '+toComma5(myScore);
         $('#profCount').textContent = 'Oy: '+cnt;
 
-        // Sıralama: sadece puanlananlar arasında
         const all=await db.collection('users').get();
         const arr=[];
         all.forEach(d=>{
@@ -441,7 +438,6 @@
         $('#profRank').textContent  = 'Sıra: — (en az 1 oy sonrası)';
       }
 
-      // profile doc
       const pRef=db.collection('profiles').doc(uid);
       const pDoc=await pRef.get();
       const p=pDoc.exists ? pDoc.data() : {
@@ -469,8 +465,6 @@
       $('#btnRateOpen').onclick = ()=> $('#scoreInput').focus();
 
       $('#btnEdit').onclick = ()=> openEditModal(p);
-
-      // received list
       loadReceived(uid);
     }
 
@@ -491,7 +485,7 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA (sum, count, kareler toplamı ve scoreLCB birlikte güncellenir)
+    // PUANLAMA
     $('#btnRate').addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
@@ -512,7 +506,7 @@
 
           const deltaSum   = newMicro - old;
           const deltaCount = rSnap.exists ? 0 : 1;
-          const deltaSq    = (newMicro*newMicro) - (old*old); // kare farkı
+          const deltaSq    = (newMicro*newMicro) - (old*old);
 
           tx.set(rateRef, {
             micro: newMicro,
@@ -592,8 +586,6 @@
     }
     window.addEventListener('hashchange', router);
     router();
-
-    // ilk sayaç güncellemesi
     refreshCounts();
   </script>
 </body>
