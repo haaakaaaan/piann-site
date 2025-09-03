@@ -10,7 +10,7 @@
 
   <style>
     :root{
-      --bg1:#74B9FF; --bg2:#0857A6;
+      --bg1:#8ec5ff; --bg2:#156fbf;           /* daha açık LinkedIn mavisi gradyan */
       --panel: rgba(11, 62, 119, .88);
       --panel-border: rgba(159, 210, 255, .28);
       --line: rgba(159, 210, 255, .18);
@@ -75,6 +75,18 @@
     .tab{padding:10px 12px;border-bottom:2px solid transparent;cursor:pointer}
     .tab.active{border-color:#9FD2FF;font-weight:700}
     .profile-section{padding-top:12px}
+
+    /* Arama */
+    .search{position:relative;min-width:220px;flex:1;max-width:340px}
+    .search input{width:100%;padding:8px 12px 8px 36px;border-radius:12px;border:1px solid var(--panel-border);background:rgba(0,0,0,.25);color:#fff}
+    .search::before{content:"🔎";position:absolute;left:10px;top:6px;opacity:.8}
+    .drop{position:absolute;top:42px;left:0;right:0;background:var(--panel);border:1px solid var(--panel-border);border-radius:12px;box-shadow:0 15px 40px rgba(0,0,0,.35);overflow:hidden}
+    .drop.hidden{display:none}
+    .drop-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer}
+    .drop-item:hover{background:rgba(255,255,255,.06)}
+    .drop-item img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+    .drop-item .h{font-weight:700}
+    .drop-empty{padding:10px;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -84,6 +96,13 @@
       <div class="brand">piann</div>
       <a href="#/" class="btn small">Ana sayfa</a>
       <a href="#/rank" class="btn small">Liderboard</a>
+
+      <!-- Hızlı arama -->
+      <div class="search">
+        <input id="q" type="text" placeholder="Kullanıcı ara (ad veya @handle)" autocomplete="off" />
+        <div id="qDrop" class="drop hidden"></div>
+      </div>
+
       <span class="spacer"></span>
       <span class="muted" id="memberCount">Üye: —</span>
       <span class="spacer" style="flex:0"></span>
@@ -181,7 +200,7 @@
 
   <footer class="center muted">© piann.com</footer>
 
-  <!-- EDIT MODAL (yalnız URL alanları) -->
+  <!-- EDIT MODAL (URL ile) -->
   <div id="editBack" class="modal-back" style="display:none; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:50">
     <div class="modal" style="width:min(680px,92vw);background:var(--panel);border:1px solid var(--panel-border);border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.5)">
       <div class="hd" style="display:flex;align-items:center;justify-content:space-between">
@@ -283,6 +302,7 @@
       if(doc.id === myUid) return base;
       return base + Math.floor(Math.random()*9000 + 1000);
     }
+    const debounce = (fn, t=250)=>{ let to; return (...a)=>{ clearTimeout(to); to=setTimeout(()=>fn(...a),t); } };
 
     /* ==== Auth ==== */
     let me=null;
@@ -317,13 +337,21 @@
       if(!pSnap.exists){
         let base = slugHandle((u.displayName||'').split(' ')[0] || (u.email||'user').split('@')[0]);
         base = await ensureHandleUnique(base, u.uid);
+        const dn = u.displayName || (u.email||'Kullanıcı');
         await pRef.set({
-          displayName: u.displayName || (u.email||'Kullanıcı'),
+          displayName: dn,
+          displayNameLower: dn.toLowerCase(),
           handle: base, handleLower: base.toLowerCase(),
           bio: '', location: '', website: '',
           photoURL: u.photoURL || '', coverURL: '',
           joinedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge:true });
+      } else {
+        // Eski profillerde displayNameLower yoksa ekle
+        const p = pSnap.data();
+        if(!p.displayNameLower && p.displayName){
+          await pRef.set({ displayNameLower: p.displayName.toLowerCase() }, { merge:true });
+        }
       }
     }
 
@@ -518,7 +546,7 @@
       }catch(e){ msg.textContent='Hata: ' + e.message; }
     });
 
-    /* ==== Edit modal (yalnız URL alanları) ==== */
+    /* ==== Edit modal ==== */
     function openEditModal(p){
       $('#edMsg').textContent='';
       $('#edName').value   = p.displayName || '';
@@ -534,12 +562,7 @@
     $('#edSave').onclick = async ()=>{
       if(!me){ $('#edMsg').textContent='Oturum yok.'; return; }
       const name = $('#edName').value.trim();
-      let handle  = (()=>{
-        const raw = $('#edHandle').value;
-        const s = raw ? raw : '';
-        return s;
-      })();
-      handle = slugHandle(handle);
+      let handle  = slugHandle($('#edHandle').value || '');
       const bio   = $('#edBio').value.trim().slice(0,160);
       const location = $('#edLoc').value.trim();
       const website  = normUrl($('#edWeb').value.trim());
@@ -553,6 +576,7 @@
         handle = await ensureHandleUnique(handle, me.uid);
         await db.collection('profiles').doc(me.uid).set({
           displayName: name||'(Kullanıcı)',
+          displayNameLower: (name||'(Kullanıcı)').toLowerCase(),
           handle, handleLower: handle.toLowerCase(),
           bio, location, website, photoURL, coverURL
         }, { merge:true });
@@ -565,6 +589,57 @@
       }
     };
 
+    /* ==== Hızlı Arama ==== */
+    const qInput = $('#q'); const qDrop = $('#qDrop');
+    function hideDrop(){ qDrop.classList.add('hidden'); qDrop.innerHTML=''; }
+    function openDrop(){ qDrop.classList.remove('hidden'); }
+
+    async function doSearch(){
+      const raw = (qInput.value||'').trim();
+      if(raw.length < 2){ hideDrop(); return; }
+      const term = raw.toLowerCase().replace(/^@/,'');
+      const results = new Map();
+
+      // handleLower ile başa eşleşme
+      const hSnap = await db.collection('profiles')
+        .orderBy('handleLower').startAt(term).endAt(term+'\uf8ff').limit(6).get();
+      hSnap.forEach(d=> results.set(d.id, d.data()));
+
+      // displayNameLower ile başa eşleşme (ek olarak)
+      const nSnap = await db.collection('profiles')
+        .orderBy('displayNameLower').startAt(term).endAt(term+'\uf8ff').limit(6).get();
+      nSnap.forEach(d=> results.set(d.id, d.data()));
+
+      const arr = Array.from(results.entries()).slice(0,8);
+      if(arr.length===0){ openDrop(); qDrop.innerHTML = '<div class="drop-empty">Sonuç yok</div>'; return; }
+
+      let html = '';
+      arr.forEach(([id,p])=>{
+        const av = p.photoURL || '';
+        html += `<div class="drop-item" data-id="${id}">
+          <img src="${av}" alt="">
+          <div><div class="h">${p.displayName||'(Kullanıcı)'}</div>
+          <div class="muted">@${p.handle||'user'}</div></div>
+        </div>`;
+      });
+      qDrop.innerHTML = html; openDrop();
+      // tıklama
+      Array.from(qDrop.querySelectorAll('.drop-item')).forEach(el=>{
+        el.onclick = ()=>{ location.hash = '#/u/' + el.dataset.id; hideDrop(); qInput.blur(); };
+      });
+    }
+    qInput.addEventListener('input', debounce(doSearch, 300));
+    qInput.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape'){ hideDrop(); qInput.blur(); }
+      if(e.key==='Enter'){
+        const first = qDrop.querySelector('.drop-item');
+        if(first){ location.hash = '#/u/' + first.dataset.id; hideDrop(); qInput.blur(); }
+      }
+    });
+    document.addEventListener('click', (e)=>{
+      if(!qDrop.contains(e.target) && e.target!==qInput){ hideDrop(); }
+    });
+
     /* ==== Router ==== */
     function router(){
       const h = location.hash || '#/';
@@ -576,20 +651,5 @@
     window.addEventListener('hashchange', router);
     router();
   </script>
-
-  <!--
-  Firestore RULES (öneri):
-  rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      match /profiles/{uid} {
-        allow read: if true;
-        allow create, update: if request.auth != null && request.auth.uid == uid;
-        allow delete: if false;
-      }
-      // /users ve ratings mevcut kurallarınla aynı kalsın
-    }
-  }
-  -->
 </body>
 </html>
