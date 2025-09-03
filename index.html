@@ -38,7 +38,6 @@
     .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
     .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
     .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
-    .btn.ghost{background:#fff}
     .btn:disabled{opacity:.6;cursor:not-allowed}
     input[type=text], textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
     textarea{min-height:80px;resize:vertical}
@@ -66,8 +65,8 @@
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">piann</div>
-      <a href="#/" class="btn ghost">Ana sayfa</a>
-      <a href="#/rank" class="btn ghost">Liderboard</a>
+      <a href="#/" class="btn">Ana sayfa</a>
+      <a href="#/rank" class="btn">Liderboard</a>
       <div class="spacer"></div>
       <span id="memberCount" class="count">Üye: —</span>
       <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
@@ -83,7 +82,11 @@
       <div class="bd">
         <div class="grid">
           <div>
-            <p class="muted">Google ile giriş yap, profilin otomatik oluşsun. Diğer üyeler 0–100 arası (5 ondalık) puan verebilir. Profil puanın, verilen tüm puanların <b>aritmetik ortalaması</b>dır. Sıralama <b>ağırlıklı skor</b> ile yapılır: <code>ortalama × √oy</code>.</p>
+            <p class="muted">
+              Her profil için tek bir <b>güvenli puan</b> (0–100) gösteriyoruz:
+              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.
+              Az ve oynak oylar daha konservatif, çok ve tutarlı oylar ortalamaya yakın görünür.
+            </p>
             <div class="row" style="margin-top:8px">
               <button id="homeGoProfile" class="btn">Profilime git</button>
               <a href="#/rank" class="btn">Liderboard’u gör</a>
@@ -102,7 +105,7 @@
       <div class="hd">Liderboard</div>
       <div class="bd">
         <div class="row" style="justify-content:space-between">
-          <div class="muted">Üyeler <b>ağırlıklı skor</b>a göre sıralı.</div>
+          <div class="muted">Üyeler <b>güvenli puan</b>a göre sıralı.</div>
           <span class="pill" id="rankTotal">Toplam üye: —</span>
         </div>
         <div style="height:10px"></div>
@@ -131,13 +134,12 @@
         <div id="profMeta" class="muted" style="font-size:14px"></div>
 
         <div class="kpi" style="margin:12px 0">
-          <span class="pill" id="profAvg">Ortalama: —</span>
+          <span class="pill" id="profScore">Puan: —</span>
           <span class="pill" id="profCount">Oy: —</span>
-          <span class="pill" id="profWeighted">Ağırlıklı: —</span>
           <span class="pill" id="profRank">Sıra: —</span>
         </div>
 
-        <!-- Rate box (başkasının profilinde görünür) -->
+        <!-- Puanlama kutusu (başkasının profilinde) -->
         <div id="rateBox" class="row" style="display:none">
           <input id="scoreInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px" />
           <button id="btnRate" class="btn primary">Puanla / Güncelle</button>
@@ -220,13 +222,28 @@
     const $ = (s)=>document.querySelector(s);
     const pages = {home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile')};
     const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
-    const toComma2 = (n)=> Number.isFinite(n)? n.toFixed(2).replace('.', ',') : '—';
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
+    function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
 
-    // Ağırlıklı skor: ortalama * sqrt(oy)
-    function weighted(avg, count){
-      if(!count) return 0;
-      return avg * Math.sqrt(count);
+    // Güvenli puan (Lower Confidence Bound)
+    // Puan = mean − 1.96 * (sd / sqrt(n))
+    function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
+      if(!n || n<=0) return 0; // hiç oy yoksa 0 göster
+      const mean = (sumMicro / n) / 100000; // 0..100
+      let sd;
+      if(n>1){
+        // Var = E[X^2] − (E[X])^2
+        const ex2 = (sumSqMicro / n) / 1e10; // (100^-2) ölçek
+        const ex  = (sumMicro / n) / 1e5;
+        const variance = Math.max(0, ex2 - ex*ex);
+        sd = Math.sqrt(variance);
+      }else{
+        // n=1 için konservatif (tek ölçüm belirsiz): sd≈25 al
+        sd = 25;
+      }
+      const z = 1.96;
+      const se = sd / Math.sqrt(n);
+      return clamp01_100(mean - z * se);
     }
 
     const slugHandle = (s)=>{
@@ -280,7 +297,10 @@
           displayName: u.displayName || u.email || null,
           photoURL: u.photoURL || null,
           joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          ratingCount:0, ratingSumMicro:0, avgMicroCache:0
+          ratingCount:0,
+          ratingSumMicro:0,
+          ratingSumSqMicro:0,   // ◀ kareler toplamı
+          avgMicroCache:0
         }, {merge:true});
       }
       // profiles
@@ -305,7 +325,7 @@
       }
     }
 
-    /* ===== Home (Top10 ağırlıklı sıralama) ===== */
+    /* ===== Home ===== */
     async function renderHome(){
       showPage('home');
       try{
@@ -317,31 +337,34 @@
       const qs = await db.collection('users').get();
       const arr=[];
       qs.forEach(d=>{
-        const u=d.data(); const c=u.ratingCount||0, s=u.ratingSumMicro||0;
-        const avg=c? (s/c)/100000 : 0;
-        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count:c, w:weighted(avg,c)});
+        const u=d.data();
+        const c=u.ratingCount||0, sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
+        const score = lcbScoreFromAggregates(sum, sumsq, c);
+        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
       });
-      arr.sort((a,b)=> b.w - a.w || b.avg - a.avg || b.count - a.count);
+      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       const top=arr.slice(0,10);
       if(top.length===0){ box.textContent='Henüz veri yok.'; return; }
-      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Ortalama</th><th>Oy</th><th>Ağırlıklı</th></tr></thead><tbody>';
-      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.avg)}</td><td>${u.count}</td><td>${toComma2(u.w)}</td></tr>`);
+      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
+      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.score)}</td><td>${u.count}</td></tr>`);
       html+='</tbody></table>'; box.innerHTML=html;
     }
 
-    /* ===== Rank (ağırlıklı sıralama) ===== */
+    /* ===== Rank ===== */
     async function renderRank(){
       showPage('rank');
       const wrap=$('#rankTableWrap'); wrap.textContent='Yükleniyor…';
       const qs=await db.collection('users').get(); $('#rankTotal').textContent='Toplam üye: '+qs.size;
       const arr=[];
       qs.forEach(d=>{
-        const u=d.data(); const c=u.ratingCount||0, s=u.ratingSumMicro||0;
-        const avg=c?(s/c)/100000:0; arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count:c, w:weighted(avg,c)});
+        const u=d.data();
+        const c=u.ratingCount||0, sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
+        const score = lcbScoreFromAggregates(sum, sumsq, c);
+        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
       });
-      arr.sort((a,b)=> b.w - a.w || b.avg - a.avg || b.count - a.count);
-      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Ortalama</th><th>Oy</th><th>Ağırlıklı</th><th>Profil</th></tr></thead><tbody>';
-      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.avg)}</td><td>${u.count}</td><td>${toComma2(u.w)}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
       html+='</tbody></table>'; wrap.innerHTML=html;
     }
 
@@ -351,28 +374,28 @@
     async function renderProfile(uid){
       showPage('profile'); currentProfileUid=uid;
 
-      // aggregate + rank
+      // kullanıcı aggregate
       const uRef = db.collection('users').doc(uid);
       const uDoc = await uRef.get();
       if(!uDoc.exists){ $('#pageProfile .bd').innerHTML='<p class="muted">Kullanıcı bulunamadı.</p>'; return; }
       const udat=uDoc.data();
-      const cnt=udat.ratingCount||0, sum=udat.ratingSumMicro||0;
-      const avg=cnt? (sum/cnt)/100000 : 0;
-      const w = weighted(avg, cnt);
-      $('#profAvg').textContent = 'Ortalama: '+toComma5(avg);
-      $('#profCount').textContent = 'Oy: '+cnt;
-      $('#profWeighted').textContent = 'Ağırlıklı: '+toComma2(w);
+      const cnt=udat.ratingCount||0, sum=udat.ratingSumMicro||0, sumsq=udat.ratingSumSqMicro||0;
 
-      try{
-        const all=await db.collection('users').get();
-        const arr=[]; all.forEach(d=>{
-          const x=d.data(); const c=x.ratingCount||0, s=x.ratingSumMicro||0; const a=c?(s/c)/100000:0;
-          arr.push({id:d.id, w:weighted(a,c), a, c});
-        });
-        arr.sort((a,b)=> b.w - a.w || b.a - a.a || b.c - a.c);
-        const pos=arr.findIndex(x=>x.id===uid);
-        $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
-      }catch{ $('#profRank').textContent='Sıra: —'; }
+      const myScore = lcbScoreFromAggregates(sum, sumsq, cnt);
+      $('#profScore').textContent = 'Puan: '+toComma5(myScore);
+      $('#profCount').textContent = 'Oy: '+cnt;
+
+      // sıralama
+      const all=await db.collection('users').get();
+      const arr=[];
+      all.forEach(d=>{
+        const x=d.data();
+        const c=x.ratingCount||0, s=x.ratingSumMicro||0, ss=x.ratingSumSqMicro||0;
+        arr.push({id:d.id, score:lcbScoreFromAggregates(s, ss, c), count:c});
+      });
+      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+      const pos=arr.findIndex(x=>x.id===uid);
+      $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
 
       // profile doc
       const pRef=db.collection('profiles').doc(uid);
@@ -387,7 +410,7 @@
       $('#profAvatar').src = p.photoURL || '';
       const meta=[];
       if(p.location) meta.push('📍 '+p.location);
-      if(p.website)  meta.push('🔗 '+p.website);
+      if(p.website)  meta.push('🔗 '+normUrl(p.website));
       $('#profMeta').textContent = meta.join('   ');
 
       const own = me && me.uid===uid;
@@ -424,7 +447,7 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA
+    // PUANLAMA (transaction: sum, count ve kareler toplamı birlikte güncellenir)
     $('#btnRate').addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
@@ -441,20 +464,34 @@
 
           const rSnap = await tx.get(rateRef);
           const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
-          const deltaSum = parsed.micro - old;
+          const newMicro = parsed.micro;
+
+          const deltaSum   = newMicro - old;
           const deltaCount = rSnap.exists ? 0 : 1;
+          const deltaSq    = (newMicro*newMicro) - (old*old); // ◀ kare farkı
 
           tx.set(rateRef, {
-            micro: parsed.micro,
+            micro: newMicro,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
           }, { merge:true });
 
-          const oSum=uSnap.data().ratingSumMicro||0, oCnt=uSnap.data().ratingCount||0;
-          const nSum=oSum+deltaSum, nCnt=oCnt+deltaCount;
+          const oSum = uSnap.data().ratingSumMicro||0;
+          const oCnt = uSnap.data().ratingCount||0;
+          const oSq  = uSnap.data().ratingSumSqMicro||0;
+
+          const nSum = oSum + deltaSum;
+          const nCnt = oCnt + deltaCount;
+          const nSq  = oSq  + deltaSq;
+
           const newAvgMicro = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
 
-          tx.set(userRef, { ratingSumMicro:nSum, ratingCount:nCnt, avgMicroCache:newAvgMicro }, { merge:true });
+          tx.set(userRef, {
+            ratingSumMicro:nSum,
+            ratingCount:nCnt,
+            ratingSumSqMicro:nSq,
+            avgMicroCache:newAvgMicro
+          }, { merge:true });
         });
         msg.textContent='Kaydedildi ✔'; msg.className='ok';
         renderProfile(currentProfileUid);
@@ -477,7 +514,10 @@
     $('#edSave').onclick = async ()=>{
       if(!me){ $('#edMsg').textContent='Oturum yok.'; return; }
       const name = $('#edName').value.trim();
-      let handle  = slugHandle($('#edHandle').value || '');
+      let handle  = (()=>{
+        const s = ($('#edHandle').value || '').toString().trim().toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/_+/g,'_');
+        return s.length<3 ? s.padEnd(3,'0') : (s.length>15 ? s.slice(0,15) : s);
+      })();
       const bio   = $('#edBio').value.trim().slice(0,160);
       const location = $('#edLoc').value.trim();
       const website  = normUrl($('#edWeb').value.trim());
