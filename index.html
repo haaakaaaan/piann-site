@@ -38,6 +38,7 @@
     .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
     .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
     .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
+    .btn.ghost{background:#fff}
     .btn:disabled{opacity:.6;cursor:not-allowed}
     input[type=text], textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
     textarea{min-height:80px;resize:vertical}
@@ -65,8 +66,8 @@
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">piann</div>
-      <a href="#/" class="btn">Ana sayfa</a>
-      <a href="#/rank" class="btn">Liderboard</a>
+      <a href="#/" class="btn ghost">Ana sayfa</a>
+      <a href="#/rank" class="btn ghost">Liderboard</a>
       <div class="spacer"></div>
       <span id="memberCount" class="count">Üye: —</span>
       <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
@@ -82,7 +83,7 @@
       <div class="bd">
         <div class="grid">
           <div>
-            <p class="muted">Google ile giriş yap, profilin oluşsun. Üyeler 0–100 (5 ondalık) puan verir. Ekranda gördüğün <b>tek puan</b> ve sıralama <b>Bayes puanı</b>dır: <code>(n·ortalama + C·genel) / (n + C)</code>. Varsayılan <code>C=25</code>.</p>
+            <p class="muted">Google ile giriş yap, profilin otomatik oluşsun. Diğer üyeler 0–100 arası (5 ondalık) puan verebilir. Profil puanın, verilen tüm puanların <b>aritmetik ortalaması</b>dır. Sıralama <b>ağırlıklı skor</b> ile yapılır: <code>ortalama × √oy</code>.</p>
             <div class="row" style="margin-top:8px">
               <button id="homeGoProfile" class="btn">Profilime git</button>
               <a href="#/rank" class="btn">Liderboard’u gör</a>
@@ -101,7 +102,7 @@
       <div class="hd">Liderboard</div>
       <div class="bd">
         <div class="row" style="justify-content:space-between">
-          <div class="muted">Üyeler <b>Bayes puanı</b>na göre sıralı.</div>
+          <div class="muted">Üyeler <b>ağırlıklı skor</b>a göre sıralı.</div>
           <span class="pill" id="rankTotal">Toplam üye: —</span>
         </div>
         <div style="height:10px"></div>
@@ -130,12 +131,13 @@
         <div id="profMeta" class="muted" style="font-size:14px"></div>
 
         <div class="kpi" style="margin:12px 0">
-          <span class="pill" id="profScore">Puan: —</span>
+          <span class="pill" id="profAvg">Ortalama: —</span>
           <span class="pill" id="profCount">Oy: —</span>
+          <span class="pill" id="profWeighted">Ağırlıklı: —</span>
           <span class="pill" id="profRank">Sıra: —</span>
         </div>
 
-        <!-- Puanlama kutusu (başkasının profilinde) -->
+        <!-- Rate box (başkasının profilinde görünür) -->
         <div id="rateBox" class="row" style="display:none">
           <input id="scoreInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px" />
           <button id="btnRate" class="btn primary">Puanla / Güncelle</button>
@@ -218,12 +220,13 @@
     const $ = (s)=>document.querySelector(s);
     const pages = {home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile')};
     const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
+    const toComma2 = (n)=> Number.isFinite(n)? n.toFixed(2).replace('.', ',') : '—';
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
-    const PRIOR_C = 25; // Bayes sanal oy ağırlığı
 
-    // Bayes puanı: (n*avg + C*M)/(n+C)
-    function bayes(avg, n, M, C=PRIOR_C){
-      return (n>0 || C>0) ? ((n*avg + C*M) / (n + C)) : avg;
+    // Ağırlıklı skor: ortalama * sqrt(oy)
+    function weighted(avg, count){
+      if(!count) return 0;
+      return avg * Math.sqrt(count);
     }
 
     const slugHandle = (s)=>{
@@ -302,20 +305,7 @@
       }
     }
 
-    /* ===== Global ortalama (genel_ortalama) hesap yardımı ===== */
-    function collectUsersSnapshot(qs){
-      const arr=[]; let totalCount=0, totalSumMicro=0;
-      qs.forEach(d=>{
-        const u=d.data(); const c=u.ratingCount||0, s=u.ratingSumMicro||0;
-        const avg = c ? (s/c)/100000 : 0;
-        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count:c});
-        totalCount += c; totalSumMicro += s;
-      });
-      const M = totalCount ? (totalSumMicro/totalCount)/100000 : 50; // hiç oy yoksa 50
-      return {arr, M};
-    }
-
-    /* ===== Home ===== */
+    /* ===== Home (Top10 ağırlıklı sıralama) ===== */
     async function renderHome(){
       showPage('home');
       try{
@@ -325,26 +315,33 @@
 
       const box = $('#homeTop10');
       const qs = await db.collection('users').get();
-      const {arr, M} = collectUsersSnapshot(qs);
-      arr.forEach(u=> u.score = bayes(u.avg, u.count, M));
-      arr.sort((a,b)=> b.score - a.score || b.avg - a.avg || b.count - a.count);
+      const arr=[];
+      qs.forEach(d=>{
+        const u=d.data(); const c=u.ratingCount||0, s=u.ratingSumMicro||0;
+        const avg=c? (s/c)/100000 : 0;
+        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count:c, w:weighted(avg,c)});
+      });
+      arr.sort((a,b)=> b.w - a.w || b.avg - a.avg || b.count - a.count);
       const top=arr.slice(0,10);
       if(top.length===0){ box.textContent='Henüz veri yok.'; return; }
-      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
-      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.score)}</td><td>${u.count}</td></tr>`);
+      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Ortalama</th><th>Oy</th><th>Ağırlıklı</th></tr></thead><tbody>';
+      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.avg)}</td><td>${u.count}</td><td>${toComma2(u.w)}</td></tr>`);
       html+='</tbody></table>'; box.innerHTML=html;
     }
 
-    /* ===== Rank ===== */
+    /* ===== Rank (ağırlıklı sıralama) ===== */
     async function renderRank(){
       showPage('rank');
       const wrap=$('#rankTableWrap'); wrap.textContent='Yükleniyor…';
       const qs=await db.collection('users').get(); $('#rankTotal').textContent='Toplam üye: '+qs.size;
-      const {arr, M} = collectUsersSnapshot(qs);
-      arr.forEach(u=> u.score = bayes(u.avg, u.count, M));
-      arr.sort((a,b)=> b.score - a.score || b.avg - a.avg || b.count - a.count);
-      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
-      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+      const arr=[];
+      qs.forEach(d=>{
+        const u=d.data(); const c=u.ratingCount||0, s=u.ratingSumMicro||0;
+        const avg=c?(s/c)/100000:0; arr.push({id:d.id, name:u.displayName||'(İsimsiz)', avg, count:c, w:weighted(avg,c)});
+      });
+      arr.sort((a,b)=> b.w - a.w || b.avg - a.avg || b.count - a.count);
+      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Ortalama</th><th>Oy</th><th>Ağırlıklı</th><th>Profil</th></tr></thead><tbody>';
+      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.avg)}</td><td>${u.count}</td><td>${toComma2(u.w)}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
       html+='</tbody></table>'; wrap.innerHTML=html;
     }
 
@@ -354,25 +351,28 @@
     async function renderProfile(uid){
       showPage('profile'); currentProfileUid=uid;
 
-      // kullanıcı aggregate
+      // aggregate + rank
       const uRef = db.collection('users').doc(uid);
       const uDoc = await uRef.get();
       if(!uDoc.exists){ $('#pageProfile .bd').innerHTML='<p class="muted">Kullanıcı bulunamadı.</p>'; return; }
       const udat=uDoc.data();
       const cnt=udat.ratingCount||0, sum=udat.ratingSumMicro||0;
       const avg=cnt? (sum/cnt)/100000 : 0;
-
-      // tüm kullanıcılar üzerinden M ve sıralama
-      const all=await db.collection('users').get();
-      const {arr, M} = collectUsersSnapshot(all);
-      const myScore = bayes(avg, cnt, M);
-      $('#profScore').textContent = 'Puan: '+toComma5(myScore);
+      const w = weighted(avg, cnt);
+      $('#profAvg').textContent = 'Ortalama: '+toComma5(avg);
       $('#profCount').textContent = 'Oy: '+cnt;
+      $('#profWeighted').textContent = 'Ağırlıklı: '+toComma2(w);
 
-      arr.forEach(u=> u.score = bayes(u.avg, u.count, M));
-      arr.sort((a,b)=> b.score - a.score || b.avg - a.avg || b.count - a.count);
-      const pos=arr.findIndex(x=>x.id===uid);
-      $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
+      try{
+        const all=await db.collection('users').get();
+        const arr=[]; all.forEach(d=>{
+          const x=d.data(); const c=x.ratingCount||0, s=x.ratingSumMicro||0; const a=c?(s/c)/100000:0;
+          arr.push({id:d.id, w:weighted(a,c), a, c});
+        });
+        arr.sort((a,b)=> b.w - a.w || b.a - a.a || b.c - a.c);
+        const pos=arr.findIndex(x=>x.id===uid);
+        $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
+      }catch{ $('#profRank').textContent='Sıra: —'; }
 
       // profile doc
       const pRef=db.collection('profiles').doc(uid);
@@ -387,7 +387,7 @@
       $('#profAvatar').src = p.photoURL || '';
       const meta=[];
       if(p.location) meta.push('📍 '+p.location);
-      if(p.website)  meta.push('🔗 '+normUrl(p.website));
+      if(p.website)  meta.push('🔗 '+p.website);
       $('#profMeta').textContent = meta.join('   ');
 
       const own = me && me.uid===uid;
@@ -477,10 +477,7 @@
     $('#edSave').onclick = async ()=>{
       if(!me){ $('#edMsg').textContent='Oturum yok.'; return; }
       const name = $('#edName').value.trim();
-      let handle  = (()=>{
-        const s = ($('#edHandle').value || '').toString().trim().toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/_+/g,'_');
-        return s.length<3 ? s.padEnd(3,'0') : (s.length>15 ? s.slice(0,15) : s);
-      })();
+      let handle  = slugHandle($('#edHandle').value || '');
       const bio   = $('#edBio').value.trim().slice(0,160);
       const location = $('#edLoc').value.trim();
       const website  = normUrl($('#edWeb').value.trim());
