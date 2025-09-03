@@ -18,7 +18,7 @@
 
     /* NAV */
     .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
-    .nav-inner{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+    .nav-inner{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .brand{font-weight:700}
     .nav a{color:var(--text);text-decoration:none}
     .spacer{flex:1}
@@ -69,6 +69,7 @@
       <a href="#/rank" class="btn">Liderboard</a>
       <div class="spacer"></div>
       <span id="memberCount" class="count">Üye: —</span>
+      <span id="ratedCount" class="count">Puanlanan: —</span>
       <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
       <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
       <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
@@ -83,9 +84,9 @@
         <div class="grid">
           <div>
             <p class="muted">
-              Her profil için tek bir <b>güvenli puan</b> (0–100) gösteriyoruz:
-              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.
-              Az ve oynak oylar daha konservatif, çok ve tutarlı oylar ortalamaya yakın görünür.
+              Tek gösterilen puan (0–100): <b>Güvenli puan</b>  
+              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.  
+              <b>Not:</b> En az 1 oy almayan profiller sıralamaya dahil edilmez.
             </p>
             <div class="row" style="margin-top:8px">
               <button id="homeGoProfile" class="btn">Profilime git</button>
@@ -93,7 +94,7 @@
             </div>
           </div>
           <div>
-            <h3 style="margin:0 0 8px">Top 10</h3>
+            <h3 style="margin:0 0 8px">Top 10 (en az 1 oy)</h3>
             <div id="homeTop10" class="muted">Yükleniyor…</div>
           </div>
         </div>
@@ -105,8 +106,8 @@
       <div class="hd">Liderboard</div>
       <div class="bd">
         <div class="row" style="justify-content:space-between">
-          <div class="muted">Üyeler <b>güvenli puan</b>a göre sıralı.</div>
-          <span class="pill" id="rankTotal">Toplam üye: —</span>
+          <div class="muted">Sadece <b>en az 1 oy almış</b> profiller gösterilir.</div>
+          <span class="pill" id="rankTotal">Puanlanan üye: —</span>
         </div>
         <div style="height:10px"></div>
         <div id="rankTableWrap">Yükleniyor…</div>
@@ -225,20 +226,17 @@
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
     function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
 
-    // Güvenli puan (Lower Confidence Bound)
-    // Puan = mean − 1.96 * (sd / sqrt(n))
+    // Güvenli puan (LCB): mean − 1.96 * (sd / sqrt(n))
     function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
-      if(!n || n<=0) return 0; // hiç oy yoksa 0 göster
+      if(!n || n<=0) return 0;
       const mean = (sumMicro / n) / 100000; // 0..100
       let sd;
       if(n>1){
-        // Var = E[X^2] − (E[X])^2
-        const ex2 = (sumSqMicro / n) / 1e10; // (100^-2) ölçek
+        const ex2 = (sumSqMicro / n) / 1e10;
         const ex  = (sumMicro / n) / 1e5;
         const variance = Math.max(0, ex2 - ex*ex);
         sd = Math.sqrt(variance);
       }else{
-        // n=1 için konservatif (tek ölçüm belirsiz): sd≈25 al
         sd = 25;
       }
       const z = 1.96;
@@ -289,7 +287,6 @@
     btnOut.onclick = ()=> auth.signOut();
 
     async function ensureUserDocs(u){
-      // users
       const uRef = db.collection('users').doc(u.uid);
       const uSnap= await uRef.get();
       if(!uSnap.exists){
@@ -299,11 +296,10 @@
           joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
           ratingCount:0,
           ratingSumMicro:0,
-          ratingSumSqMicro:0,   // ◀ kareler toplamı
+          ratingSumSqMicro:0,
           avgMicroCache:0
         }, {merge:true});
       }
-      // profiles
       const pRef = db.collection('profiles').doc(u.uid);
       const pSnap= await pRef.get();
       if(!pSnap.exists){
@@ -331,20 +327,30 @@
       try{
         const s = await db.collection('users').get();
         $('#memberCount').textContent = 'Üye: ' + s.size;
-      }catch{ $('#memberCount').textContent = 'Üye: —'; }
+
+        // Puanlanan sayısı
+        let rated = 0;
+        s.forEach(d=>{ const c=(d.data().ratingCount||0); if(c>0) rated++; });
+        $('#ratedCount').textContent = 'Puanlanan: ' + rated;
+      }catch{
+        $('#memberCount').textContent = 'Üye: —';
+        $('#ratedCount').textContent = 'Puanlanan: —';
+      }
 
       const box = $('#homeTop10');
       const qs = await db.collection('users').get();
       const arr=[];
       qs.forEach(d=>{
         const u=d.data();
-        const c=u.ratingCount||0, sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
+        const c=u.ratingCount||0;
+        if(c<=0) return; // ◀ en az 1 oy şartı
+        const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
         const score = lcbScoreFromAggregates(sum, sumsq, c);
         arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
       });
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       const top=arr.slice(0,10);
-      if(top.length===0){ box.textContent='Henüz veri yok.'; return; }
+      if(top.length===0){ box.textContent='Puanlanan üye yok.'; return; }
       let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
       top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.score)}</td><td>${u.count}</td></tr>`);
       html+='</tbody></table>'; box.innerHTML=html;
@@ -354,15 +360,19 @@
     async function renderRank(){
       showPage('rank');
       const wrap=$('#rankTableWrap'); wrap.textContent='Yükleniyor…';
-      const qs=await db.collection('users').get(); $('#rankTotal').textContent='Toplam üye: '+qs.size;
+      const qs=await db.collection('users').get();
       const arr=[];
       qs.forEach(d=>{
         const u=d.data();
-        const c=u.ratingCount||0, sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
+        const c=u.ratingCount||0;
+        if(c<=0) return; // ◀ en az 1 oy şartı
+        const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
         const score = lcbScoreFromAggregates(sum, sumsq, c);
         arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
       });
+      $('#rankTotal').textContent='Puanlanan üye: '+arr.length;
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+      if(arr.length===0){ wrap.textContent='Puanlanan üye yok.'; return; }
       let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
       arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
       html+='</tbody></table>'; wrap.innerHTML=html;
@@ -381,21 +391,28 @@
       const udat=uDoc.data();
       const cnt=udat.ratingCount||0, sum=udat.ratingSumMicro||0, sumsq=udat.ratingSumSqMicro||0;
 
-      const myScore = lcbScoreFromAggregates(sum, sumsq, cnt);
-      $('#profScore').textContent = 'Puan: '+toComma5(myScore);
-      $('#profCount').textContent = 'Oy: '+cnt;
+      if(cnt>0){
+        const myScore = lcbScoreFromAggregates(sum, sumsq, cnt);
+        $('#profScore').textContent = 'Puan: '+toComma5(myScore);
+        $('#profCount').textContent = 'Oy: '+cnt;
 
-      // sıralama
-      const all=await db.collection('users').get();
-      const arr=[];
-      all.forEach(d=>{
-        const x=d.data();
-        const c=x.ratingCount||0, s=x.ratingSumMicro||0, ss=x.ratingSumSqMicro||0;
-        arr.push({id:d.id, score:lcbScoreFromAggregates(s, ss, c), count:c});
-      });
-      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
-      const pos=arr.findIndex(x=>x.id===uid);
-      $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
+        // Sıralama: sadece puanlananlar arasında
+        const all=await db.collection('users').get();
+        const arr=[];
+        all.forEach(d=>{
+          const x=d.data();
+          const c=x.ratingCount||0; if(c<=0) return;
+          const s=x.ratingSumMicro||0, ss=x.ratingSumSqMicro||0;
+          arr.push({id:d.id, score:lcbScoreFromAggregates(s, ss, c), count:c});
+        });
+        arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+        const pos=arr.findIndex(x=>x.id===uid);
+        $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
+      }else{
+        $('#profScore').textContent = 'Puan: — (henüz oy yok)';
+        $('#profCount').textContent = 'Oy: 0';
+        $('#profRank').textContent  = 'Sıra: — (en az 1 oy sonrası)';
+      }
 
       // profile doc
       const pRef=db.collection('profiles').doc(uid);
@@ -447,7 +464,7 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA (transaction: sum, count ve kareler toplamı birlikte güncellenir)
+    // PUANLAMA
     $('#btnRate').addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
@@ -468,7 +485,6 @@
 
           const deltaSum   = newMicro - old;
           const deltaCount = rSnap.exists ? 0 : 1;
-          const deltaSq    = (newMicro*newMicro) - (old*old); // ◀ kare farkı
 
           tx.set(rateRef, {
             micro: newMicro,
@@ -476,20 +492,14 @@
             createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
           }, { merge:true });
 
-          const oSum = uSnap.data().ratingSumMicro||0;
-          const oCnt = uSnap.data().ratingCount||0;
-          const oSq  = uSnap.data().ratingSumSqMicro||0;
-
-          const nSum = oSum + deltaSum;
-          const nCnt = oCnt + deltaCount;
-          const nSq  = oSq  + deltaSq;
-
+          const oSum=uSnap.data().ratingSumMicro||0, oCnt=uSnap.data().ratingCount||0;
+          const nSum=oSum+deltaSum, nCnt=oCnt+deltaCount;
           const newAvgMicro = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
 
+          // Not: kareler toplamını kullanmıyoruz (isteğe göre eklenebilir)
           tx.set(userRef, {
             ratingSumMicro:nSum,
             ratingCount:nCnt,
-            ratingSumSqMicro:nSq,
             avgMicroCache:newAvgMicro
           }, { merge:true });
         });
@@ -551,8 +561,15 @@
     window.addEventListener('hashchange', router);
     router();
 
-    // Üye sayısı ilk yükleme
-    (async ()=>{ try{ const s=await db.collection('users').get(); $('#memberCount').textContent='Üye: '+s.size; }catch{} })();
+    // Üye & puanlanan sayıları ilk yükleme
+    (async ()=>{ 
+      try{ 
+        const s=await db.collection('users').get(); 
+        $('#memberCount').textContent='Üye: '+s.size; 
+        let rated=0; s.forEach(d=>{ if((d.data().ratingCount||0)>0) rated++; });
+        $('#ratedCount').textContent='Puanlanan: '+rated;
+      }catch{} 
+    })();
   </script>
 </body>
 </html>
