@@ -16,13 +16,24 @@
     html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
 
-    /* NAV */
-    .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
-    .nav-inner{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .brand{font-weight:700}
-    .nav a{color:var(--text);text-decoration:none}
-    .spacer{flex:1}
-    .count{color:var(--muted);font-size:14px}
+    /* NAV (sol–orta–sağ) */
+    .nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+    .nav-inner{
+      max-width:1080px;margin:0 auto;padding:10px 16px;
+      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+    }
+    .left,.right{display:flex;gap:10px;align-items:center}
+    .right{justify-content:flex-end}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .nav a,.nav button{color:var(--text);text-decoration:none}
+
+    /* Subbar (piann altında hoş geldin & sayaçlar) */
+    .subbar{background:#fff;border-bottom:1px solid var(--line)}
+    .subbar-inner{
+      max-width:1080px;margin:0 auto;padding:6px 16px 12px;text-align:center
+    }
+    .welcome{font-weight:600}
+    .counts{color:var(--muted);font-size:14px;margin-top:2px}
 
     /* LAYOUT */
     .wrap{max-width:1080px;margin:24px auto 64px;padding:0 16px}
@@ -64,15 +75,27 @@
   <!-- NAV -->
   <div class="nav">
     <div class="nav-inner">
-      <div class="brand">piann</div>
-      <a href="#/" class="btn">Ana sayfa</a>
-      <a href="#/rank" class="btn">Liderboard</a>
-      <div class="spacer"></div>
-      <span id="memberCount" class="count">Üye: —</span>
-      <span id="ratedCount" class="count">Puanlanan: —</span>
-      <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
-      <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
-      <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
+      <div class="left">
+        <a href="#/" class="btn">Ana sayfa</a>
+        <a href="#/rank" class="btn">Liderboard</a>
+      </div>
+      <div class="center">
+        <div class="brand">piann</div>
+      </div>
+      <div class="right">
+        <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
+        <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
+        <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
+      </div>
+    </div>
+    <div class="subbar">
+      <div class="subbar-inner">
+        <div id="welcomeText" class="welcome">Hoş geldin 👋</div>
+        <div class="counts">
+          <span id="memberCount">Üye: —</span> ·
+          <span id="ratedCount">Puanlanan: —</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -275,11 +298,13 @@
       me=u;
       if(u){
         btnIn.style.display='none'; btnOut.style.display='inline-block'; btnMy.style.display='inline-block';
-        btnMy.href = '#/u/'+u.uid; homeGoProfile.onclick = ()=> location.hash = '#/u/'+u.uid;
+        btnMy.href = '#/u/'+u.uid; homeGoProfile && (homeGoProfile.onclick = ()=> location.hash = '#/u/'+u.uid);
+        $('#welcomeText').textContent = 'Hoş geldin, ' + (u.displayName || u.email || 'kullanıcı') + ' 👋';
         await ensureUserDocs(u);
       }else{
         btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
-        homeGoProfile.onclick = ()=> alert('Önce giriş yap');
+        $('#welcomeText').textContent = 'Hoş geldin 👋';
+        homeGoProfile && (homeGoProfile.onclick = ()=> alert('Önce giriş yap'));
       }
       router();
     });
@@ -287,6 +312,7 @@
     btnOut.onclick = ()=> auth.signOut();
 
     async function ensureUserDocs(u){
+      // users
       const uRef = db.collection('users').doc(u.uid);
       const uSnap= await uRef.get();
       if(!uSnap.exists){
@@ -297,9 +323,11 @@
           ratingCount:0,
           ratingSumMicro:0,
           ratingSumSqMicro:0,
-          avgMicroCache:0
+          avgMicroCache:0,
+          scoreLCB:0
         }, {merge:true});
       }
+      // profiles
       const pRef = db.collection('profiles').doc(u.uid);
       const pSnap= await pRef.get();
       if(!pSnap.exists){
@@ -321,29 +349,28 @@
       }
     }
 
-    /* ===== Home ===== */
-    async function renderHome(){
-      showPage('home');
+    /* ===== Sayaçlar + Home Top10 ===== */
+    async function refreshCounts(){
       try{
         const s = await db.collection('users').get();
         $('#memberCount').textContent = 'Üye: ' + s.size;
-
-        // Puanlanan sayısı
-        let rated = 0;
-        s.forEach(d=>{ const c=(d.data().ratingCount||0); if(c>0) rated++; });
-        $('#ratedCount').textContent = 'Puanlanan: ' + rated;
+        let rated = 0; s.forEach(d=>{ if((d.data().ratingCount||0)>0) rated++; });
+        $('#ratedCount').textContent  = 'Puanlanan: ' + rated;
       }catch{
         $('#memberCount').textContent = 'Üye: —';
-        $('#ratedCount').textContent = 'Puanlanan: —';
+        $('#ratedCount').textContent  = 'Puanlanan: —';
       }
+    }
 
+    async function renderHome(){
+      showPage('home');
+      refreshCounts();
       const box = $('#homeTop10');
       const qs = await db.collection('users').get();
       const arr=[];
       qs.forEach(d=>{
         const u=d.data();
-        const c=u.ratingCount||0;
-        if(c<=0) return; // ◀ en az 1 oy şartı
+        const c=u.ratingCount||0; if(c<=0) return; // en az 1 oy
         const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
         const score = lcbScoreFromAggregates(sum, sumsq, c);
         arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
@@ -364,8 +391,7 @@
       const arr=[];
       qs.forEach(d=>{
         const u=d.data();
-        const c=u.ratingCount||0;
-        if(c<=0) return; // ◀ en az 1 oy şartı
+        const c=u.ratingCount||0; if(c<=0) return;
         const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
         const score = lcbScoreFromAggregates(sum, sumsq, c);
         arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
@@ -383,6 +409,7 @@
 
     async function renderProfile(uid){
       showPage('profile'); currentProfileUid=uid;
+      refreshCounts();
 
       // kullanıcı aggregate
       const uRef = db.collection('users').doc(uid);
@@ -464,7 +491,7 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA
+    // PUANLAMA (sum, count, kareler toplamı ve scoreLCB birlikte güncellenir)
     $('#btnRate').addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
@@ -485,6 +512,7 @@
 
           const deltaSum   = newMicro - old;
           const deltaCount = rSnap.exists ? 0 : 1;
+          const deltaSq    = (newMicro*newMicro) - (old*old); // kare farkı
 
           tx.set(rateRef, {
             micro: newMicro,
@@ -492,15 +520,19 @@
             createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
           }, { merge:true });
 
-          const oSum=uSnap.data().ratingSumMicro||0, oCnt=uSnap.data().ratingCount||0;
-          const nSum=oSum+deltaSum, nCnt=oCnt+deltaCount;
+          const o = uSnap.data();
+          const nSum = (o.ratingSumMicro||0)   + deltaSum;
+          const nCnt = (o.ratingCount||0)      + deltaCount;
+          const nSq  = (o.ratingSumSqMicro||0) + deltaSq;
           const newAvgMicro = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
+          const newScore = lcbScoreFromAggregates(nSum, nSq, nCnt);
 
-          // Not: kareler toplamını kullanmıyoruz (isteğe göre eklenebilir)
           tx.set(userRef, {
             ratingSumMicro:nSum,
             ratingCount:nCnt,
-            avgMicroCache:newAvgMicro
+            ratingSumSqMicro:nSq,
+            avgMicroCache:newAvgMicro,
+            scoreLCB:newScore
           }, { merge:true });
         });
         msg.textContent='Kaydedildi ✔'; msg.className='ok';
@@ -561,15 +593,8 @@
     window.addEventListener('hashchange', router);
     router();
 
-    // Üye & puanlanan sayıları ilk yükleme
-    (async ()=>{ 
-      try{ 
-        const s=await db.collection('users').get(); 
-        $('#memberCount').textContent='Üye: '+s.size; 
-        let rated=0; s.forEach(d=>{ if((d.data().ratingCount||0)>0) rated++; });
-        $('#ratedCount').textContent='Puanlanan: '+rated;
-      }catch{} 
-    })();
+    // ilk sayaç güncellemesi
+    refreshCounts();
   </script>
 </body>
 </html>
