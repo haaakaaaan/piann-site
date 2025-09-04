@@ -11,8 +11,8 @@
       --card:#ffffff; --line:#e6e9ef;
       --accent:#0A66C2; --accent-600:#0857A6;
       --ok:#10b981; --err:#ef4444;
-      /* ▶ container genişliği (istersen 1600px yap) */
       --container: min(1600px, 96vw);
+      --ink:#0f1419; --login-muted:#536471;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -71,6 +71,32 @@
     .ok{color:var(--ok)} .err{color:var(--err)}
 
     footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
+
+    /* === X tarzı LOGIN sayfası === */
+    .login-wrap{
+      min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
+      background:#fff; color:var(--ink);
+    }
+    .login-left{display:grid; place-items:center; border-right:1px solid var(--line); padding:6vh 4vw;}
+    .login-left img{width:min(38vw,420px); height:auto; display:block; opacity:.92;}
+    .login-right{padding:6vh 6vw; display:flex; flex-direction:column; gap:28px; justify-content:center; max-width:640px;}
+    .login-hero{font-size: clamp(28px, 5vw, 64px); line-height:1.04; font-weight:800; letter-spacing:-.02em; margin:0;}
+    .login-sub{ font-size: clamp(18px, 2.3vw, 28px); margin:6px 0 0; color:var(--ink); font-weight:700;}
+    .login-stack{ display:flex; flex-direction:column; gap:12px; margin-top:10px;}
+    .login-btn{ border:1px solid var(--line); background:#fff; color:var(--ink); padding:14px 18px; border-radius:9999px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:16px;}
+    .login-btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink);}
+    .login-sep{ text-align:center; color:var(--login-muted); font-size:13px; }
+    .login-terms{ color:var(--login-muted); font-size:12px; line-height:1.4; }
+
+    /* Login sayfasında üst nav/subbar gizle */
+    body.is-login .nav{display:none}
+    body.is-login .wrap, body.is-login footer{display:none}
+
+    @media (max-width: 900px){
+      .login-wrap{ grid-template-columns:1fr; }
+      .login-left{ display:none; }
+      .login-right{ padding:8vh 24px; max-width:720px; margin:0 auto; }
+    }
   </style>
 </head>
 <body>
@@ -101,6 +127,38 @@
     </div>
   </div>
 
+  <!-- === LOGIN (X tarzı) === -->
+  <section id="pageLogin" style="display:none">
+    <div class="login-wrap">
+      <div class="login-left">
+        <!-- Kendi logon: yolunu değiştir -->
+        <img src="assets/your-logo.svg" alt="piann logo">
+      </div>
+      <div class="login-right">
+        <h1 class="login-hero">Şu anda olup bitenler</h1>
+        <p class="login-sub">Hemen katıl.</p>
+
+        <div class="login-stack">
+          <button id="btnGoogleLogin" class="login-btn">
+            <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3A12.9 12.9 0 1 1 24 11a12.8 12.8 0 0 1 8.6 3.3l5.7-5.7C34.5 4.6 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22 20-9 20-22c0-1.2-.1-2.3-.4-3.5z"/>
+              <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8A12.9 12.9 0 0 1 24 11c3.3 0 6.3 1.2 8.6 3.3l5.7-5.7C34.5 4.6 29.6 2 24 2 15 2 7.5 7.2 6.3 14.7z"/>
+              <path fill="#4CAF50" d="M24 46c5.4 0 10.3-1.9 14.1-5.1l-6.5-5.3A12.7 12.7 0 0 1 24 37a12.9 12.9 0 0 1-11.2-6.8l-6.6 5A21.9 21.9 0 0 0 24 46z"/>
+              <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.3-3.5 6.1-6.7 7.6l6.5 5.3C38.9 38.5 42 32 42 24c0-1.2-.1-2.3-.4-3.5z"/>
+            </svg>
+            Google ile giriş yap
+          </button>
+
+          <div class="login-sep">veya</div>
+
+          <button id="btnVisit" class="login-btn primary">Ziyaretçi olarak devam et</button>
+          <p class="login-terms">Devam ederek Şartlar ve Gizlilik’e onay vermiş olursun.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === APP (Home / Rank / Profile) === -->
   <main class="wrap">
     <!-- HOME -->
     <section id="pageHome" class="card" style="display:none">
@@ -230,7 +288,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    /* Firebase config — piann-c58b8 (API key’ini domainle kısıtladığın için burada görünmesi sorun değil) */
+    /* Firebase config — piann-c58b8 */
     const firebaseConfig = {
       apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
       authDomain: "piann-c58b8.firebaseapp.com",
@@ -245,10 +303,19 @@
 
     /* ===== Helpers ===== */
     const $ = (s)=>document.querySelector(s);
-    const pages = {home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile')};
+    const pages = {
+      login:  $('#pageLogin'),
+      home:   $('#pageHome'),
+      rank:   $('#pageRank'),
+      profile:$('#pageProfile')
+    };
     const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
     function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
+    function showPage(name){
+      Object.entries(pages).forEach(([k,el])=> el && (el.style.display = k===name ? 'block':'none'));
+      document.body.classList.toggle('is-login', name==='login');
+    }
 
     // Güvenli puan (LCB)
     function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
@@ -286,15 +353,11 @@
       if(!(r>0 && r<=100)) return null;
       return {val:r, micro:Math.round(r*100000)};
     }
-    function showPage(name){
-      pages.home.style.display = name==='home' ? 'block':'none';
-      pages.rank.style.display = name==='rank' ? 'block':'none';
-      pages.profile.style.display = name==='profile' ? 'block':'none';
-    }
 
     /* ===== Auth ===== */
     let me=null;
     const btnIn=$('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile'), homeGoProfile=$('#homeGoProfile');
+
     auth.onAuthStateChanged(async (u)=>{
       me=u;
       if(u){
@@ -302,15 +365,28 @@
         btnMy.href = '#/u/'+u.uid; homeGoProfile && (homeGoProfile.onclick = ()=> location.hash = '#/u/'+u.uid);
         $('#welcomeText').textContent = 'Hoş geldin, ' + (u.displayName || u.email || 'kullanıcı') + ' 👋';
         await ensureUserDocs(u);
+        // Eğer login sayfasındaysak ana sayfaya geç
+        if((location.hash||'').startsWith('#/login')) location.hash = '#/';
       }else{
         btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
         $('#welcomeText').textContent = 'Hoş geldin 👋';
         homeGoProfile && (homeGoProfile.onclick = ()=> alert('Önce giriş yap'));
+        // Oturum yoksa varsayılan rota login olsun
+        if(!location.hash || location.hash==='#/' || location.hash==='#')
+          location.hash = '#/login';
       }
       router();
     });
+
+    // Nav'daki Google giriş
     btnIn.onclick = async ()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert(e.message); } };
     btnOut.onclick = ()=> auth.signOut();
+
+    // Login ekrandaki butonlar
+    const btnGoogleLogin = $('#btnGoogleLogin');
+    if(btnGoogleLogin) btnGoogleLogin.onclick = ()=> btnIn.click();
+    const btnVisit = $('#btnVisit');
+    if(btnVisit) btnVisit.onclick = ()=> location.hash = '#/rank';
 
     async function ensureUserDocs(u){
       const uRef = db.collection('users').doc(u.uid);
@@ -541,7 +617,7 @@
       $('#edHandle').value = p.handle || '';
       $('#edBio').value    = p.bio || '';
       $('#edLoc').value    = p.location || '';
-      $('#edWeb').value    = p.website || '';
+      $('#edWeb').value    = normUrl(p.website || '');
       $('#edAvatar').value = p.photoURL || '';
       $('#edCover').value  = p.coverURL || '';
       $('#editBack').style.display='flex';
@@ -578,16 +654,19 @@
 
     /* ===== Router ===== */
     function router(){
-      const h=location.hash||'#/';
+      const h=location.hash || (me ? '#/' : '#/login');
+      if(h==='#/login'){ showPage('login'); return; }
       if(h==='#/'||h==='#'){ renderHome(); return; }
       if(h.startsWith('#/rank')){ renderRank(); return; }
       if(h.startsWith('#/u/')){ renderProfile(h.split('/')[2]); return; }
-      renderHome();
+      // bilinmeyen rota => login ya da home
+      if(me){ renderHome(); } else { showPage('login'); }
     }
     window.addEventListener('hashchange', router);
     router();
+
+    // İlk sayım
     refreshCounts();
   </script>
 </body>
 </html>
-
