@@ -1,82 +1,134 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>piann — puan & sıralama</title>
-  <style>
-    :root{
-      --bg:#f7f8fb; --text:#0f172a; --muted:#64748b;
-      --line:#e6e9ef; --ink:#0f1419;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>piann — puan & sıralama</title>
+<style>
+  :root{
+    --blue:#0A66C2; --bg:var(--blue); --text:#fff; --muted:#D7E6F7;
+    --line:rgba(255,255,255,.22); --ink:#0f1419;
+    --container:min(1600px,96vw);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
 
-    /* Sadece statik nav */
-    .nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line)}
-    .nav-inner{max-width:min(1600px,96vw);margin:0 auto;padding:12px 20px;
-      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
-    .left,.right{display:flex;gap:10px;align-items:center}
-    .right{justify-content:flex-end}
-    .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600;text-decoration:none;color:var(--text)}
-    .btn.primary{background:#0f1419;color:#fff;border-color:#0f1419}
+  .nav{position:sticky;top:0;background:transparent;border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--container);margin:0 auto;padding:12px 20px;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+  .left,.right{display:flex;gap:10px;align-items:center}
+  .right{justify-content:flex-end}
+  .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--text);cursor:pointer;font-weight:600;text-decoration:none}
+  .btn.primary{background:#fff;color:#0A66C2;border-color:#fff}
+  .btn:hover{opacity:.92}
+  #userBox{font-size:14px;color:var(--muted)}
 
-    /* Login görünümü */
-    .login-wrap{min-height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1fr;background:#fff;color:var(--ink)}
-    .login-left{display:grid;place-items:center;border-right:1px solid var(--line);padding:6vh 4vw}
-    .login-left img{width:min(52vw,640px);height:auto;display:block;opacity:.96}
-    .login-right{padding:6vh 6vw;display:flex;flex-direction:column;gap:28px;justify-content:center;max-width:640px}
-    .login-hero{font-size:clamp(28px,5vw,64px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:0}
-    .login-sub{font-size:clamp(18px,2.3vw,28px);margin:6px 0 0;font-weight:700}
-    .login-stack{display:flex;flex-direction:column;gap:12px;margin-top:10px}
-    .login-btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:14px 18px;border-radius:9999px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px}
-    .login-btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
-    .login-sep{text-align:center;color:#536471;font-size:13px}
-    .login-terms{color:#536471;font-size:12px;line-height:1.4}
-
-    @media (max-width:900px){
-      .login-wrap{grid-template-columns:1fr}
-      .login-left{display:none}
-      .login-right{padding:8vh 24px;max-width:720px;margin:0 auto}
-    }
-    footer{margin:24px 0;text-align:center;color:#64748b;font-size:12px}
-  </style>
+  .login-wrap{min-height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1fr;color:#fff}
+  .login-left{display:grid;place-items:center;border-right:1px solid var(--line);padding:6vh 4vw}
+  .login-left img{width:min(52vw,640px);height:auto;display:block;filter:drop-shadow(0 10px 28px rgba(0,0,0,.25))}
+  .login-right{padding:6vh 6vw;display:flex;flex-direction:column;gap:28px;justify-content:center;max-width:640px}
+  .login-hero{font-size:clamp(28px,5vw,64px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:0}
+  .login-sub{font-size:clamp(18px,2.3vw,28px);margin:6px 0 0;font-weight:700;color:#fff;opacity:.95}
+  .login-stack{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+  .login-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 18px;border-radius:9999px;font-weight:700;font-size:16px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;text-decoration:none;cursor:pointer}
+  .login-btn.primary{background:#fff;color:#0A66C2;border-color:#fff}
+  .login-btn:hover{filter:brightness(1.04)}
+  .login-sep{text-align:center;color:var(--muted);font-size:13px}
+  .login-terms{color:var(--muted);font-size:12px;line-height:1.4}
+  @media (max-width:900px){
+    .login-wrap{grid-template-columns:1fr}
+    .login-left{display:none}
+    .login-right{padding:8vh 24px;max-width:720px;margin:0 auto}
+  }
+  footer{margin:24px 0;text-align:center;color:var(--muted);font-size:12px}
+</style>
 </head>
 <body>
-  <!-- Basit nav (statik) -->
+  <!-- NAV -->
   <div class="nav">
     <div class="nav-inner">
       <div class="left">
-        <a class="btn" href="#">Ana sayfa</a>
-        <a class="btn" href="#">Liderboard</a>
+        <a class="btn" href="#/">Ana sayfa</a>
+        <a class="btn" href="#/rank">Liderboard</a>
       </div>
       <div class="center" style="font-weight:800">piann</div>
       <div class="right">
-        <a class="btn primary" href="#">Google ile giriş yap</a>
+        <span id="userBox">Misafir</span>
+        <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
+        <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
       </div>
     </div>
   </div>
 
-  <!-- Login -->
-  <main class="login-wrap">
+  <!-- LOGIN -->
+  <main class="login-wrap" id="pageLogin">
     <div class="login-left">
-      <!-- LOGO: dosya adı kesin 'assets/logo.png' olmalı -->
-      <img src="assets/logo.png?v=3" alt="Piann logo">
+      <img src="assets/logo.png?v=5" alt="Piann logo">
     </div>
     <div class="login-right">
       <h1 class="login-hero">Adil puan, net sıralama</h1>
       <p class="login-sub">Hemen katıl.</p>
-
       <div class="login-stack">
-        <button class="login-btn">Google ile giriş yap</button>
+        <button id="btnGoogleLogin" class="login-btn">Google ile giriş yap</button>
         <div class="login-sep">veya</div>
-        <button class="login-btn primary">Ziyaretçi olarak devam et</button>
+        <a class="login-btn primary" href="#/rank">Ziyaretçi olarak devam et</a>
         <p class="login-terms">Devam ederek Şartlar ve Gizlilik’e onay vermiş olursun.</p>
       </div>
     </div>
   </main>
 
   <footer>© piann.com</footer>
+
+  <!-- Firebase (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script>
+  // ---- Firebase config (seninki) ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
+    authDomain: "piann-c58b8.firebaseapp.com",
+    projectId: "piann-c58b8",
+    storageBucket: "piann-c58b8.appspot.com",
+    messagingSenderId: "1086334896697",
+    appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // ---- UI elemanları ----
+  const $ = (s)=>document.querySelector(s);
+  const btnIn = $('#btnSignIn');
+  const btnOut= $('#btnSignOut');
+  const btnGoogleLogin = $('#btnGoogleLogin');
+  const userBox = $('#userBox');
+
+  // Sign-in tıklaması (popup)
+  function doSignIn(){
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(err=>{
+      alert('Giriş hatası: ' + (err && err.message ? err.message : err));
+    });
+  }
+  btnIn.onclick = doSignIn;
+  if(btnGoogleLogin) btnGoogleLogin.onclick = doSignIn;
+
+  // Çıkış
+  btnOut.onclick = ()=> auth.signOut();
+
+  // Duruma göre UI güncelle
+  auth.onAuthStateChanged(u=>{
+    if(u){
+      userBox.textContent = (u.displayName || u.email || 'Kullanıcı');
+      btnIn.style.display='none';
+      btnOut.style.display='inline-block';
+    }else{
+      userBox.textContent = 'Misafir';
+      btnOut.style.display='none';
+      btnIn.style.display='inline-block';
+    }
+  });
+  </script>
 </body>
 </html>
