@@ -18,7 +18,7 @@
     html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
 
-    /* NAV */
+    /* NAV (sol–orta–sağ) */
     .nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
     .nav-inner{
       max-width:var(--container); margin:0 auto; padding:12px 20px;
@@ -29,8 +29,11 @@
     .brand{font-weight:800;letter-spacing:.2px}
     .nav a,.nav button{color:var(--text);text-decoration:none}
 
+    /* Subbar */
     .subbar{background:#fff;border-bottom:1px solid var(--line)}
-    .subbar-inner{max-width:var(--container); margin:0 auto; padding:8px 20px 14px; text-align:center}
+    .subbar-inner{
+      max-width:var(--container); margin:0 auto; padding:8px 20px 14px; text-align:center
+    }
     .welcome{font-weight:600}
     .counts{color:var(--muted);font-size:14px;margin-top:2px}
 
@@ -43,6 +46,7 @@
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
+    /* BUTTONS + INPUTS */
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
     .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -51,27 +55,30 @@
     input[type=text], textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
     textarea{min-height:80px;resize:vertical}
 
+    /* TABLE */
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
     th{color:#111827}
 
+    /* PROFILE */
     .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
     .kpi{display:flex;gap:10px;flex-wrap:wrap}
 
+    /* MODAL */
     .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:50}
     .modal{width:min(680px,92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
     .ok{color:var(--ok)} .err{color:var(--err)}
 
     footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 
-    /* === LOGIN === */
+    /* === X tarzı LOGIN sayfası === */
     .login-wrap{
       min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
       background:#fff; color:var(--ink);
     }
     .login-left{display:grid; place-items:center; border-right:1px solid var(--line); padding:6vh 4vw;}
-    .login-left img{width:min(52vw,640px); height:auto; display:block; opacity:.96;}
+    .login-left img{width:min(38vw,420px); height:auto; display:block; opacity:.92;}
     .login-right{padding:6vh 6vw; display:flex; flex-direction:column; gap:28px; justify-content:center; max-width:640px;}
     .login-hero{font-size: clamp(28px, 5vw, 64px); line-height:1.04; font-weight:800; letter-spacing:-.02em; margin:0;}
     .login-sub{ font-size: clamp(18px, 2.3vw, 28px); margin:6px 0 0; color:var(--ink); font-weight:700;}
@@ -81,7 +88,7 @@
     .login-sep{ text-align:center; color:var(--login-muted); font-size:13px; }
     .login-terms{ color:var(--login-muted); font-size:12px; line-height:1.4; }
 
-    /* Login'de üst kısımları gizle */
+    /* Login sayfasında üst nav/subbar gizle */
     body.is-login .nav{display:none}
     body.is-login .wrap, body.is-login footer{display:none}
 
@@ -91,21 +98,6 @@
       .login-right{ padding:8vh 24px; max-width:720px; margin:0 auto; }
     }
   </style>
-
-  <!-- Basit fallback router: JS kırılsa bile login'i göster -->
-  <script>
-  (function(){
-    function basicRouter(){
-      var h = location.hash || '';
-      if (!h || h === '#/' || h === '#') { location.hash = '#/login'; h = '#/login'; }
-      if (h === '#/login') {
-        var page = document.getElementById('pageLogin');
-        if (page){ page.style.display = 'block'; document.body.classList.add('is-login'); }
-      }
-    }
-    document.addEventListener('DOMContentLoaded', basicRouter);
-  })();
-  </script>
 </head>
 <body>
   <!-- NAV -->
@@ -115,7 +107,9 @@
         <a href="#/" class="btn">Ana sayfa</a>
         <a href="#/rank" class="btn">Liderboard</a>
       </div>
-      <div class="center"><div class="brand">piann</div></div>
+      <div class="center">
+        <div class="brand">piann</div>
+      </div>
       <div class="right">
         <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
         <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
@@ -125,33 +119,32 @@
     <div class="subbar">
       <div class="subbar-inner">
         <div id="welcomeText" class="welcome">Hoş geldin 👋</div>
-        <div class="counts"><span id="memberCount">Üye: —</span> · <span id="ratedCount">Puanlanan: —</span></div>
+        <div class="counts">
+          <span id="memberCount">Üye: —</span> ·
+          <span id="ratedCount">Puanlanan: —</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- LOGIN -->
+  <!-- === LOGIN (X tarzı) === -->
   <section id="pageLogin" style="display:none">
     <div class="login-wrap">
       <div class="login-left">
-        <img src="assets/ploginekrani.png" alt="Piann logo">
+        <!-- ✅ Logo güncellendi -->
+        <img src="assets/logo.png?v=1" alt="Piann logo">
       </div>
       <div class="login-right">
-        <h1 class="login-hero">Adil puan, net sıralama</h1>
+        <h1 class="login-hero">Adil puan,<br>net sıralama</h1>
         <p class="login-sub">Hemen katıl.</p>
 
         <div class="login-stack">
           <button id="btnGoogleLogin" class="login-btn">
-            <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-              <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3A12.9 12.9 0 1 1 24 11a12.8 12.8 0 0 1 8.6 3.3l5.7-5.7C34.5 4.6 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22 20-9 20-22c0-1.2-.1-2.3-.4-3.5z"/>
-              <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8A12.9 12.9 0 0 1 24 11c3.3 0 6.3 1.2 8.6 3.3l5.7-5.7C34.5 4.6 29.6 2 24 2 15 2 7.5 7.2 6.3 14.7z"/>
-              <path fill="#4CAF50" d="M24 46c5.4 0 10.3-1.9 14.1-5.1l-6.5-5.3A12.7 12.7 0 0 1 24 37a12.9 12.9 0 0 1-11.2-6.8l-6.6 5A21.9 21.9 0 0 0 24 46z"/>
-              <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.3-3.5 6.1-6.7 7.6l6.5 5.3C38.9 38.5 42 32 42 24c0-1.2-.1-2.3-.4-3.5z"/>
-            </svg>
             Google ile giriş yap
           </button>
 
           <div class="login-sep">veya</div>
+
           <button id="btnVisit" class="login-btn primary">Ziyaretçi olarak devam et</button>
           <p class="login-terms">Devam ederek Şartlar ve Gizlilik’e onay vermiş olursun.</p>
         </div>
@@ -159,191 +152,10 @@
     </div>
   </section>
 
-  <!-- APP (Home / Rank / Profile) -->
   <main class="wrap">
-    <section id="pageHome" class="card" style="display:none">
-      <div class="hd">Hoş geldin</div>
-      <div class="bd">
-        <div class="grid">
-          <div>
-            <p class="muted">
-              Tek gösterilen puan (0–100): <b>Güvenli puan</b>
-              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.
-              <b>Not:</b> En az 1 oy almayan profiller sıralamaya dahil edilmez.
-            </p>
-            <div class="row" style="margin-top:8px">
-              <button id="homeGoProfile" class="btn">Profilime git</button>
-              <a href="#/rank" class="btn">Liderboard’u gör</a>
-            </div>
-          </div>
-          <div>
-            <h3 style="margin:0 0 8px">Top 10 (en az 1 oy)</h3>
-            <div id="homeTop10" class="muted">Yükleniyor…</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pageRank" class="card" style="display:none">
-      <div class="hd">Liderboard</div>
-      <div class="bd">
-        <div class="row" style="justify-content:space-between">
-          <div class="muted">Sadece <b>en az 1 oy almış</b> profiller gösterilir.</div>
-          <span class="pill" id="rankTotal">Puanlanan üye: —</span>
-        </div>
-        <div style="height:10px"></div>
-        <div id="rankTableWrap">Yükleniyor…</div>
-      </div>
-    </section>
-
-    <section id="pageProfile" class="card" style="display:none">
-      <div class="hd">Profil</div>
-      <div class="bd">
-        <div class="row" style="align-items:center">
-          <img id="profAvatar" class="avatar" alt="">
-          <div style="flex:1">
-            <div id="profName" style="font-weight:800;font-size:20px">—</div>
-            <div id="profHandle" class="muted">@—</div>
-          </div>
-          <div class="row">
-            <button id="btnEdit" class="btn" style="display:none">Profili düzenle</button>
-            <button id="btnRateOpen" class="btn" style="display:none">Puan ver</button>
-            <button id="btnShare" class="btn">Paylaş</button>
-          </div>
-        </div>
-
-        <p id="profBio" class="muted" style="margin:10px 0 6px"></p>
-        <div id="profMeta" class="muted" style="font-size:14px"></div>
-
-        <div class="kpi" style="margin:12px 0">
-          <span class="pill" id="profScore">Puan: —</span>
-          <span class="pill" id="profCount">Oy: —</span>
-          <span class="pill" id="profRank">Sıra: —</span>
-        </div>
-
-        <div id="rateBox" class="row" style="display:none">
-          <input id="scoreInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px" />
-          <button id="btnRate" class="btn primary">Puanla / Güncelle</button>
-          <span id="rateMsg" class="muted"></span>
-        </div>
-
-        <h3 style="margin:18px 0 8px)">Alınan Puanlar</h3>
-        <div id="receivedList" class="muted">Yükleniyor…</div>
-      </div>
-    </section>
+    <!-- Buradan sonrası senin mevcut sayfaların (Home, Rank, Profile) aynı kalabilir -->
   </main>
 
   <footer>© piann.com</footer>
-
-  <!-- Firebase SDK (Compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-  <script>
-    /* Firebase config — piann-c58b8 */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
-      authDomain: "piann-c58b8.firebaseapp.com",
-      projectId: "piann-c58b8",
-      storageBucket: "piann-c58b8.appspot.com",
-      messagingSenderId: "1086334896697",
-      appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db   = firebase.firestore();
-
-    /* ===== Helpers ===== */
-    const $ = (s)=>document.querySelector(s);
-    const pages = { login:$('#pageLogin'), home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile') };
-    const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
-    const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
-    function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
-    function showPage(name){
-      Object.entries(pages).forEach(([k,el])=> el && (el.style.display = k===name ? 'block':'none'));
-      document.body.classList.toggle('is-login', name==='login');
-    }
-
-    // Güvenli puan (LCB)
-    function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
-      if(!n || n<=0) return 0;
-      const mean = (sumMicro / n) / 100000;
-      let sd;
-      if(n>1){
-        const ex2 = (sumSqMicro / n) / 1e10;
-        const ex  = (sumMicro / n) / 1e5;
-        const variance = Math.max(0, ex2 - ex*ex);
-        sd = Math.sqrt(variance);
-      }else{
-        sd = 25;
-      }
-      const z = 1.96;
-      const se = sd / Math.sqrt(n);
-      return clamp01_100(mean - z * se);
-    }
-
-    /* ===== Auth + Router ===== */
-    let me=null;
-    const btnIn=$('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile'), homeGoProfile=$('#homeGoProfile');
-
-    auth.onAuthStateChanged(async (u)=>{
-      me=u;
-      if(u){
-        btnIn.style.display='none'; btnOut.style.display='inline-block'; btnMy.style.display='inline-block';
-        btnMy.href = '#/u/'+u.uid; homeGoProfile && (homeGoProfile.onclick = ()=> location.hash = '#/u/'+u.uid);
-        $('#welcomeText').textContent = 'Hoş geldin, ' + (u.displayName || u.email || 'kullanıcı') + ' 👋';
-        await ensureUserDocs(u);
-        if((location.hash||'').startsWith('#/login')) location.hash = '#/';
-      }else{
-        btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
-        $('#welcomeText').textContent = 'Hoş geldin 👋';
-        homeGoProfile && (homeGoProfile.onclick = ()=> alert('Önce giriş yap'));
-        if(!location.hash || location.hash==='#/' || location.hash==='#') location.hash = '#/login';
-      }
-      router();
-    });
-
-    btnIn.onclick = async ()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert(e.message); } };
-    btnOut.onclick = ()=> auth.signOut();
-
-    const btnGoogleLogin = $('#btnGoogleLogin'); if(btnGoogleLogin) btnGoogleLogin.onclick = ()=> btnIn.click();
-    const btnVisit = $('#btnVisit'); if(btnVisit) btnVisit.onclick = ()=> location.hash = '#/rank';
-
-    async function ensureUserDocs(u){
-      const uRef = db.collection('users').doc(u.uid);
-      const uSnap= await uRef.get();
-      if(!uSnap.exists){
-        await uRef.set({
-          displayName: u.displayName || u.email || null,
-          photoURL: u.photoURL || null,
-          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          ratingCount:0, ratingSumMicro:0, ratingSumSqMicro:0, avgMicroCache:0, scoreLCB:0
-        }, {merge:true});
-      }
-      const pRef = db.collection('profiles').doc(u.uid);
-      const pSnap= await pRef.get();
-      if(!pSnap.exists){
-        const base = (u.displayName||u.email||'user').split(/[ @]/)[0].toLowerCase();
-        await pRef.set({
-          displayName: u.displayName || (u.email||'Kullanıcı'),
-          displayNameLower: (u.displayName || (u.email||'Kullanıcı')).toLowerCase(),
-          handle: base, handleLower: base, bio:'', location:'', website:'',
-          photoURL: u.photoURL || '', coverURL:'', joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, {merge:true});
-      }
-    }
-
-    function router(){
-      const h=location.hash || '#/login';
-      if(h==='#/login'){ showPage('login'); return; }
-      if(h==='#/'||h==='#'){ showPage('home'); return; }
-      if(h.startsWith('#/rank')){ showPage('rank'); return; }
-      if(h.startsWith('#/u/')){ showPage('profile'); return; }
-      showPage(me ? 'home' : 'login');
-    }
-    window.addEventListener('hashchange', router);
-    router();
-  </script>
 </body>
 </html>
