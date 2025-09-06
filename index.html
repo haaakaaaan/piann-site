@@ -4,156 +4,77 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>piann — puan & sıralama</title>
-
   <style>
     :root{
       --bg:#f7f8fb; --text:#0f172a; --muted:#64748b;
-      --card:#ffffff; --line:#e6e9ef;
-      --accent:#0A66C2; --accent-600:#0857A6;
-      --ok:#10b981; --err:#ef4444;
-      --container: min(1600px, 96vw);
-      --ink:#0f1419; --login-muted:#536471;
+      --line:#e6e9ef; --ink:#0f1419;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
 
-    /* NAV (sol–orta–sağ) */
-    .nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
-    .nav-inner{
-      max-width:var(--container); margin:0 auto; padding:12px 20px;
-      display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
-    }
+    /* Sadece statik nav */
+    .nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line)}
+    .nav-inner{max-width:min(1600px,96vw);margin:0 auto;padding:12px 20px;
+      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
     .left,.right{display:flex;gap:10px;align-items:center}
     .right{justify-content:flex-end}
-    .brand{font-weight:800;letter-spacing:.2px}
-    .nav a,.nav button{color:var(--text);text-decoration:none}
+    .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600;text-decoration:none;color:var(--text)}
+    .btn.primary{background:#0f1419;color:#fff;border-color:#0f1419}
 
-    /* Subbar */
-    .subbar{background:#fff;border-bottom:1px solid var(--line)}
-    .subbar-inner{
-      max-width:var(--container); margin:0 auto; padding:8px 20px 14px; text-align:center
+    /* Login görünümü */
+    .login-wrap{min-height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1fr;background:#fff;color:var(--ink)}
+    .login-left{display:grid;place-items:center;border-right:1px solid var(--line);padding:6vh 4vw}
+    .login-left img{width:min(52vw,640px);height:auto;display:block;opacity:.96}
+    .login-right{padding:6vh 6vw;display:flex;flex-direction:column;gap:28px;justify-content:center;max-width:640px}
+    .login-hero{font-size:clamp(28px,5vw,64px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:0}
+    .login-sub{font-size:clamp(18px,2.3vw,28px);margin:6px 0 0;font-weight:700}
+    .login-stack{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+    .login-btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:14px 18px;border-radius:9999px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px}
+    .login-btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .login-sep{text-align:center;color:#536471;font-size:13px}
+    .login-terms{color:#536471;font-size:12px;line-height:1.4}
+
+    @media (max-width:900px){
+      .login-wrap{grid-template-columns:1fr}
+      .login-left{display:none}
+      .login-right{padding:8vh 24px;max-width:720px;margin:0 auto}
     }
-    .welcome{font-weight:600}
-    .counts{color:var(--muted);font-size:14px;margin-top:2px}
-
-    /* LAYOUT */
-    .wrap{max-width:var(--container); margin:26px auto 64px; padding:0 20px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
-    .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
-    .bd{padding:16px}
-    .muted{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-
-    /* BUTTONS + INPUTS */
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
-    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-    .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    input[type=text], textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
-    textarea{min-height:80px;resize:vertical}
-
-    /* TABLE */
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
-    th{color:#111827}
-
-    /* PROFILE */
-    .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
-    .kpi{display:flex;gap:10px;flex-wrap:wrap}
-
-    /* MODAL */
-    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:50}
-    .modal{width:min(680px,92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
-    .ok{color:var(--ok)} .err{color:var(--err)}
-
-    footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
-
-    /* === X tarzı LOGIN sayfası === */
-    .login-wrap{
-      min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
-      background:#fff; color:var(--ink);
-    }
-    .login-left{display:grid; place-items:center; border-right:1px solid var(--line); padding:6vh 4vw;}
-    .login-left img{width:min(38vw,420px); height:auto; display:block; opacity:.92;}
-    .login-right{padding:6vh 6vw; display:flex; flex-direction:column; gap:28px; justify-content:center; max-width:640px;}
-    .login-hero{font-size: clamp(28px, 5vw, 64px); line-height:1.04; font-weight:800; letter-spacing:-.02em; margin:0;}
-    .login-sub{ font-size: clamp(18px, 2.3vw, 28px); margin:6px 0 0; color:var(--ink); font-weight:700;}
-    .login-stack{ display:flex; flex-direction:column; gap:12px; margin-top:10px;}
-    .login-btn{ border:1px solid var(--line); background:#fff; color:var(--ink); padding:14px 18px; border-radius:9999px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; font-size:16px;}
-    .login-btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink);}
-    .login-sep{ text-align:center; color:var(--login-muted); font-size:13px; }
-    .login-terms{ color:var(--login-muted); font-size:12px; line-height:1.4; }
-
-    /* Login sayfasında üst nav/subbar gizle */
-    body.is-login .nav{display:none}
-    body.is-login .wrap, body.is-login footer{display:none}
-
-    @media (max-width: 900px){
-      .login-wrap{ grid-template-columns:1fr; }
-      .login-left{ display:none; }
-      .login-right{ padding:8vh 24px; max-width:720px; margin:0 auto; }
-    }
+    footer{margin:24px 0;text-align:center;color:#64748b;font-size:12px}
   </style>
 </head>
 <body>
-  <!-- NAV -->
+  <!-- Basit nav (statik) -->
   <div class="nav">
     <div class="nav-inner">
       <div class="left">
-        <a href="#/" class="btn">Ana sayfa</a>
-        <a href="#/rank" class="btn">Liderboard</a>
+        <a class="btn" href="#">Ana sayfa</a>
+        <a class="btn" href="#">Liderboard</a>
       </div>
-      <div class="center">
-        <div class="brand">piann</div>
-      </div>
+      <div class="center" style="font-weight:800">piann</div>
       <div class="right">
-        <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
-        <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
-        <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
-      </div>
-    </div>
-    <div class="subbar">
-      <div class="subbar-inner">
-        <div id="welcomeText" class="welcome">Hoş geldin 👋</div>
-        <div class="counts">
-          <span id="memberCount">Üye: —</span> ·
-          <span id="ratedCount">Puanlanan: —</span>
-        </div>
+        <a class="btn primary" href="#">Google ile giriş yap</a>
       </div>
     </div>
   </div>
 
-  <!-- === LOGIN (X tarzı) === -->
-  <section id="pageLogin" style="display:none">
-    <div class="login-wrap">
-      <div class="login-left">
-        <!-- ✅ Logo güncellendi -->
-        <img src="assets/logo.png?v=1" alt="Piann logo">
-      </div>
-      <div class="login-right">
-        <h1 class="login-hero">Adil puan,<br>net sıralama</h1>
-        <p class="login-sub">Hemen katıl.</p>
+  <!-- Login -->
+  <main class="login-wrap">
+    <div class="login-left">
+      <!-- LOGO: dosya adı kesin 'assets/logo.png' olmalı -->
+      <img src="assets/logo.png?v=3" alt="Piann logo">
+    </div>
+    <div class="login-right">
+      <h1 class="login-hero">Adil puan, net sıralama</h1>
+      <p class="login-sub">Hemen katıl.</p>
 
-        <div class="login-stack">
-          <button id="btnGoogleLogin" class="login-btn">
-            Google ile giriş yap
-          </button>
-
-          <div class="login-sep">veya</div>
-
-          <button id="btnVisit" class="login-btn primary">Ziyaretçi olarak devam et</button>
-          <p class="login-terms">Devam ederek Şartlar ve Gizlilik’e onay vermiş olursun.</p>
-        </div>
+      <div class="login-stack">
+        <button class="login-btn">Google ile giriş yap</button>
+        <div class="login-sep">veya</div>
+        <button class="login-btn primary">Ziyaretçi olarak devam et</button>
+        <p class="login-terms">Devam ederek Şartlar ve Gizlilik’e onay vermiş olursun.</p>
       </div>
     </div>
-  </section>
-
-  <main class="wrap">
-    <!-- Buradan sonrası senin mevcut sayfaların (Home, Rank, Profile) aynı kalabilir -->
   </main>
 
   <footer>© piann.com</footer>
