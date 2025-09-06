@@ -78,7 +78,8 @@
       background:#fff; color:var(--ink);
     }
     .login-left{display:grid; place-items:center; border-right:1px solid var(--line); padding:6vh 4vw;}
-    .login-left img{width:min(38vw,420px); height:auto; display:block; opacity:.92;}
+    /* ← LOGO BOYUTU: X.com’a yakın */
+    .login-left img{width:min(52vw,640px); height:auto; display:block; opacity:.96;}
     .login-right{padding:6vh 6vw; display:flex; flex-direction:column; gap:28px; justify-content:center; max-width:640px;}
     .login-hero{font-size: clamp(28px, 5vw, 64px); line-height:1.04; font-weight:800; letter-spacing:-.02em; margin:0;}
     .login-sub{ font-size: clamp(18px, 2.3vw, 28px); margin:6px 0 0; color:var(--ink); font-weight:700;}
@@ -131,11 +132,12 @@
   <section id="pageLogin" style="display:none">
     <div class="login-wrap">
       <div class="login-left">
-        <!-- Kendi logon: yolunu değiştir -->
-        <img src="assets/your-logo.svg" alt="piann logo">
+        <!-- LOGO: kendi dosyan -->
+        <img src="assets/ploginekrani.png" alt="Piann logo">
       </div>
       <div class="login-right">
-        <h1 class="login-hero">Şu anda olup bitenler</h1>
+        <!-- KISA SLOGAN -->
+        <h1 class="login-hero">Adil puan, net sıralama</h1>
         <p class="login-sub">Hemen katıl.</p>
 
         <div class="login-stack">
@@ -356,7 +358,7 @@
 
     /* ===== Auth ===== */
     let me=null;
-    const btnIn=$('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile'), homeGoProfile=$('#homeGoProfile');
+    const btnIn=$('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile'), homeGoProfile=$('#homeGoProfile']);
 
     auth.onAuthStateChanged(async (u)=>{
       me=u;
@@ -365,13 +367,11 @@
         btnMy.href = '#/u/'+u.uid; homeGoProfile && (homeGoProfile.onclick = ()=> location.hash = '#/u/'+u.uid);
         $('#welcomeText').textContent = 'Hoş geldin, ' + (u.displayName || u.email || 'kullanıcı') + ' 👋';
         await ensureUserDocs(u);
-        // Eğer login sayfasındaysak ana sayfaya geç
         if((location.hash||'').startsWith('#/login')) location.hash = '#/';
       }else{
         btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
         $('#welcomeText').textContent = 'Hoş geldin 👋';
         homeGoProfile && (homeGoProfile.onclick = ()=> alert('Önce giriş yap'));
-        // Oturum yoksa varsayılan rota login olsun
         if(!location.hash || location.hash==='#/' || location.hash==='#')
           location.hash = '#/login';
       }
@@ -659,7 +659,6 @@
       if(h==='#/'||h==='#'){ renderHome(); return; }
       if(h.startsWith('#/rank')){ renderRank(); return; }
       if(h.startsWith('#/u/')){ renderProfile(h.split('/')[2]); return; }
-      // bilinmeyen rota => login ya da home
       if(me){ renderHome(); } else { showPage('login'); }
     }
     window.addEventListener('hashchange', router);
@@ -670,5 +669,3 @@
   </script>
 </body>
 </html>
-
-
