@@ -11,15 +11,16 @@
       --card:#ffffff; --line:#e6e9ef;
       --accent:#0A66C2; --accent-600:#0857A6;
       --ok:#10b981; --err:#ef4444;
+      --container:1400px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
 
-    /* NAV (sol–orta–sağ) */
+    /* NAV */
     .nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
     .nav-inner{
-      max-width:1400px; margin:0 auto; padding:10px 16px;
+      max-width:var(--container); margin:0 auto; padding:10px 16px;
       display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px;
     }
     .left,.right{display:flex;gap:10px;align-items:center}
@@ -30,13 +31,13 @@
     /* Subbar */
     .subbar{background:#fff;border-bottom:1px solid var(--line)}
     .subbar-inner{
-      max-width:1400px; margin:0 auto; padding:6px 16px 12px; text-align:center
+      max-width:var(--container); margin:0 auto; padding:6px 16px 12px; text-align:center
     }
     .welcome{font-weight:600}
     .counts{color:var(--muted);font-size:14px;margin-top:2px}
 
     /* LAYOUT */
-    .wrap{max-width:1400px;margin:24px auto 64px;padding:0 16px}
+    .wrap{max-width:var(--container);margin:24px auto 64px;padding:0 16px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
     .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
     .bd{padding:16px}
@@ -69,6 +70,29 @@
     .ok{color:var(--ok)} .err{color:var(--err)}
 
     footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
+
+    /* ===== LOGIN PAGE (mavi tema, sadece login için) ===== */
+    .login-wrap{min-height:calc(100vh - 60px);display:none;background:#0A66C2;color:#fff}
+    .login-inner{
+      max-width:min(1600px,96vw);margin:0 auto;padding:10px 20px;
+      display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center
+    }
+    .login-left{display:grid;place-items:center;border-right:1px solid rgba(255,255,255,.22);padding:6vh 4vw}
+    .login-left img{width:min(52vw,640px);height:auto;display:block;filter:drop-shadow(0 10px 28px rgba(0,0,0,.25))}
+    .login-right{padding:6vh 6vw;display:flex;flex-direction:column;gap:28px;justify-content:center;max-width:640px}
+    .login-hero{font-size:clamp(28px,5vw,64px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:0}
+    .login-sub{font-size:clamp(18px,2.3vw,28px);margin:6px 0 0;font-weight:700;color:#fff;opacity:.95}
+    .login-stack{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+    .login-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 18px;border-radius:9999px;font-weight:700;font-size:16px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;text-decoration:none;cursor:pointer}
+    .login-btn.primary{background:#fff;color:#0A66C2;border-color:#fff}
+    .login-btn:hover{filter:brightness(1.04)}
+    .login-sep{text-align:center;color:#D7E6F7;font-size:13px}
+    .login-terms{color:#D7E6F7;font-size:12px;line-height:1.4}
+    @media (max-width:900px){
+      .login-inner{grid-template-columns:1fr}
+      .login-left{display:none}
+      .login-right{padding:8vh 24px;max-width:720px;margin:0 auto}
+    }
   </style>
 </head>
 <body>
@@ -99,7 +123,28 @@
     </div>
   </div>
 
-  <main class="wrap">
+  <!-- ===== LOGIN PAGE ===== -->
+  <main id="pageLogin" class="login-wrap">
+    <div class="login-inner">
+      <div class="login-left">
+        <!-- İsteğe bağlı görsel: /assets/logo.png (yoksa gizlenir) -->
+        <img id="loginHeroImg" src="assets/logo.png" alt="Piann" onerror="this.style.display='none'">
+      </div>
+      <div class="login-right">
+        <h1 class="login-hero">Adil puan, net sıralama</h1>
+        <p class="login-sub">Hemen katıl.</p>
+        <div class="login-stack">
+          <button id="btnGoogleLogin" class="login-btn">Google ile giriş yap</button>
+          <div class="login-sep">veya</div>
+          <a class="login-btn primary" href="#/rank">Ziyaretçi olarak devam et</a>
+          <p class="login-terms">Devam ederek Şartlar ve Gizlilik’e onay vermiş olursun.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== APP PAGES ===== -->
+  <main class="wrap" id="appWrap" style="display:none">
     <!-- HOME -->
     <section id="pageHome" class="card" style="display:none">
       <div class="hd">Hoş geldin</div>
@@ -182,58 +227,13 @@
 
   <footer>© piann.com</footer>
 
-  <!-- EDIT MODAL -->
-  <div id="editBack" class="backdrop">
-    <div class="modal">
-      <div class="hd row" style="justify-content:space-between">
-        <span>Profili düzenle</span>
-        <button id="editClose" class="btn">Kapat</button>
-      </div>
-      <div class="bd" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="full" style="grid-column:1/-1">
-          <label class="muted">Görünen ad</label>
-          <input id="edName" type="text" placeholder="Ad Soyad">
-        </div>
-        <div>
-          <label class="muted">Kullanıcı adı (@)</label>
-          <input id="edHandle" type="text" placeholder="ornek_kullanici">
-          <small class="muted">3–15, harf-rakam-altçizgi. Benzersiz olmalı.</small>
-        </div>
-        <div>
-          <label class="muted">Web sitesi</label>
-          <input id="edWeb" type="text" placeholder="https://...">
-        </div>
-        <div class="full" style="grid-column:1/-1">
-          <label class="muted">Bio</label>
-          <textarea id="edBio" maxlength="160" placeholder="Kısa bio (≤160)"></textarea>
-        </div>
-        <div>
-          <label class="muted">Konum</label>
-          <input id="edLoc" type="text" placeholder="İstanbul, TR">
-        </div>
-        <div>
-          <label class="muted">Avatar (URL)</label>
-          <input id="edAvatar" type="text" placeholder="https://...">
-        </div>
-        <div class="full" style="grid-column:1/-1">
-          <label class="muted">Kapak (URL)</label>
-          <input id="edCover" type="text" placeholder="https://...">
-        </div>
-        <div class="full row" style="justify-content:flex-end">
-          <span id="edMsg" class="muted"></span>
-          <button id="edSave" class="btn primary">Kaydet</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Firebase SDK (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    /* Firebase config — piann-c58b8 (API key origin + API restricted) */
+    /* Firebase config — piann-c58b8 */
     const firebaseConfig = {
       apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
       authDomain: "piann-c58b8.firebaseapp.com",
@@ -252,11 +252,13 @@
     const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
     function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
+    const showLogin = ()=>{ $('#pageLogin').style.display='block'; $('#appWrap').style.display='none'; };
+    const showApp   = ()=>{ $('#pageLogin').style.display='none';  $('#appWrap').style.display='block'; };
 
-    // Güvenli puan (LCB): mean − 1.96 * (sd / sqrt(n))
+    // LCB
     function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
       if(!n || n<=0) return 0;
-      const mean = (sumMicro / n) / 100000; // 0..100
+      const mean = (sumMicro / n) / 100000;
       let sd;
       if(n>1){
         const ex2 = (sumSqMicro / n) / 1e10;
@@ -264,7 +266,7 @@
         const variance = Math.max(0, ex2 - ex*ex);
         sd = Math.sqrt(variance);
       }else{
-        sd = 25; // tek oyda geniş belirsizlik
+        sd = 25;
       }
       const z = 1.96;
       const se = sd / Math.sqrt(n);
@@ -298,25 +300,36 @@
     /* ===== Auth ===== */
     let me=null;
     const btnIn=$('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile'), homeGoProfile=$('#homeGoProfile');
+    const loginBtn=$('#btnGoogleLogin');
+
+    const doSignIn = async ()=>{
+      try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+      catch(e){ alert('Giriş hatası: ' + (e && e.message ? e.message : e)); }
+    };
+    btnIn.onclick = doSignIn;
+    if(loginBtn) loginBtn.onclick = doSignIn;
+    btnOut.onclick = ()=> auth.signOut();
+
     auth.onAuthStateChanged(async (u)=>{
       me=u;
       if(u){
         btnIn.style.display='none'; btnOut.style.display='inline-block'; btnMy.style.display='inline-block';
         btnMy.href = '#/u/'+u.uid; homeGoProfile && (homeGoProfile.onclick = ()=> location.hash = '#/u/'+u.uid);
         $('#welcomeText').textContent = 'Hoş geldin, ' + (u.displayName || u.email || 'kullanıcı') + ' 👋';
+        showApp();
         await ensureUserDocs(u);
+        router();
       }else{
         btnIn.style.display='inline-block'; btnOut.style.display='none'; btnMy.style.display='none';
         $('#welcomeText').textContent = 'Hoş geldin 👋';
-        homeGoProfile && (homeGoProfile.onclick = ()=> alert('Önce giriş yap'));
+        showLogin();
+        // Ziyaretçi olarak rank'a girerse router çalışsın:
+        router();
       }
-      router();
+      refreshCounts();
     });
-    btnIn.onclick = async ()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert(e.message); } };
-    btnOut.onclick = ()=> auth.signOut();
 
     async function ensureUserDocs(u){
-      // users
       const uRef = db.collection('users').doc(u.uid);
       const uSnap= await uRef.get();
       if(!uSnap.exists){
@@ -331,7 +344,6 @@
           scoreLCB:0
         }, {merge:true});
       }
-      // profiles
       const pRef = db.collection('profiles').doc(u.uid);
       const pSnap= await pRef.get();
       if(!pSnap.exists){
@@ -368,7 +380,6 @@
 
     async function renderHome(){
       showPage('home');
-      refreshCounts();
       const box = $('#homeTop10');
       try{
         const qs = await db.collection('users')
@@ -392,17 +403,12 @@
         arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.score)}</td><td>${u.count}</td></tr>`);
         html+='</tbody></table>'; box.innerHTML=html;
       }catch(e){
-        box.textContent='Hata: '+e.message;
+        box.textContent='Hata: '+e.message + ' (İlk kez görüyorsan index oluştur.)';
       }
     }
 
     /* ===== Rank (Sayfalama) ===== */
-    let rankState = {
-      pageSize: 25,
-      lastDoc: null,
-      loaded: [],
-      finished: false
-    };
+    let rankState = { pageSize:25, lastDoc:null, loaded:[], finished:false };
 
     function resetRankState(){
       rankState = { pageSize:25, lastDoc:null, loaded:[], finished:false };
@@ -464,7 +470,7 @@
         $('#btnLoadMore').style.display = snap.size < rankState.pageSize ? 'none' : 'inline-block';
         $('#rankHint').textContent = (snap.size < rankState.pageSize) ? 'Hepsi yüklendi.' : '';
       }catch(e){
-        $('#rankHint').textContent = 'Hata: '+e.message;
+        $('#rankHint').textContent = 'Hata: '+e.message + ' (İlk kez görüyorsan index oluştur.)';
       }finally{
         $('#btnLoadMore').disabled = false;
       }
@@ -482,7 +488,6 @@
 
     async function renderProfile(uid){
       showPage('profile'); currentProfileUid=uid;
-      refreshCounts();
 
       // users aggregate
       const uRef = db.collection('users').doc(uid);
@@ -496,7 +501,6 @@
         $('#profScore').textContent = 'Puan: '+toComma5(myScore);
         $('#profCount').textContent = 'Oy: '+cnt;
 
-        // Sıralama pozisyonu
         const ratedSnap = await db.collection('users').where('ratingCount','>',0).get();
         const arr=[];
         ratedSnap.forEach(d=>{
@@ -658,6 +662,13 @@
     /* ===== Router ===== */
     function router(){
       const h=location.hash||'#/';
+      // Ziyaretçi olarak rank'a izin var, diğer sayfaları login gerektir.
+      if(!me){
+        if(h.startsWith('#/rank')){ showApp(); renderRank(); return; }
+        showLogin(); return;
+      }
+      // Girişliyse:
+      showApp();
       if(h==='#/'||h==='#'){ renderHome(); return; }
       if(h.startsWith('#/rank')){ renderRank(); return; }
       if(h.startsWith('#/u/')){ renderProfile(h.split('/')[2]); return; }
@@ -666,7 +677,7 @@
     window.addEventListener('hashchange', router);
     router();
 
-    // ilk sayaç güncellemesi
+    // ilk sayaç
     refreshCounts();
   </script>
 </body>
