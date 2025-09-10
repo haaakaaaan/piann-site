@@ -169,14 +169,14 @@
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, orderBy, limit, getDocs, startAfter, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // 🔐 SENİN KONSOLUNDAKİ DEĞERLER — lütfen birebir doğrula
+    // 🔐 Kendi projenin değerleri
     const firebaseConfig = {
-      apiKey: "AIzaSyC87Iffvsv3ySQFarsguaCQ911hJFiES8Q",
+      apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
       authDomain: "piann-c58b8.firebaseapp.com",
       projectId: "piann-c58b8",
-      storageBucket: "piann-c58b8.firebasestorage.app",
-      messagingSenderId: "11806334896697",
-      appId: "1:11806334896697:web:7770adc7f9438be4a49be8"
+      storageBucket: "piann-c58b8.appspot.com",   // ✅ düzeltildi
+      messagingSenderId: "1086334896697",
+      appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -234,8 +234,8 @@
 
     async function signInWithGoogle(){
       try{
-      await signInWithPopup(auth, provider);
-    }catch(err){
+        await signInWithPopup(auth, provider);
+      }catch(err){
         console.error("Google sign-in error:", err);
         alert("Giriş başarısız: " + (err?.code || err?.message || err));
         if (err?.code === "auth/popup-blocked" || err?.code === "auth/popup-closed-by-user") {
@@ -514,4 +514,3 @@
   </script>
 </body>
 </html>
-
