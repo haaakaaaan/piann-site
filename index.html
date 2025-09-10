@@ -233,7 +233,16 @@
     }
 
     async function signInWithGoogle(){
+      try{
       await signInWithPopup(auth, provider);
+    }catch(err){
+        console.error("Google sign-in error:", err);
+        alert("Giriş başarısız: " + (err?.code || err?.message || err));
+        if (err?.code === "auth/popup-blocked" || err?.code === "auth/popup-closed-by-user") {
+          const { signInWithRedirect } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+          await signInWithRedirect(auth, provider);
+        }
+      }
     }
 
     onAuthStateChanged(auth, async (user)=>{
@@ -505,3 +514,4 @@
   </script>
 </body>
 </html>
+
