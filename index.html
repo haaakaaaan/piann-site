@@ -52,9 +52,7 @@
         <button class="btn" id="go-board">Liderboard</button>
       </div>
       <div class="nav-middle">piann</div>
-      <div class="nav-right" id="auth-area">
-        <!-- filled by JS -->
-      </div>
+      <div class="nav-right" id="auth-area"></div>
     </div>
   </nav>
 
@@ -66,9 +64,7 @@
           <div class="in">
             <h1>Profilini puanla, saygıyla sıralan.</h1>
             <p class="muted">Facebook + IMDb karması: insanlar birbirine 0-100 arası puan verir, tek görünen skor güvenli LCB olur.</p>
-            <div style="display:flex;gap:10px;margin-top:8px" id="home-cta">
-              <!-- buttons injected -->
-            </div>
+            <div style="display:flex;gap:10px;margin-top:8px" id="home-cta"></div>
             <div class="footer">Üye sayısı: <span id="stat-users">—</span> • Puanlanan: <span id="stat-rated">—</span></div>
           </div>
         </div>
@@ -90,9 +86,7 @@
         <div class="in">
           <div class="bar">
             <h2>Liderboard</h2>
-            <div>
-              <button class="btn" id="reload-board">Yenile</button>
-            </div>
+            <div><button class="btn" id="reload-board">Yenile</button></div>
           </div>
           <div id="board-list" class="list"></div>
           <div class="center" style="margin-top:12px">
@@ -146,38 +140,20 @@
       <div class="in">
         <h3>Profili Düzenle</h3>
         <div class="grid-2">
-          <div>
-            <label>Ad</label>
-            <input id="p-name" placeholder="Görünen ad" />
-          </div>
-          <div>
-            <label>@kullanıcı adı</label>
-            <input id="p-handle" placeholder="Benzersiz handle" />
-          </div>
+          <div><label>Ad</label><input id="p-name" placeholder="Görünen ad" /></div>
+          <div><label>@kullanıcı adı</label><input id="p-handle" placeholder="Benzersiz handle" /></div>
         </div>
         <div class="grid-2" style="margin-top:8px">
-          <div>
-            <label>Web</label>
-            <input id="p-web" placeholder="https://..." />
-          </div>
-          <div>
-            <label>Konum</label>
-            <input id="p-loc" placeholder="Şehir, Ülke" />
-          </div>
+          <div><label>Web</label><input id="p-web" placeholder="https://..." /></div>
+          <div><label>Konum</label><input id="p-loc" placeholder="Şehir, Ülke" /></div>
         </div>
         <div style="margin-top:8px">
           <label>Bio</label>
           <textarea id="p-bio" rows="3" placeholder="Kısa açıklama"></textarea>
         </div>
         <div class="grid-2" style="margin-top:8px">
-          <div>
-            <label>Avatar URL</label>
-            <input id="p-photo" placeholder="https://..." />
-          </div>
-          <div>
-            <label>Kapak URL</label>
-            <input id="p-cover" placeholder="https://..." />
-          </div>
+          <div><label>Avatar URL</label><input id="p-photo" placeholder="https://..." /></div>
+          <div><label>Kapak URL</label><input id="p-cover" placeholder="https://..." /></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
           <button class="btn" id="edit-cancel">İptal</button>
@@ -190,21 +166,15 @@
   <!-- Firebase v10 (modular) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp,
-      collection, query, where, orderBy, limit, getDocs, startAfter,
-      runTransaction
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, orderBy, limit, getDocs, startAfter, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // TODO: KENDİ BİLGİLERİNİ YAPIŞTIR (PASTE YOUR OWN CONFIG)
+    // 🔐 SENİN KONSOLUNDAKİ DEĞERLER — lütfen birebir doğrula
     const firebaseConfig = {
-      apiKey: "AIz...ES8Q",
+      apiKey: "AIzaSyC87Iffvsv3ySQFarsguaCQ911hJFiES8Q",
       authDomain: "piann-c58b8.firebaseapp.com",
       projectId: "piann-c58b8",
-      storageBucket: "piann-c58b8.appspot.com",
+      storageBucket: "piann-c58b8.firebasestorage.app",
       messagingSenderId: "11806334896697",
       appId: "1:11806334896697:web:7770adc7f9438be4a49be8"
     };
@@ -214,7 +184,6 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // ----- UI helpers
     const $ = (s)=>document.querySelector(s);
     const home = $("#home"), board=$("#board"), profile=$("#profile");
     const authArea = $("#auth-area"), homeCta=$("#home-cta");
@@ -228,7 +197,7 @@
     const editBtn=$("#edit-profile"), signOutBtn=$("#sign-out");
 
     let currentUser=null;
-    let lastCursor=null; // for pagination
+    let lastCursor=null;
     let visitorMode=false;
     let rateTarget=null;
 
@@ -239,7 +208,6 @@
     goHome.onclick=()=>show(home);
     goBoard.onclick=()=>{ show(board); loadBoard(true); };
 
-    // ----- AUTH AREA
     async function renderAuth(){
       homeCta.innerHTML="";
       authArea.innerHTML="";
@@ -266,7 +234,6 @@
 
     async function signInWithGoogle(){
       await signInWithPopup(auth, provider);
-      // İlk girişte users/{uid} ve profiles/{uid} yarat/yenile
     }
 
     onAuthStateChanged(auth, async (user)=>{
@@ -294,7 +261,6 @@
           joinedAt: serverTimestamp()
         });
       }else{
-        // displayName/photo güncel tut
         await updateDoc(uref,{
           displayName: currentUser.displayName || snap.data().displayName || "Kullanıcı",
           photoURL: currentUser.photoURL || snap.data().photoURL || ""
@@ -317,22 +283,11 @@
       }
     }
 
-    // ----- Stats (approx via queries)
     async function loadStats(){
-      // Kullanıcı sayısı ~ users koleksiyonu doc sayısı (cheap approximation via Top10 + Board load)
-      // Burada sadece "puanlanan" istatistiğini güvenli hesaplarız: ratingCount>0
-      const q1 = query(collection(db,"users"), where("ratingCount",">",0), limit(1));
-      const snap1 = await getDocs(q1);
-      let ratedCount = 0;
-      if(!snap1.empty){
-        // Firestore'da tam sayıyı almak için sayım koleksiyonu gerekir; basit MVP’de göstergeyi Top10/Board sayılarıyla dolduracağız.
-      }
-      // Sade gösterim:
       statUsers.textContent = "—";
       statRated.textContent = "LCB listesinde olanlar";
     }
 
-    // ----- Top10 & copy
     async function loadTop10s(){
       top10.innerHTML = "Yükleniyor…";
       top10b.innerHTML = "Yükleniyor…";
@@ -353,25 +308,40 @@
       top10b.innerHTML = top10.innerHTML;
     }
 
-    // ----- Board + pagination
+    // Leaderboard + Fallback: puanlı kimse yoksa son katılanları göster
     async function loadBoard(reset=false){
       if(reset){ boardList.innerHTML=""; lastCursor=null; }
-      const baseQ = query(
+
+      const rankedBase = query(
         collection(db,"users"),
         where("ratingCount",">",0),
         orderBy("scoreLCB","desc"),
         orderBy("ratingCount","desc"),
         limit(25)
       );
-      const q2 = lastCursor ? query(baseQ, startAfter(lastCursor.scoreLCB, lastCursor.ratingCount)) : baseQ;
-      const snap = await getDocs(q2);
+      const rankedQ = lastCursor
+        ? query(rankedBase, startAfter(lastCursor.scoreLCB, lastCursor.ratingCount))
+        : rankedBase;
+
+      let snap = await getDocs(rankedQ);
+
+      if(snap.empty && !lastCursor){
+        const newestQ = query(
+          collection(db,"users"),
+          orderBy("joinedAt","desc"),
+          limit(25)
+        );
+        snap = await getDocs(newestQ);
+      }
+
       if(snap.empty){ moreBtn.disabled=true; moreBtn.textContent="Bitti"; return; }
+
       const arr=[];
       let last=null;
       snap.forEach(docu=>{
         const d = docu.data();
         arr.push(renderRow(docu.id, d, false));
-        last = { scoreLCB: d.scoreLCB, ratingCount: d.ratingCount };
+        last = { scoreLCB: d.scoreLCB ?? 0, ratingCount: d.ratingCount ?? 0 };
       });
       boardList.insertAdjacentHTML("beforeend", arr.join(""));
       lastCursor = last;
@@ -381,11 +351,10 @@
     moreBtn.onclick = ()=>loadBoard(false);
     reloadBoard.onclick=()=>loadBoard(true);
 
-    // ----- Render helpers
     function num(x){ return typeof x==="number" && isFinite(x) ? x : 0; }
     function to2(x){ return Math.round(x*100)/100; }
 
-    function renderRow(uid, d, compact=false){
+    function renderRow(uid, d){
       const img = d.photoURL || ("https://i.pravatar.cc/100?u="+uid);
       const name = d.displayName || "Kullanıcı";
       const lcb = to2(num(d.scoreLCB));
@@ -401,7 +370,6 @@
             <small>LCB: ${lcb} • Oy: ${cnt}</small>
           </div>
           <div class="score">${lcb}</div>
-          ${compact?``:``}
           <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px">${rateBtn}</div>
         </div>`;
     }
@@ -419,23 +387,18 @@
     $("#rate-cancel").onclick=()=>{ rateModal.style.display="none"; rateTarget=null; };
     $("#rate-save").onclick=saveRating;
 
-    // ----- LCB hesap (mikro tam sayılarla)
     function computeLCBFromSums(sumMicro, sumSqMicro, count){
       if(count<=0) return 0;
-      const avgMicro = sumMicro / count; // mikro birim
-      const mean = avgMicro / 100000;   // 0..100 float
-      // Varyans (mikro^2 birim): E[x^2] - (E[x])^2
+      const avgMicro = sumMicro / count;
+      const mean = avgMicro / 100000;
       const ex2_micro2 = (sumSqMicro / count);
       const var_micro2 = Math.max(0, ex2_micro2 - avgMicro*avgMicro);
-      // Standart sapma (mikro)
       const sd_micro = Math.sqrt(var_micro2);
       const sd = sd_micro / 100000;
       const lcb = mean - 1.96 * (sd / Math.sqrt(count));
-      const clipped = Math.max(0, Math.min(100, lcb));
-      return clipped;
+      return Math.max(0, Math.min(100, lcb));
     }
 
-    // ----- Puan Kaydet (transaction ile delta işle)
     async function saveRating(){
       if(!currentUser || !rateTarget) return;
       const val = parseFloat($("#rate-input").value);
@@ -450,26 +413,19 @@
           const rSnap = await tx.get(rDoc);
           const uSnap = await tx.get(uDoc);
           if(!uSnap.exists()){
-            // hedef kullanıcı yoksa oluştur (nadir)
             tx.set(uDoc,{
               ratingCount: 0, ratingSumMicro: 0, ratingSumSqMicro: 0,
               avgMicroCache: 0, scoreLCB: 0, displayName:"Kullanıcı", photoURL:"", joinedAt: serverTimestamp()
             });
           }
-          let { ratingCount, ratingSumMicro, ratingSumSqMicro } = uSnap.exists()? uSnap.data() : { ratingCount:0, ratingSumMicro:0, ratingSumSqMicro:0 };
-
-          let oldMicro = null;
-          if(rSnap.exists()){
-            oldMicro = rSnap.data().micro|0;
-          }
+          let { ratingCount=0, ratingSumMicro=0, ratingSumSqMicro=0 } = uSnap.exists()? uSnap.data() : {};
+          let oldMicro = rSnap.exists()? (rSnap.data().micro|0) : null;
 
           if(oldMicro===null){
-            // ilk oy
             ratingCount += 1;
             ratingSumMicro += newMicro;
             ratingSumSqMicro += (newMicro*newMicro);
           }else{
-            // güncelleme
             ratingSumMicro += (newMicro - oldMicro);
             ratingSumSqMicro += (newMicro*newMicro - oldMicro*oldMicro);
           }
@@ -478,9 +434,7 @@
           const scoreLCB = computeLCBFromSums(ratingSumMicro, ratingSumSqMicro, ratingCount);
 
           tx.set(rDoc, { micro:newMicro, updatedAt: serverTimestamp() }, { merge:true });
-          tx.set(uDoc, {
-            ratingCount, ratingSumMicro, ratingSumSqMicro, avgMicroCache, scoreLCB,
-          }, { merge:true });
+          tx.set(uDoc, { ratingCount, ratingSumMicro, ratingSumSqMicro, avgMicroCache, scoreLCB }, { merge:true });
         });
 
         rateModal.style.display="none";
@@ -493,7 +447,6 @@
       }
     }
 
-    // ----- Profilim
     async function refreshMe(){
       if(!currentUser){ meBox.textContent="—"; return; }
       const uref = doc(db,"users",currentUser.uid);
@@ -511,10 +464,8 @@
         </div>`;
     }
 
-    // ----- Edit profile
     editBtn && (editBtn.onclick=async ()=>{
       if(!currentUser) return;
-      // load existing
       const psnap = await getDoc(doc(db,"profiles",currentUser.uid));
       const p = psnap.data()||{};
       $("#p-name").value = p.displayName||"";
@@ -550,9 +501,7 @@
       await loadTop10s();
     };
 
-    // ----- Sign out
     signOutBtn && (signOutBtn.onclick=()=>signOut(auth));
   </script>
 </body>
 </html>
-
