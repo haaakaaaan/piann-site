@@ -7,100 +7,57 @@
 
   <style>
     :root{
-      --bg:#f6f8fb; --text:#0f172a; --muted:#64748b;
-      --card:#ffffff; --line:#e8ecf2;
+      --bg:#f7f8fb; --text:#0f172a; --muted:#64748b;
+      --card:#ffffff; --line:#e6e9ef;
       --accent:#0A66C2; --accent-600:#0857A6;
       --ok:#10b981; --err:#ef4444;
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:var(--text); background:var(--bg);
-    }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
 
     /* NAV */
-    .nav{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter:saturate(140%) blur(8px);
-      background:rgba(255,255,255,.85);
-      border-bottom:1px solid var(--line);
-      box-shadow:0 8px 24px rgba(15,23,42,.06);
-    }
-    .nav-inner{
-      max-width:1080px; margin:0 auto; padding:10px 16px;
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-    }
-    .brand{ font-weight:800; letter-spacing:.2px }
-    .nav a{ color:var(--text); text-decoration:none }
-    .spacer{ flex:1 }
+    .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+    .nav-inner{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .brand{font-weight:700}
+    .nav a{color:var(--text);text-decoration:none}
+    .spacer{flex:1}
+    .count{color:var(--muted);font-size:14px}
 
     /* LAYOUT */
-    .wrap{ max-width:1080px; margin:24px auto 64px; padding:0 16px }
-    .card{
-      background:var(--card); border:1px solid var(--line);
-      border-radius:16px; box-shadow:0 14px 32px rgba(15,23,42,.05)
-    }
-    .hd{
-      padding:16px 18px; border-bottom:1px solid var(--line);
-      font-weight:800; letter-spacing:.2px
-    }
-    .bd{ padding:18px }
-    .muted{ color:var(--muted) }
-    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
-    @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
+    .wrap{max-width:1080px;margin:24px auto 64px;padding:0 16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
+    .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
+    .bd{padding:16px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
     /* BUTTONS + INPUTS */
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-    .btn{
-      padding:10px 14px; border:1px solid var(--line); border-radius:12px;
-      background:#fff; cursor:pointer; font-weight:600; transition:.15s ease;
-      box-shadow:0 2px 0 rgba(15,23,42,.04)
-    }
-    .btn:hover{ transform:translateY(-1px); box-shadow:0 6px 10px rgba(15,23,42,.08) }
-    .btn:active{ transform:translateY(0) }
-    .btn.primary{
-      background:linear-gradient(180deg, var(--accent) 0%, var(--accent-600) 100%);
-      border-color:transparent; color:#fff; box-shadow:0 6px 14px rgba(10,102,194,.28)
-    }
-    .btn.primary:hover{ filter:brightness(.98) }
-    .btn:disabled{ opacity:.6; cursor:not-allowed }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    input[type=text], textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
+    textarea{min-height:80px;resize:vertical}
 
-    input[type=text], textarea{
-      width:100%; background:#fff; border:1px solid var(--line);
-      border-radius:12px; padding:10px 12px; color:var(--text)
-    }
-    textarea{ min-height:80px; resize:vertical }
-
-    /* PILLS */
-    .pill{
-      padding:6px 10px; border-radius:999px; border:1px solid var(--line);
-      background:#fff; font-size:12px; color:var(--muted)
-    }
-    .pill.stat{
-      background:#eef6ff; border-color:#d9e8ff; color:#0A66C2; font-weight:700
-    }
-
-    /* TABLES */
-    #homeTop10, #rankTableWrap{ overflow:auto } /* mobil taşmaları engelle */
-    table{ width:100%; border-collapse:separate; border-spacing:0 }
-    th,td{ padding:11px 10px; border-bottom:1px solid var(--line); font-size:14px; text-align:left }
-    th{ color:#111827; background:#fafbff; position:sticky; top:0; z-index:1 }
-    tbody tr:nth-child(even){ background:#fafcff }
-    tbody tr:hover{ background:#f2f6ff }
-    td.num, th.num{ text-align:right }
-    a{ color:var(--accent-600) }
+    /* TABLE */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+    th{color:#111827}
 
     /* PROFILE */
-    .avatar{ width:100px; height:100px; border-radius:50%; object-fit:cover;
-      background:#f2f3f7; border:1px solid var(--line) }
-    .kpi{ display:flex; gap:10px; flex-wrap:wrap }
-    .ok{ color:var(--ok) } .err{ color:var(--err) }
+    .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
 
-    /* FOOTER */
-    footer{ margin:32px 0; text-align:center; color:var(--muted); font-size:12px }
+    /* MODAL */
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal{width:min(680px,92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+    .ok{color:var(--ok)} .err{color:var(--err)}
+
+    footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
@@ -111,8 +68,8 @@
       <a href="#/" class="btn">Ana sayfa</a>
       <a href="#/rank" class="btn">Liderboard</a>
       <div class="spacer"></div>
-      <span id="memberCount" class="pill stat">Üye: —</span>
-      <span id="ratedCount"  class="pill stat">Puanlanan: —</span>
+      <span id="memberCount" class="count">Üye: —</span>
+      <span id="ratedCount" class="count">Puanlanan: —</span>
       <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
       <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
       <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
@@ -127,8 +84,8 @@
         <div class="grid">
           <div>
             <p class="muted">
-              Tek gösterilen puan (0–100): <b>Güvenli puan</b>
-              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.
+              Tek gösterilen puan (0–100): <b>Güvenli puan</b>  
+              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.  
               <b>Not:</b> En az 1 oy almayan profiller sıralamaya dahil edilmez.
             </p>
             <div class="row" style="margin-top:8px">
@@ -394,13 +351,8 @@
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       const top=arr.slice(0,10);
       if(top.length===0){ box.textContent='Puanlanan üye yok.'; return; }
-      let html='<table><thead><tr><th class="num">#</th><th>Ad</th><th class="num">Puan</th><th class="num">Oy</th></tr></thead><tbody>';
-      top.forEach((u,i)=> html+=`<tr>
-        <td class="num">${i+1}</td>
-        <td><a href="#/u/${u.id}">${u.name}</a></td>
-        <td class="num">${toComma5(u.score)}</td>
-        <td class="num">${u.count}</td>
-      </tr>`);
+      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
+      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.score)}</td><td>${u.count}</td></tr>`);
       html+='</tbody></table>'; box.innerHTML=html;
     }
 
@@ -421,14 +373,8 @@
       $('#rankTotal').textContent='Puanlanan üye: '+arr.length;
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       if(arr.length===0){ wrap.textContent='Puanlanan üye yok.'; return; }
-      let html='<table><thead><tr><th class="num">#</th><th>Ad</th><th class="num">Puan</th><th class="num">Oy</th><th>Profil</th></tr></thead><tbody>';
-      arr.forEach((u,i)=> html+=`<tr>
-        <td class="num">${i+1}</td>
-        <td>${u.name}</td>
-        <td class="num">${toComma5(u.score)}</td>
-        <td class="num">${u.count}</td>
-        <td><a href="#/u/${u.id}">Gör</a></td>
-      </tr>`);
+      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
       html+='</tbody></table>'; wrap.innerHTML=html;
     }
 
@@ -506,19 +452,19 @@
       try{
         const snap=await db.collection('users').doc(uid).collection('ratings').orderBy('updatedAt','desc').limit(20).get();
         if(snap.empty){ box.textContent='Henüz oy yok.'; return; }
-        let html='<table><thead><tr><th>Veren</th><th class="num">Puan</th><th>Tarih</th></tr></thead><tbody>';
+        let html='<table><thead><tr><th>Veren</th><th>Puan</th><th>Tarih</th></tr></thead><tbody>';
         for(const d of snap.docs){
           const r=d.data(); const score=(r.micro/100000).toFixed(5).replace('.', ',');
           let who=d.id;
           try{ const pp=await db.collection('profiles').doc(d.id).get(); if(pp.exists){ const pd=pp.data(); who=pd.displayName || '@'+(pd.handle||'user'); } }catch{}
           const t = r.updatedAt && r.updatedAt.toDate ? r.updatedAt.toDate().toLocaleString() : '-';
-          html+=`<tr><td>${who}</td><td class="num">${score}</td><td>${t}</td></tr>`;
+          html+=`<tr><td>${who}</td><td>${score}</td><td>${t}</td></tr>`;
         }
         html+='</tbody></table>'; box.innerHTML=html;
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA (mevcut mantığınla aynı — sadece UI şık)
+    // PUANLAMA
     $('#btnRate').addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
