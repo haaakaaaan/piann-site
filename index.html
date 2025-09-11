@@ -7,10 +7,12 @@
 
   <style>
     :root{
+      /* Tek ton mavi + nötrler */
       --bg:#f7f8fb; --card:#ffffff; --line:#e6e9ef;
       --ink:#0f172a; --muted:#64748b;
-      --accent:#0A66C2; --accent-50:#eef5ff; --accent-200:#c2dbfb; --accent-700:#0857A6;
-      --ok:#10b981; --err:#ef4444;
+      --accent:#0A66C2; --accent-50:#eef5ff; --accent-200:#c2dbfb;
+      --accent-600:#0A66C2; --accent-700:#0857A6;
+
       --radius:14px; --shadow:0 10px 24px rgba(15,23,42,.04);
     }
     *{box-sizing:border-box}
@@ -21,64 +23,59 @@
 
     /* NAV */
     .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
-    .nav-inner{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .nav-inner{max-width:1160px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .brand{font-weight:800;color:var(--accent-700)}
     .spacer{flex:1}
     .count{color:var(--muted);font-size:14px}
 
     /* LAYOUT */
-    .wrap{max-width:1180px;margin:24px auto 64px;padding:0 16px}
-    .grid2{display:grid;grid-template-columns:3fr 1.4fr;gap:16px}
-    @media (max-width:1000px){.grid2{grid-template-columns:1fr}}
+    .wrap{max-width:1160px;margin:24px auto 64px;padding:0 16px}
+    .split{display:grid;grid-template-columns:1fr 300px;gap:16px}
+    @media (max-width:1000px){.split{grid-template-columns:1fr}}
 
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
     .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:800}
     .bd{padding:16px}
     .muted{color:var(--muted)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
 
     /* BUTTONS + INPUTS */
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
     .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
     .btn.primary:hover{background:var(--accent-700)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
-    input[type=text]{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink)}
-    .chips{display:flex;gap:6px;flex-wrap:wrap}
-    .chip{border:1px solid var(--line);padding:6px 8px;border-radius:999px;cursor:pointer;font-size:12px;background:#fff}
+    input[type=text]{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink)}
 
     /* TABLE */
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
     tbody tr:hover{background:#f9fbff}
 
-    /* DISCOVER GRID */
-    .disc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    @media (max-width:1100px){.disc-grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:640px){.disc-grid{grid-template-columns:1fr}}
-    .disc-card{display:grid;grid-template-columns:1fr 150px}
-    @media (max-width:640px){.disc-card{grid-template-columns:1fr}}
-    .disc-right{border-left:1px solid var(--line);padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--accent-50)}
-    @media (max-width:640px){.disc-right{border-left:none;border-top:1px solid var(--line)}}
-    .disc-right .big{font-size:24px;font-weight:800;color:var(--accent-700);font-variant-numeric:tabular-nums}
-    .disc-right .small{font-size:12px;color:var(--accent-700)}
-    .disc-left{padding:12px}
-    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
-    .name{font-weight:800}
-    .handle{color:var(--muted);font-size:12px}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
-    .bio{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    /* DISCOVER GRID & CARD */
+    .disco-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px}
+    @media (max-width:1000px){.disco-grid{grid-template-columns:repeat(2, 1fr)}}
+    @media (max-width:640px){.disco-grid{grid-template-columns:1fr}}
 
-    /* PROFILE HEADER (aynı kalıyor) */
-    .kpis{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--accent-200);background:var(--accent-50);color:var(--accent-700);font-weight:700}
-    .badge.big{font-size:16px}
-    .badge .num{font-variant-numeric:tabular-nums}
-    .avatar-lg{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
-
-    /* MODAL (kapalı) */
-    #editBack{display:none !important;} #btnEdit{display:none !important;}
+    .disco-card{display:grid;grid-template-columns:1fr 140px;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px}
+    .disco-card .r{border-left:1px dashed var(--line);padding-left:10px;background:var(--accent-50);border-radius:8px}
+    .disco-card .r .big{font-weight:800;font-size:22px;line-height:1}
+    .disco-card .r .lbl{font-size:12px;color:var(--muted)}
+    .disco-avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
+    .disco-top{display:flex;gap:10px;align-items:center}
+    .handle{color:var(--muted);font-size:13px}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{padding:3px 8px;border-radius:999px;border:1px solid var(--accent-200);background:#fff;color:var(--accent-700);font-size:12px}
+    .bio{color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .num{font-variant-numeric:tabular-nums}
+    .mini-chips{display:flex;gap:6px}
+    .ghost{opacity:.5}
 
     footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
+
+    /* Düzenleme kapalı (şimdilik) */
+    #editBack{ display:none !important; }
+    #btnEdit{  display:none !important; }
   </style>
 </head>
 <body>
@@ -98,33 +95,24 @@
   </div>
 
   <main class="wrap">
-    <!-- DISCOVER (HOME) -->
-    <section id="pageHome" style="display:none">
-      <div class="grid2">
-        <!-- Left: Discover -->
-        <div class="card">
-          <div class="hd">Keşfet</div>
-          <div class="bd">
-            <div class="muted" style="margin-bottom:10px">
-              Sana önerilen profiller. Puan ver ya da atla; gördüklerin 14 gün tekrar karşına çıkmaz.
-            </div>
-            <div id="discGrid" class="disc-grid"></div>
-            <div class="row" style="justify-content:center;margin-top:12px">
-              <button id="btnMoreDiscover" class="btn">Daha fazla</button>
-            </div>
+    <div class="split">
+      <!-- LEFT: HOME / DISCOVER -->
+      <section id="pageHome" class="card" style="display:none">
+        <div class="hd">Keşfet</div>
+        <div class="bd">
+          <div id="discoverGrid" class="disco-grid"></div>
+          <div class="row" style="margin-top:12px;justify-content:flex-end">
+            <button id="btnDiscoRefresh" class="btn">Daha fazla keşfet</button>
           </div>
         </div>
+      </section>
 
-        <!-- Right: Top-10 mini -->
-        <aside class="card">
-          <div class="hd">Top 10</div>
-          <div class="bd" id="miniTop10">Yükleniyor…</div>
-          <div class="bd" style="border-top:1px solid var(--line)">
-            <a href="#/rank" class="btn">Tümünü gör</a>
-          </div>
-        </aside>
-      </div>
-    </section>
+      <!-- RIGHT: SMALL TOP10 -->
+      <aside class="card" id="sideTop" style="display:none">
+        <div class="hd">Top 10</div>
+        <div class="bd" id="homeTop10">Yükleniyor…</div>
+      </aside>
+    </div>
 
     <!-- RANK -->
     <section id="pageRank" class="card" style="display:none">
@@ -145,15 +133,15 @@
       <div class="bd">
         <div class="row" style="align-items:center;justify-content:space-between">
           <div class="row" style="align-items:center">
-            <img id="profAvatar" class="avatar-lg" alt="">
+            <img id="profAvatar" class="disco-avatar" style="width:96px;height:96px" alt="">
             <div style="margin-left:12px">
               <div id="profName" style="font-weight:800;font-size:20px">—</div>
-              <div id="profHandle" class="muted">@—</div>
-              <div class="kpis" style="margin-top:10px">
-                <span class="badge big">#<span class="num" id="kpiRank">—</span></span>
-                <span class="badge">LCB <span class="num" id="kpiLCB">—</span></span>
-                <span class="badge">Oy <span class="num" id="kpiVotes">—</span></span>
-                <span class="badge" id="kpiTopWrap" style="display:none">Top <span class="num" id="kpiTop">—</span>%</span>
+              <div id="profHandle" class="handle">@—</div>
+              <div class="row" style="margin-top:10px">
+                <span class="chip">#<span id="kpiRank" class="num">—</span></span>
+                <span class="chip">LCB <span id="kpiLCB" class="num">—</span></span>
+                <span class="chip">Oy <span id="kpiVotes" class="num">—</span></span>
+                <span class="chip" id="kpiTopWrap" style="display:none">Top <span id="kpiTop" class="num">—</span>%</span>
               </div>
             </div>
           </div>
@@ -187,18 +175,13 @@
 
   <footer>© piann.com</footer>
 
-  <!-- (düzenleme modalı kapalı tutuyoruz) -->
-  <div id="editBack"></div>
-
   <!-- Firebase SDK (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    const SEEN_DAYS   = 14;           // keşfette tekrar gösterme eşiği
-    const DISC_BATCH  = 15;           // bir seferde kart sayısı (hedef)
-    const EDIT_LOCKED = true;
+    const EDIT_LOCKED = true; // düzenleme kapalı
 
     /* Firebase config — piann-c58b8 */
     const firebaseConfig = {
@@ -217,15 +200,13 @@
     const $ = (s)=>document.querySelector(s);
     const pages = {home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile')};
     const toComma2 = (n)=> Number.isFinite(n)? (Math.round(n*100)/100).toFixed(2).replace('.', ',') : '—';
-    const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
     function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
-    function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 
     // LCB: mean − 1.96 * (sd / sqrt(n))
     function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
       if(!n || n<=0) return 0;
-      const mean = (sumMicro / n) / 100000;
+      const mean = (sumMicro / n) / 100000; // 0..100
       let sd;
       if(n>1){
         const ex2 = (sumSqMicro / n) / 1e10;
@@ -246,11 +227,29 @@
       if(s.length<3) s = s.padEnd(3,'0'); if(s.length>15) s = s.slice(0,15);
       return s;
     };
+    async function ensureHandleUnique(base, myUid){
+      const q = await db.collection('profiles').where('handleLower','==', base).limit(1).get();
+      if(q.empty) return base; const d=q.docs[0]; if(d.id===myUid) return base;
+      return base + Math.floor(Math.random()*9000+1000);
+    }
+    function parseScore(s){
+      if(!s) return null; s=String(s).trim().replace(',', '.');
+      const v=Number(s); if(!isFinite(v)) return null;
+      const r=Math.round(v*100000)/100000;
+      if(!(r>0 && r<=100)) return null;
+      return {val:r, micro:Math.round(r*100000)};
+    }
+    function showPage(name){
+      pages.home.style.display = name==='home' ? 'block':'none';
+      pages.rank.style.display = name==='rank' ? 'block':'none';
+      pages.profile.style.display = name==='profile' ? 'block':'none';
+      // sağ panel top10 sadece home'da gözüksün
+      $('#sideTop').style.display = name==='home' ? 'block' : 'none';
+    }
 
     /* ===== Auth ===== */
     let me=null;
     const btnIn=$('#btnSignIn'), btnOut=$('#btnSignOut'), btnMy=$('#btnMyProfile');
-    const homeGoProfile = ()=> location.hash = me? ('#/u/'+me.uid) : '#/';
     auth.onAuthStateChanged(async (u)=>{
       me=u;
       if(u){
@@ -273,266 +272,275 @@
           displayName: u.displayName || u.email || null,
           photoURL: u.photoURL || null,
           joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          ratingCount:0, ratingSumMicro:0, ratingSumSqMicro:0, avgMicroCache:0,
-          givenCount:0, rand: Math.random()
+          ratingCount:0,
+          ratingSumMicro:0,
+          ratingSumSqMicro:0,
+          avgMicroCache:0,
+          givenCount:0,
+          rand: Math.random()
         }, {merge:true});
       }else if(uSnap.exists && (uSnap.data().rand==null)){
-        await uRef.set({rand: Math.random()}, {merge:true});
+        await uRef.set({ rand: Math.random() }, { merge:true });
       }
       const pRef = db.collection('profiles').doc(u.uid);
       const pSnap= await pRef.get();
       if(!pSnap.exists){
         let base = slugHandle((u.displayName||'').split(' ')[0] || (u.email||'user').split('@')[0]);
-        const q = await db.collection('profiles').where('handleLower','==', base).limit(1).get();
-        if(!q.empty) base = base + Math.floor(Math.random()*9000+1000);
+        base = await ensureHandleUnique(base, u.uid);
         const dn = u.displayName || (u.email||'Kullanıcı');
         await pRef.set({
           displayName: dn, displayNameLower: dn.toLowerCase(),
-          handle: base, handleLower: base, bio:'', location:'', website:'',
+          handle: base, handleLower: base,
+          bio:'', location:'', website:'',
           photoURL: u.photoURL || '', coverURL:'',
           joinedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge:true});
+      }else{
+        const p=pSnap.data();
+        if(!p.displayNameLower && p.displayName){
+          await pRef.set({displayNameLower:p.displayName.toLowerCase()}, {merge:true});
+        }
       }
     }
 
-    /* ===== Counters (header) & mini top10 ===== */
-    async function refreshHeaderCounts(){
+    /* ===== Home (Discover + Side Top10) ===== */
+    const demoProfiles = [
+      { id:'d1', name:'Ada Yılmaz', handle:'adayilmaz', bio:'Üretim mühendisi, kahve ve deniz tutkunu.', photo:'https://i.pravatar.cc/100?img=5', lcb:68.36, rank:12, cnt:3, isNew:true },
+      { id:'d2', name:'Bora Demir',  handle:'borademir',  bio:'Verimlilik saplantılı, sade kod savunucusu.', photo:'https://i.pravatar.cc/100?img=12', lcb:82.10, rank:3,  cnt:25, isNew:false },
+      { id:'d3', name:'Ceyda Kaya',  handle:'ceyda',      bio:'Tasarım sistemleri ve tipografi.', photo:'https://i.pravatar.cc/100?img=32', lcb:null,  rank:null, cnt:0,  isNew:true }
+    ];
+
+    async function renderHome(){
+      showPage('home');
+      // Sayaçlar
       try{
         const s = await db.collection('users').get();
         $('#memberCount').textContent = 'Üye: ' + s.size;
-        let rated = 0; s.forEach(d=>{ if((d.data().ratingCount||0)>0) rated++; });
+        let rated = 0; s.forEach(d=>{ const c=(d.data().ratingCount||0); if(c>0) rated++; });
         $('#ratedCount').textContent = 'Puanlanan: ' + rated;
-      }catch{}
-    }
-    async function renderMiniTop10(){
-      const box = $('#miniTop10'); box.textContent='Yükleniyor…';
-      const qs = await db.collection('users').get();
-      const arr=[];
-      qs.forEach(doc=>{
-        const u=doc.data(), c=u.ratingCount||0;
-        if(c<=0) return;
-        const score = lcbScoreFromAggregates(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
-        arr.push({id:doc.id, name:u.displayName||'(İsimsiz)', score, count:c});
-      });
-      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
-      const top=arr.slice(0,5);
-      if(top.length===0){ box.textContent='Puanlanan üye yok.'; return; }
-      let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th></tr></thead><tbody>';
-      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma2(u.score)}</td></tr>`);
-      html+='</tbody></table>'; box.innerHTML=html;
+      }catch{
+        $('#memberCount').textContent = 'Üye: —';
+        $('#ratedCount').textContent = 'Puanlanan: —';
+      }
+
+      // Discover
+      await renderDiscover3();
+
+      // Side Top10
+      await renderHomeTop10();
     }
 
-    /* ===== Discover ===== */
-    let givenSet = new Set();       // me -> puanladıklarım
-    let seenMap  = new Map();       // me -> { targetUid : seenAtMs }
-    let rankMap  = new Map();       // uid -> {rank, topPct}
-    let allRatedCache = null;       // tüm puanlı users (rank hesap için 1 kez)
-    const discGrid = $('#discGrid');
-
-    async function loadGivenAndSeen(){
-      givenSet = new Set();
-      seenMap  = new Map();
-      if(!me) return;
-
+    async function renderHomeTop10(){
+      const box = $('#homeTop10');
+      box.textContent = 'Yükleniyor…';
       try{
-        const g = await db.collection('users').doc(me.uid).collection('given').limit(1000).get();
-        g.forEach(d=>givenSet.add(d.id));
-      }catch(e){}
-
-      try{
-        const cutoff = Date.now() - SEEN_DAYS*24*3600*1000;
-        const s = await db.collection('users').doc(me.uid).collection('discoverSeen').orderBy('seenAt','desc').limit(1000).get();
-        s.forEach(d=>{
-          const t = d.data().seenAt && d.data().seenAt.toDate ? d.data().seenAt.toDate().getTime() : 0;
-          if(t>cutoff) seenMap.set(d.id, t);
+        const qs = await db.collection('users').get();
+        const arr=[];
+        qs.forEach(doc=>{
+          const u=doc.data(), c=u.ratingCount||0;
+          if(c<=0) return;
+          const score = lcbScoreFromAggregates(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
+          arr.push({id:doc.id, name:u.displayName||'(İsimsiz)', score, count:c});
         });
-      }catch(e){}
+        arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+        const top=arr.slice(0,10);
+        if(top.length===0){ box.textContent='Puanlanan üye yok.'; return; }
+        let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th></tr></thead><tbody>';
+        top.slice(0,10).forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td class="num">${toComma2(u.score)}</td></tr>`);
+        html+='</tbody></table><div style="text-align:right;margin-top:8px"><a href="#/rank">Tümünü gör →</a></div>';
+        box.innerHTML=html;
+      }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    async function ensureRankMap(){
-      if(allRatedCache) return;
-      const qs = await db.collection('users').where('ratingCount','>',0).get();
-      const arr=[];
-      qs.forEach(d=>{
-        const u=d.data(), c=u.ratingCount||0;
-        const score=lcbScoreFromAggregates(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
-        arr.push({id:d.id, score, count:c});
-      });
-      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
-      allRatedCache = arr;
-      arr.forEach((x,i)=>{
-        const pct = Math.ceil(100 * (i+1) / arr.length);
-        rankMap.set(x.id, {rank:i+1, top:pct});
-      });
+    async function renderDiscover3(){
+      const wrap = $('#discoverGrid');
+      wrap.innerHTML = '';
+      const isAuthed = !!me;
+
+      if(!isAuthed){
+        // DEMO 3 kart
+        demoProfiles.forEach(p=>{
+          wrap.appendChild(buildDiscoverCard({
+            uid: p.id, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
+            lcb: p.lcb, rank: p.rank, cnt: p.cnt, isNew: p.isNew, demo:true
+          }));
+        });
+        $('#btnDiscoRefresh').onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
+        return;
+      }
+
+      // Girişli — canlı 3 kart
+      try{
+        // Basit seçim: kendim hariç 50 kullanıcı çek, rastgele karıştır, ilk 3'ü al
+        const qs = await db.collection('users').limit(50).get();
+        const cand=[];
+        qs.forEach(d=>{
+          if(d.id===me.uid) return;
+          const u=d.data();
+          cand.push({
+            uid:d.id,
+            name:u.displayName||'(Kullanıcı)',
+            handle: null, // profilden alacağız (az sonra)
+            bio:'',
+            photo: u.photoURL || ('https://i.pravatar.cc/100?u='+d.id),
+            cnt: u.ratingCount||0,
+            lcb: lcbScoreFromAggregates(u.ratingSumMicro||0, u.ratingSumSqMicro||0, u.ratingCount||0),
+            rank: null, // hesaplayabiliriz ama 3 kart için gerek yok; profilde net hesaplanıyor
+            isNew: !!u.joinedAt
+          });
+        });
+
+        // Profil verilerini zenginleştir (handle/bio)
+        // (Performans: sadece ilk 10 aday için dene)
+        const enrich = cand.slice(0,10);
+        for (const c of enrich){
+          try{
+            const ps = await db.collection('profiles').doc(c.uid).get();
+            if(ps.exists){
+              const p=ps.data();
+              c.handle = p.handle || null;
+              c.bio    = p.bio || '';
+              if(p.photoURL) c.photo = p.photoURL;
+            }
+          }catch(e){}
+        }
+
+        // Shuffle ve ilk 3
+        cand.sort(()=> Math.random() - 0.5);
+        const three = cand.slice(0,3);
+
+        if(three.length===0){
+          wrap.innerHTML = '<div class="muted">Gösterilecek profil bulunamadı.</div>';
+        }else{
+          three.forEach(p=>{
+            wrap.appendChild(buildDiscoverCard({
+              uid:p.uid, name:p.name, handle:p.handle||'user', bio:p.bio, photo:p.photo,
+              lcb: Number.isFinite(p.lcb)? p.lcb : null, rank:null, cnt:p.cnt, isNew:(p.cnt||0)===0
+            }));
+          });
+        }
+
+        $('#btnDiscoRefresh').onclick = renderDiscover3;
+      }catch(e){
+        wrap.innerHTML = '<div class="muted">Hata: '+(e?.message||e)+'</div>';
+      }
     }
 
-    function cardHTML(d){
-      const uid = d.id;
-      const data = d.data;
-      const name = data.displayName || '(Kullanıcı)';
-      const handle = (data.handle || '').trim();
-      const photo = data.photoURL || 'https://i.pravatar.cc/100?u='+uid;
-      const cnt = data.ratingCount||0;
-      const lcb = cnt>0 ? lcbScoreFromAggregates(data.ratingSumMicro||0, data.ratingSumSqMicro||0, cnt) : null;
-      const rk  = rankMap.get(uid);
-
-      const pills = [];
-      if(cnt>0) pills.push(`Oy ${cnt}`);
-      if(cnt<=0) pills.push('İlk oyunu sen ver');
-      if(data.joinedAt?.toDate && (Date.now() - data.joinedAt.toDate().getTime() < 14*24*3600*1000)) pills.push('Yeni');
-
-      return `
-      <div class="card disc-card" data-uid="${uid}">
-        <div class="disc-left">
-          <div class="row">
-            <img class="avatar" src="${photo}" alt="">
+    function buildDiscoverCard(p){
+      const el = document.createElement('div');
+      el.className = 'disco-card';
+      el.innerHTML = `
+        <div class="l">
+          <div class="disco-top">
+            <img class="disco-avatar" src="${p.photo||''}" alt="">
             <div>
-              <div class="name">${name}</div>
-              <div class="handle">@${handle || '—'}</div>
+              <div style="font-weight:700">${p.name||'(Kullanıcı)'}</div>
+              <div class="handle">@${(p.handle||'user')}</div>
+              <div class="mini-chips" style="margin-top:6px">
+                ${p.isNew ? `<span class="chip">Yeni</span>`:''}
+                <span class="chip">Oy ${p.cnt||0}</span>
+              </div>
             </div>
           </div>
+          <div class="bio" style="margin:10px 0">${p.bio||''}</div>
 
-          <div class="row" style="margin:8px 0">${pills.map(p=>`<span class="pill">${p}</span>`).join('')}</div>
-
-          <div class="bio">${(data.bio||'').slice(0,300)}</div>
-
-          <div class="row" style="margin-top:10px">
-            <input type="text" class="score-inp" placeholder="0–100" style="width:120px" />
-            <button class="btn primary act-save" data-uid="${uid}">Kaydet</button>
-            <button class="btn act-skip" data-uid="${uid}">Atla</button>
-            <a class="btn" href="#/u/${uid}">Profili gör</a>
+          <div class="row">
+            <input type="text" placeholder="0–100 (örn: 88,75)" class="in-score" style="max-width:160px">
+            <button class="btn primary btn-save">Kaydet</button>
+            <button class="btn btn-skip">Atla</button>
+            <a class="btn ghost" href="#/u/${p.uid}">Profili gör</a>
+            <span class="muted msg"></span>
           </div>
-          <div class="chips" style="margin-top:6px">
-            ${[70,80,90,95].map(v=>`<span class="chip" data-uid="${uid}" data-val="${v}">${v}</span>`).join('')}
-          </div>
-          <div class="muted save-msg" style="margin-top:6px"></div>
         </div>
-
-        <div class="disc-right">
-          <div class="small">PUAN (LCB)</div>
-          <div class="big">${lcb==null ? '—' : toComma2(lcb)}</div>
-          <div class="small" style="margin-top:6px">Sıra ${rk?.rank ?? '—'}</div>
-          ${rk?.top ? `<div class="small">Top %${rk.top}</div>` : ``}
+        <div class="r">
+          <div class="lbl">PUAN (LCB)</div>
+          <div class="big num" style="margin-top:2px">${Number.isFinite(p.lcb)? toComma2(p.lcb) : '—'}</div>
+          <div class="lbl" style="margin-top:10px">Sıra</div>
+          <div class="num" style="font-weight:700">—</div>
         </div>
-      </div>`;
+      `;
+
+      const inScore = el.querySelector('.in-score');
+      const btnSave = el.querySelector('.btn-save');
+      const btnSkip = el.querySelector('.btn-skip');
+      const msg     = el.querySelector('.msg');
+
+      if(!me || p.demo){
+        btnSave.onclick = ()=> alert('Puan vermek için Google ile giriş yapın.');
+        btnSkip.onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
+      }else{
+        btnSave.onclick = async ()=>{
+          const parsed = parseScore(inScore.value);
+          if(!parsed){ msg.textContent='Geçersiz değer'; return; }
+          msg.textContent='Kaydediliyor…';
+          try{
+            await rateUser(p.uid, parsed.micro);
+            msg.textContent='Kaydedildi ✔';
+            el.style.opacity = .6;
+            setTimeout(()=>{ el.remove(); }, 350);
+          }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
+        };
+        btnSkip.onclick = ()=>{
+          el.style.opacity = .6;
+          setTimeout(()=>{ el.remove(); }, 200);
+          // ileride: discoverSeen yazılabilir
+        };
+      }
+
+      return el;
     }
 
-    function addSeen(uid){
-      if(!me) return;
-      try{
-        db.collection('users').doc(me.uid).collection('discoverSeen').doc(uid)
-          .set({ seenAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true});
-        seenMap.set(uid, Date.now());
-      }catch{}
-    }
+    async function rateUser(targetUid, newMicro){
+      if(!me) throw new Error('Önce giriş yapın');
+      if(me.uid===targetUid) throw new Error('Kendini puanlayamazsın');
+      await db.runTransaction( async (tx)=>{
+        const targetRef = db.collection('users').doc(targetUid);
+        const rateRef   = targetRef.collection('ratings').doc(me.uid);
+        const meRef     = db.collection('users').doc(me.uid);
+        const givenRef  = meRef.collection('given').doc(targetUid);
 
-    async function queryRatedRandom(limitN){
-      let out=[];
-      try{
-        const r = Math.random();
-        const base = db.collection('users').where('ratingCount','>',0).orderBy('rand');
-        const q1 = await base.startAt(r).limit(limitN).get();
-        out = q1.docs;
-        if(out.length < limitN){
-          const q2 = await base.limit(limitN - out.length).get();
-          out = out.concat(q2.docs);
+        const tSnap = await tx.get(targetRef);
+        if(!tSnap.exists) throw new Error('Kullanıcı yok');
+
+        const rSnap = await tx.get(rateRef);
+        const mSnap = await tx.get(meRef);
+        const gSnap = await tx.get(givenRef);
+
+        const oldMicro = rSnap.exists ? (rSnap.data().micro||0) : 0;
+
+        let ratingCount = tSnap.data().ratingCount||0;
+        let ratingSum   = tSnap.data().ratingSumMicro||0;
+        let ratingSumSq = tSnap.data().ratingSumSqMicro||0;
+
+        if(!rSnap.exists){
+          ratingCount += 1;
+          ratingSum   += newMicro;
+          ratingSumSq += (newMicro*newMicro);
+        }else{
+          ratingSum   += (newMicro - oldMicro);
+          ratingSumSq += (newMicro*newMicro - oldMicro*oldMicro);
         }
-      }catch(e){ /* index gerekebilir */ }
-      return out;
-    }
-    async function queryUnratedRandom(limitN){
-      let out=[];
-      try{
-        const r = Math.random();
-        const base = db.collection('users').where('ratingCount','==',0).orderBy('rand');
-        const q1 = await base.startAt(r).limit(limitN).get();
-        out = q1.docs;
-        if(out.length < limitN){
-          const q2 = await base.limit(limitN - out.length).get();
-          out = out.concat(q2.docs);
+        const avgMicroCache = ratingCount>0 ? Math.floor(ratingSum / ratingCount) : 0;
+
+        tx.set(rateRef, {
+          micro: newMicro,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge:true });
+
+        tx.set(targetRef, {
+          ratingCount, ratingSumMicro:ratingSum, ratingSumSqMicro:ratingSumSq, avgMicroCache
+        }, { merge:true });
+
+        if(!gSnap.exists){
+          const givenCount = (mSnap.exists ? (mSnap.data().givenCount||0) : 0) + 1;
+          tx.set(meRef, { givenCount }, { merge:true });
+          tx.set(givenRef, { createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
         }
-      }catch(e){ /* index gerekebilir */ }
-      return out;
-    }
-    async function queryNew(limitN){
-      try{
-        const cut = new Date(Date.now() - 14*24*3600*1000);
-        const q = await db.collection('users').where('joinedAt','>=',cut).orderBy('joinedAt','desc').limit(limitN).get();
-        return q.docs;
-      }catch(e){ return []; }
+      });
     }
 
-    function filterCandidates(docs){
-      const cut = Date.now() - SEEN_DAYS*24*3600*1000;
-      const out=[];
-      for(const doc of docs){
-        const id = doc.id;
-        if(me && id===me.uid) continue;
-        if(givenSet.has(id)) continue;
-        const seenAt = seenMap.get(id);
-        if(seenAt && seenAt>cut) continue;
-        out.push(doc);
-      }
-      return out;
-    }
-
-    async function renderDiscover(batch=true){
-      await loadGivenAndSeen();
-      await ensureRankMap();
-
-      const a = await queryNew(6);
-      const b = await queryRatedRandom(12);
-      const c = await queryUnratedRandom(8);
-
-      // tek listede topla, filtrele, uniq yap
-      const all = [...a, ...b, ...c];
-      const uniq = new Map();
-      all.forEach(d=>{ if(!uniq.has(d.id)) uniq.set(d.id, d); });
-      let list = filterCandidates([...uniq.values()]);
-      list = shuffle(list).slice(0, DISC_BATCH);
-
-      // render
-      if(list.length===0){
-        discGrid.innerHTML = `<div class="muted">Öneri bulunamadı. Daha fazla kişi katıldığında tekrar dene.</div>`;
-        return;
-      }
-      discGrid.innerHTML = list.map(d=> cardHTML({id:d.id, data:d.data()})).join('');
-    }
-
-    // Keşfet: olay dinleyicileri (save / skip / chip)
-    document.addEventListener('click', async (e)=>{
-      const chip = e.target.closest('.chip');
-      if(chip){
-        const card = chip.closest('.disc-card');
-        card.querySelector('.score-inp').value = chip.dataset.val;
-        return;
-      }
-      const skip = e.target.closest('.act-skip');
-      if(skip){
-        const uid = skip.dataset.uid;
-        addSeen(uid);
-        skip.closest('.disc-card').remove();
-        return;
-      }
-      const save = e.target.closest('.act-save');
-      if(save){
-        const card = save.closest('.disc-card');
-        const uid  = save.dataset.uid;
-        const inp  = card.querySelector('.score-inp');
-        const msg  = card.querySelector('.save-msg');
-        if(!me){ msg.textContent='Önce giriş yap.'; return; }
-        if(me.uid===uid){ msg.textContent='Kendini puanlayamazsın.'; return; }
-        const v = String(inp.value||'').replace(',','.');
-        const num = Number(v);
-        if(!(isFinite(num) && num>0 && num<=100)){ msg.textContent='0–100 arası değer gir.'; return; }
-        await saveRatingTransaction(uid, Math.round(num*100000), msg);
-        addSeen(uid);
-        card.remove();
-      }
-    });
-    $('#btnMoreDiscover').onclick = ()=> renderDiscover();
-
-    /* ===== Leaderboard ===== */
+    /* ===== Rank page ===== */
     async function renderRank(){
       showPage('rank');
       const wrap=$('#rankTableWrap'); wrap.textContent='Yükleniyor…';
@@ -548,13 +556,12 @@
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       if(arr.length===0){ wrap.textContent='Puanlanan üye yok.'; return; }
       let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
-      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma2(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td class="num">${toComma2(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
       html+='</tbody></table>'; wrap.innerHTML=html;
     }
 
-    /* ===== Profile (eski akış korunuyor) ===== */
+    /* ===== Profile page ===== */
     let currentProfileUid=null;
-
     async function renderProfile(uid){
       showPage('profile'); currentProfileUid=uid;
 
@@ -569,11 +576,22 @@
         $('#kpiLCB').textContent   = toComma2(myScore);
         $('#kpiVotes').textContent = String(cnt);
 
-        await ensureRankMap();
-        const rk = rankMap.get(uid);
-        $('#kpiRank').textContent = rk? rk.rank : '—';
-        if(rk){ $('#kpiTop').textContent = rk.top; $('#kpiTopWrap').style.display='inline-flex'; }
-        else  { $('#kpiTopWrap').style.display='none'; }
+        const all=await db.collection('users').get();
+        const arr=[];
+        all.forEach(d=>{
+          const x=d.data(); const c=x.ratingCount||0; if(c<=0) return;
+          arr.push({id:d.id, score:lcbScoreFromAggregates(x.ratingSumMicro||0, x.ratingSumSqMicro||0, c), count:c});
+        });
+        arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+        const pos=arr.findIndex(x=>x.id===uid);
+        $('#kpiRank').textContent = (pos>=0? pos+1 : '—');
+        if(arr.length>0 && pos>=0){
+          const pct = Math.ceil(100 * (pos+1) / arr.length);
+          $('#kpiTop').textContent = String(pct);
+          $('#kpiTopWrap').style.display='inline-flex';
+        }else{
+          $('#kpiTopWrap').style.display='none';
+        }
       }else{
         $('#kpiLCB').textContent   = '—';
         $('#kpiVotes').textContent = '0';
@@ -608,6 +626,7 @@
         navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: ' + link));
       };
 
+      // received list (puan gizli)
       loadReceived(uid);
     }
 
@@ -628,92 +647,7 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA (aynı mekanik + discoverSeen yazıyoruz)
-    async function saveRatingTransaction(targetUid, newMicro, msgEl){
-      try{
-        await db.runTransaction(async (tx)=>{
-          const targetRef = db.collection('users').doc(targetUid);
-          const rateRef   = targetRef.collection('ratings').doc(me.uid);
-          const meRef     = db.collection('users').doc(me.uid);
-          const givenRef  = meRef.collection('given').doc(targetUid);
-
-          const tSnap = await tx.get(targetRef);
-          if(!tSnap.exists) throw new Error('Kullanıcı yok');
-
-          const rSnap = await tx.get(rateRef);
-          const mSnap = await tx.get(meRef);
-          const gSnap = await tx.get(givenRef);
-
-          const oldMicro = rSnap.exists ? (rSnap.data().micro||0) : 0;
-
-          let ratingCount = tSnap.data().ratingCount||0;
-          let ratingSum   = tSnap.data().ratingSumMicro||0;
-          let ratingSumSq = tSnap.data().ratingSumSqMicro||0;
-
-          if(!rSnap.exists){
-            ratingCount += 1;
-            ratingSum   += newMicro;
-            ratingSumSq += (newMicro*newMicro);
-          }else{
-            ratingSum   += (newMicro - oldMicro);
-            ratingSumSq += (newMicro*newMicro - oldMicro*oldMicro);
-          }
-          const avgMicroCache = ratingCount>0 ? Math.floor(ratingSum / ratingCount) : 0;
-
-          tx.set(rateRef, {
-            micro: newMicro,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge:true });
-
-          tx.set(targetRef, {
-            ratingCount, ratingSumMicro:ratingSum, ratingSumSqMicro:ratingSumSq, avgMicroCache
-          }, { merge:true });
-
-          if(!gSnap.exists){
-            const givenCount = (mSnap.exists ? (mSnap.data().givenCount||0) : 0) + 1;
-            tx.set(meRef, { givenCount }, { merge:true });
-            tx.set(givenRef, { createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
-          }
-        });
-        // seen kaydı
-        addSeen(targetUid);
-        if(msgEl){ msgEl.textContent='Kaydedildi ✔'; msgEl.style.color='var(--ok)'; }
-        await refreshHeaderCounts();
-        renderMiniTop10();
-      }catch(e){
-        if(msgEl){ msgEl.textContent='Hata: '+(e.message||e); msgEl.style.color='var(--err)'; }
-      }
-    }
-
-    // Profil sayfasındaki buton
-    $('#btnRate')?.addEventListener('click', async ()=>{
-      const uid=currentProfileUid, msg=$('#rateMsg');
-      if(!me){ msg.textContent='Önce giriş yap.'; return; }
-      if(me.uid===uid){ msg.textContent='Kendini puanlayamazsın.'; return; }
-      const parsed = (()=>{
-        const v = String($('#scoreInput').value||'').trim().replace(',','.');
-        const n = Number(v); if(!isFinite(n)) return null;
-        const r = Math.round(n*100000); if(r<=0 || r>10000000) return null;
-        return r;
-      })();
-      if(!parsed){ msg.textContent='Geçersiz değer. 0<puan≤100'; return; }
-      await saveRatingTransaction(uid, parsed, msg);
-      renderProfile(uid);
-    });
-
-    /* ===== Router ===== */
-    function showPage(name){
-      pages.home.style.display = name==='home' ? 'block':'none';
-      pages.rank.style.display = name==='rank' ? 'block':'none';
-      pages.profile.style.display = name==='profile' ? 'block':'none';
-    }
-    async function renderHome(){
-      showPage('home');
-      refreshHeaderCounts();
-      renderMiniTop10();
-      renderDiscover();
-    }
+    /* Router */
     function router(){
       const h=location.hash||'#/';
       if(h==='#/'||h==='#'){ renderHome(); return; }
@@ -723,9 +657,6 @@
     }
     window.addEventListener('hashchange', router);
     router();
-
-    // ilk header sayıları
-    refreshHeaderCounts();
   </script>
 </body>
 </html>
