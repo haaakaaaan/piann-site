@@ -87,7 +87,7 @@
   </div>
 
   <main class="wrap">
-    <!-- LOGIN (yalnızca logo + slogan + Google ile giriş) -->
+    <!-- LOGIN -->
     <section id="pageLogin" class="login-shell" style="display:none">
       <div class="login-card">
         <div class="login-logo"><div class="brand">piann</div></div>
@@ -188,6 +188,10 @@
     const auth = firebase.auth();
     const db   = firebase.firestore();
 
+    // ÖNEMLİ: Yalnızca redirect bazlı giriş (popup yok)
+    auth.useDeviceLanguage();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
     /* ===== Helpers ===== */
     const $ = (s)=>document.querySelector(s);
     const toComma2 = (n)=> Number.isFinite(n)? (Math.round(n*100)/100).toFixed(2).replace('.', ',') : '—';
@@ -231,17 +235,17 @@
     /* ===== Auth ===== */
     let me=null;
 
-    // Redirect dönüşünü yakala (takılmayı önler)
+    // Redirect dönüşünü YAKALA (ilk render’dan hemen sonra)
     (async ()=>{
       try{
         const res = await auth.getRedirectResult();
         if(res && res.user){
-          const m = document.getElementById('loginMsg');
-          if(m) m.textContent = '';
+          // Giriş tamam: onAuthStateChanged de tetiklenecek
+          const m = $('#loginMsg'); if(m) m.textContent = '';
         }
       }catch(e){
-        const m = document.getElementById('loginMsg');
-        if(m) m.textContent = e?.message || 'Giriş hatası.';
+        const m = $('#loginMsg'); if(m) m.textContent = e?.message || 'Giriş hatası.';
+        console.error('getRedirectResult:', e);
       }
     })();
 
@@ -615,28 +619,16 @@
       }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
     });
 
-    /* ===== LOGIN: Google (popup + timeout + redirect fallback) ===== */
+    /* ===== LOGIN: SADECE REDIRECT ===== */
     document.getElementById('loginGoogle')?.addEventListener('click', async ()=>{
       const msg = document.getElementById('loginMsg');
-      msg.textContent = 'Google ile giriş yapılıyor…';
-      const provider = new firebase.auth.GoogleAuthProvider();
-
-      function withTimeout(promise, ms = 2000){
-        return Promise.race([
-          promise,
-          new Promise((_, reject)=> setTimeout(()=> reject({ code:'timeout' }), ms))
-        ]);
-      }
-
+      msg.textContent = 'Google’a yönlendiriliyor…';
       try{
-        await withTimeout(auth.signInWithPopup(provider), 2000);
-        // başarılı olursa onAuthStateChanged tetiklenecek
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithRedirect(provider);
       }catch(err){
-        try{
-          await auth.signInWithRedirect(provider);
-        }catch(e2){
-          msg.textContent = e2?.message || 'Giriş başarısız.';
-        }
+        console.error('signInWithRedirect hata:', err);
+        msg.textContent = err?.message || 'Giriş başarısız.';
       }
     });
 
@@ -671,13 +663,10 @@
         box.innerHTML=html;
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
-    function guardAuthOrLogin(next){
-      if(!me){ location.hash = '#/login'; return false; }
-      return true;
-    }
+    function guardAuthOrLogin(){ if(!me){ location.hash = '#/login'; return false; } return true; }
     function router(){
       const h=location.hash||'#/login';
-      if(!me){ showPage('login'); return; } // login guard
+      if(!me){ showPage('login'); return; }
       if(h==='#/' || h==='#'){ if(!guardAuthOrLogin()) return; renderHome(); return; }
       if(h.startsWith('#/login')){ showPage('login'); return; }
       if(h.startsWith('#/rank')) { if(!guardAuthOrLogin()) return; renderRank(); return; }
