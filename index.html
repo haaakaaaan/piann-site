@@ -188,7 +188,7 @@
     const auth = firebase.auth();
     const db   = firebase.firestore();
 
-    // ÖNEMLİ: Yalnızca redirect bazlı giriş (popup yok)
+    // Redirect bazlı giriş + kalıcı oturum
     auth.useDeviceLanguage();
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
@@ -232,22 +232,31 @@
       return _rankCache;
     }
 
-    /* ===== Auth ===== */
-    let me=null;
-
-    // Redirect dönüşünü YAKALA (ilk render’dan hemen sonra)
+    /* ===== Redirect dönüşünü kesin yakala + zorla devam et ===== */
     (async ()=>{
       try{
+        const hadFlag = sessionStorage.getItem('piann_redirect') === '1';
         const res = await auth.getRedirectResult();
-        if(res && res.user){
-          // Giriş tamam: onAuthStateChanged de tetiklenecek
+        sessionStorage.removeItem('piann_redirect'); // flag temizle
+        if (res && res.user) {
           const m = $('#loginMsg'); if(m) m.textContent = '';
+          if (!location.hash || location.hash.startsWith('#/login')) {
+            location.hash = '#/'; // hedef
+          }
+          if (hadFlag) {
+            // Bazı tarayıcılarda router erken çalıştığı için tazele
+            setTimeout(()=> window.location.reload(), 50);
+          }
         }
       }catch(e){
+        console.error('getRedirectResult hata:', e);
         const m = $('#loginMsg'); if(m) m.textContent = e?.message || 'Giriş hatası.';
-        console.error('getRedirectResult:', e);
+        sessionStorage.removeItem('piann_redirect');
       }
     })();
+
+    /* ===== Auth ===== */
+    let me=null;
 
     auth.onAuthStateChanged(async (u)=>{
       me=u;
@@ -619,12 +628,13 @@
       }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
     });
 
-    /* ===== LOGIN: SADECE REDIRECT ===== */
+    /* ===== LOGIN: SADECE REDIRECT + FLAG ===== */
     document.getElementById('loginGoogle')?.addEventListener('click', async ()=>{
       const msg = document.getElementById('loginMsg');
       msg.textContent = 'Google’a yönlendiriliyor…';
       try{
         const provider = new firebase.auth.GoogleAuthProvider();
+        sessionStorage.setItem('piann_redirect', '1'); // dönüş için bayrak
         await auth.signInWithRedirect(provider);
       }catch(err){
         console.error('signInWithRedirect hata:', err);
