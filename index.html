@@ -61,7 +61,7 @@
     .disco-score{font-size:24px;font-weight:800;color:var(--accent)}
     .disco-rank{font-size:13px;color:var(--muted);margin-top:4px}
 
-    /* === LOGIN (facebook/linkedin tarzı) === */
+    /* LOGIN */
     .login-shell{min-height:calc(100vh - 60px);display:grid;place-items:center;padding:32px 16px}
     .login-split{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center;width:min(980px, 96vw)}
     @media (max-width:900px){.login-split{grid-template-columns:1fr}}
@@ -72,11 +72,8 @@
     .login-card .hd{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:800}
     .login-card .bd{padding:18px}
     .login-in{display:flex;flex-direction:column;gap:10px}
-    .login-in label{font-size:13px;color:#475467}
-    .login-in input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px}
     .login-submit{width:100%;padding:12px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
     .login-submit:hover{background:var(--accent-700)}
-    .login-foot{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
     .terms{margin-top:6px;text-align:center;font-size:12px;color:var(--muted)}
   </style>
 </head>
@@ -88,7 +85,7 @@
       <a href="#/" class="btn">Keşfet</a>
       <a href="#/rank" class="btn">Liderboard</a>
       <div class="spacer"></div>
-      <a href="#/login" class="btn">Giriş</a>
+      <a href="#/login" class="btn" id="btnGoLogin">Giriş</a>
       <span id="memberCount" class="count">Üye: —</span>
       <span id="ratedCount" class="count">Puanlanan: —</span>
       <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
@@ -97,30 +94,30 @@
   </div>
 
   <main class="wrap">
-    <!-- LOGIN -->
+    <!-- LOGIN (Google ile giriş) -->
     <section id="pageLogin" class="login-shell" style="display:none">
       <div class="login-split">
         <div class="login-hero">
-          <!-- SLOGAN: güncellendi -->
           <h1>Gerçek değerini keşfet; skorun senin imzan.</h1>
           <p>piann, insanların birbirini puanladığı ve gerçek değerini gördüğü topluluk.</p>
           <ul>
-            <li>Basit ve hızlı giriş</li>
             <li>Tek görünür skor: LCB</li>
             <li>En az 1 oy alanlar listede</li>
+            <li>Hızlı ve güvenli Google girişi</li>
           </ul>
         </div>
         <div class="login-card">
           <div class="hd">Giriş yap</div>
           <div class="bd">
-            <div class="login-in">
-              <label>E-posta</label>
-              <input type="text" placeholder="ornek@eposta.com" autocomplete="username" />
-              <label>Şifre</label>
-              <input type="password" placeholder="••••••••" autocomplete="current-password" />
-              <button id="loginSubmit" class="login-submit">Devam Et</button>
-              <div class="login-foot">Hesabın yok mu? <a href="#/login">Hemen katıl</a></div>
-              <div class="terms">Devam ederek <a href="#">Şartlar</a> ve <a href="#">Gizlilik</a>’i kabul edersin.</div>
+            <div class="login-in" style="align-items:center;text-align:center">
+              <button id="loginGoogle" class="login-submit" style="width:100%">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                     alt="Google" style="width:20px;vertical-align:middle;margin-right:8px">
+                Google ile giriş yap
+              </button>
+              <div class="terms">
+                Devam ederek <a href="#">Şartlar</a> ve <a href="#">Gizlilik</a>’i kabul edersin.
+              </div>
               <div id="loginMsg" class="terms" style="margin-top:6px"></div>
             </div>
           </div>
@@ -128,7 +125,7 @@
       </div>
     </section>
 
-    <!-- HOME (Keşfet) -->
+    <!-- HOME (Keşfet) + Top10 -->
     <div class="split">
       <section id="pageHome" class="card" style="display:none">
         <div class="hd">Keşfet</div>
@@ -273,6 +270,7 @@
       if(u){
         $('#btnSignOut').style.display='inline-block';
         $('#btnMyProfile').style.display='inline-block';
+        $('#btnGoLogin').style.display='none';
         $('#btnMyProfile').href = '#/u/'+u.uid;
         await ensureUserDocs(u);
         await updateCounters();
@@ -280,6 +278,7 @@
       }else{
         $('#btnSignOut').style.display='none';
         $('#btnMyProfile').style.display='none';
+        $('#btnGoLogin').style.display='inline-block';
       }
       router();
     });
@@ -652,7 +651,7 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // Profile inline rate
+    // Profil içinde puan kaydet
     document.getElementById('btnRate')?.addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
@@ -666,10 +665,10 @@
       }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
     });
 
-    /* ===== LOGIN actions (arka planda Google ile) ===== */
-    document.getElementById('loginSubmit')?.addEventListener('click', async ()=>{
+    /* ===== LOGIN actions: Google ile ===== */
+    document.getElementById('loginGoogle')?.addEventListener('click', async ()=>{
       const msg = $('#loginMsg');
-      msg.textContent = 'Giriş yapılıyor…';
+      msg.textContent = 'Google ile giriş yapılıyor…';
       try{
         await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
       }catch(err){
