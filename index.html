@@ -7,27 +7,31 @@
 
   <style>
     :root{
-      --bg:#f7f8fb; --text:#0f172a; --muted:#64748b;
-      --card:#ffffff; --line:#e6e9ef;
-      --accent:#0A66C2; --accent-600:#0857A6;
-      --ok:#10b981; --err:#ef4444;
+      /* Tek ton mavi + nötrler */
+      --bg:#f7f8fb; --card:#ffffff; --line:#e6e9ef;
+      --ink:#0f172a; --muted:#64748b;
+      --accent:#0A66C2; --accent-50:#eef5ff; --accent-200:#c2dbfb;
+      --accent-600:#0A66C2; --accent-700:#0857A6;
+
+      --radius:14px; --shadow:0 10px 24px rgba(15,23,42,.04);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    a{color:var(--accent-700);text-decoration:none}
+    a:hover{text-decoration:underline}
 
     /* NAV */
     .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
     .nav-inner{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .brand{font-weight:700}
-    .nav a{color:var(--text);text-decoration:none}
+    .brand{font-weight:800;color:var(--accent-700)}
     .spacer{flex:1}
     .count{color:var(--muted);font-size:14px}
 
     /* LAYOUT */
     .wrap{max-width:1080px;margin:24px auto 64px;padding:0 16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
-    .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:800}
     .bd{padding:16px}
     .muted{color:var(--muted)}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -37,29 +41,29 @@
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
     .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-    .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
+    .btn.primary:hover{background:var(--accent-700)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
-    input[type=text], textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
-    textarea{min-height:80px;resize:vertical}
+    input[type=text]{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink)}
 
     /* TABLE */
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
-    th{color:#111827}
+    tbody tr:hover{background:#f9fbff}
 
-    /* PROFILE */
-    .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
+    /* PROFILE HEADER */
+    .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
+    .kpis{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
-    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--accent-200);background:var(--accent-50);color:var(--accent-700);font-weight:700}
+    .badge.big{font-size:16px}
+    .badge .num{font-variant-numeric:tabular-nums}
 
-    /* MODAL (kalıyor ama KAPALI) */
-    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:50}
-    .modal{width:min(680px,92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
-    .ok{color:var(--ok)} .err{color:var(--err)}
+    /* MODAL (kilitli) */
+    .backdrop{display:none}
 
     footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 
-    /* 🔒 Düzenleme tamamen kapalı */
+    /* Düzenleme kapalı */
     #editBack{ display:none !important; }
     #btnEdit{  display:none !important; }
   </style>
@@ -88,8 +92,8 @@
         <div class="grid">
           <div>
             <p class="muted">
-              Tek gösterilen puan (0–100): <b>Güvenli puan</b>
-              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.
+              Tek gösterilen puan (0–100): <b>Güvenli puan (LCB)</b>  
+              <code>Puan = Ortalama − 1.96 × (StdSapma / √Oy)</code>.  
               <b>Not:</b> En az 1 oy almayan profiller sıralamaya dahil edilmez.
             </p>
             <div class="row" style="margin-top:8px">
@@ -122,11 +126,20 @@
     <section id="pageProfile" class="card" style="display:none">
       <div class="hd">Profil</div>
       <div class="bd">
-        <div class="row" style="align-items:center">
-          <img id="profAvatar" class="avatar" alt="">
-          <div style="flex:1">
-            <div id="profName" style="font-weight:800;font-size:20px">—</div>
-            <div id="profHandle" class="muted">@—</div>
+        <!-- Başlık -->
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <div class="row" style="align-items:center">
+            <img id="profAvatar" class="avatar" alt="">
+            <div style="margin-left:12px">
+              <div id="profName" style="font-weight:800;font-size:20px">—</div>
+              <div id="profHandle" class="muted">@—</div>
+              <div class="kpis" style="margin-top:10px">
+                <span class="badge big">#<span class="num" id="kpiRank">—</span></span>
+                <span class="badge">LCB <span class="num" id="kpiLCB">—</span></span>
+                <span class="badge">Oy <span class="num" id="kpiVotes">—</span></span>
+                <span class="badge" id="kpiTopWrap" style="display:none">Top <span class="num" id="kpiTop">—</span>%</span>
+              </div>
+            </div>
           </div>
           <div class="row">
             <button id="btnEdit" class="btn" style="display:none">Profili düzenle</button>
@@ -135,23 +148,24 @@
           </div>
         </div>
 
-        <p id="profBio" class="muted" style="margin:10px 0 6px"></p>
-        <div id="profMeta" class="muted" style="font-size:14px"></div>
-
-        <div class="kpi" style="margin:12px 0">
-          <span class="pill" id="profScore">Puan: —</span>
-          <span class="pill" id="profCount">Oy: —</span>
-          <span class="pill" id="profRank">Sıra: —</span>
+        <!-- Ağ metrikleri -->
+        <div class="row" style="margin:14px 0 6px">
+          <span class="pill">Seni puanlayanlar: <b id="netRatedBy">—</b></span>
+          <span class="pill">Puanladıkların: <b id="netGiven">—</b></span>
         </div>
 
-        <!-- Puanlama kutusu (başkasının profilinde) -->
-        <div id="rateBox" class="row" style="display:none">
+        <p id="profBio" class="muted" style="margin:6px 0 6px"></p>
+        <div id="profMeta" class="muted" style="font-size:14px"></div>
+
+        <!-- Puan kutusu (başkasının profilinde) -->
+        <div id="rateBox" class="row" style="margin-top:14px;display:none">
           <input id="scoreInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px" />
           <button id="btnRate" class="btn primary">Puanla / Güncelle</button>
           <span id="rateMsg" class="muted"></span>
         </div>
 
         <h3 style="margin:18px 0 8px">Alınan Puanlar</h3>
+        <div class="muted" style="margin:-6px 0 8px">Puan değerleri gizlidir; aşağıda yalnızca veren kişi ve tarih görünür.</div>
         <div id="receivedList" class="muted">Yükleniyor…</div>
       </div>
     </section>
@@ -159,50 +173,8 @@
 
   <footer>© piann.com</footer>
 
-  <!-- EDIT MODAL (SİSTEMDE TUTULUYOR AMA KAPALI) -->
-  <div id="editBack" class="backdrop">
-    <div class="modal">
-      <div class="hd row" style="justify-content:space-between">
-        <span>Profili düzenle</span>
-        <button id="editClose" class="btn">Kapat</button>
-      </div>
-      <div class="bd" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="full" style="grid-column:1/-1">
-          <label class="muted">Görünen ad</label>
-          <input id="edName" type="text" placeholder="Ad Soyad">
-        </div>
-        <div>
-          <label class="muted">Kullanıcı adı (@)</label>
-          <input id="edHandle" type="text" placeholder="ornek_kullanici">
-          <small class="muted">3–15, harf-rakam-altçizgi. Benzersiz olmalı.</small>
-        </div>
-        <div>
-          <label class="muted">Web sitesi</label>
-          <input id="edWeb" type="text" placeholder="https://...">
-        </div>
-        <div class="full" style="grid-column:1/-1">
-          <label class="muted">Bio</label>
-          <textarea id="edBio" maxlength="160" placeholder="Kısa bio (≤160)"></textarea>
-        </div>
-        <div>
-          <label class="muted">Konum</label>
-          <input id="edLoc" type="text" placeholder="İstanbul, TR">
-        </div>
-        <div>
-          <label class="muted">Avatar (URL)</label>
-          <input id="edAvatar" type="text" placeholder="https://...">
-        </div>
-        <div class="full" style="grid-column:1/-1">
-          <label class="muted">Kapak (URL)</label>
-          <input id="edCover" type="text" placeholder="https://...">
-        </div>
-        <div class="full row" style="justify-content:flex-end">
-          <span id="edMsg" class="muted"></span>
-          <button id="edSave" class="btn primary" disabled>Kaydet</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- EDIT MODAL (sistemde dursun ama kapalı) -->
+  <div id="editBack" class="backdrop"></div>
 
   <!-- Firebase SDK (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -210,8 +182,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    /* 🔒 Global kilit: düzenleme kapalı */
-    const EDIT_LOCKED = true;
+    const EDIT_LOCKED = true; // düzenleme kapalı
 
     /* Firebase config — piann-c58b8 */
     const firebaseConfig = {
@@ -229,11 +200,12 @@
     /* ===== Helpers ===== */
     const $ = (s)=>document.querySelector(s);
     const pages = {home:$('#pageHome'), rank:$('#pageRank'), profile:$('#pageProfile')};
+    const toComma2 = (n)=> Number.isFinite(n)? (Math.round(n*100)/100).toFixed(2).replace('.', ',') : '—';
     const toComma5 = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
     const normUrl = (u)=> u && !/^https?:\/\//i.test(u) ? ('https://' + u) : u;
     function clamp01_100(x){ return Math.max(0, Math.min(100, x)); }
 
-    // Güvenli puan (LCB): mean − 1.96 * (sd / sqrt(n))
+    // LCB: mean − 1.96 * (sd / sqrt(n))
     function lcbScoreFromAggregates(sumMicro, sumSqMicro, n){
       if(!n || n<=0) return 0;
       const mean = (sumMicro / n) / 100000; // 0..100
@@ -304,7 +276,8 @@
           ratingCount:0,
           ratingSumMicro:0,
           ratingSumSqMicro:0,
-          avgMicroCache:0
+          avgMicroCache:0,
+          givenCount:0
         }, {merge:true});
       }
       const pRef = db.collection('profiles').doc(u.uid);
@@ -335,7 +308,6 @@
         const s = await db.collection('users').get();
         $('#memberCount').textContent = 'Üye: ' + s.size;
 
-        // Puanlanan sayısı
         let rated = 0;
         s.forEach(d=>{ const c=(d.data().ratingCount||0); if(c>0) rated++; });
         $('#ratedCount').textContent = 'Puanlanan: ' + rated;
@@ -347,19 +319,18 @@
       const box = $('#homeTop10');
       const qs = await db.collection('users').get();
       const arr=[];
-      qs.forEach(d=>{
-        const u=d.data();
-        const c=u.ratingCount||0;
-        if(c<=0) return; // ◀ en az 1 oy şartı
+      qs.forEach(doc=>{
+        const u=doc.data(), c=u.ratingCount||0;
+        if(c<=0) return;
         const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
         const score = lcbScoreFromAggregates(sum, sumsq, c);
-        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
+        arr.push({id:doc.id, name:u.displayName||'(İsimsiz)', score, count:c});
       });
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       const top=arr.slice(0,10);
       if(top.length===0){ box.textContent='Puanlanan üye yok.'; return; }
       let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
-      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma5(u.score)}</td><td>${u.count}</td></tr>`);
+      top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/u/${u.id}">${u.name}</a></td><td>${toComma2(u.score)}</td><td>${u.count}</td></tr>`);
       html+='</tbody></table>'; box.innerHTML=html;
     }
 
@@ -369,19 +340,17 @@
       const wrap=$('#rankTableWrap'); wrap.textContent='Yükleniyor…';
       const qs=await db.collection('users').get();
       const arr=[];
-      qs.forEach(d=>{
-        const u=d.data();
-        const c=u.ratingCount||0;
-        if(c<=0) return; // ◀ en az 1 oy şartı
-        const sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro||0;
-        const score = lcbScoreFromAggregates(sum, sumsq, c);
-        arr.push({id:d.id, name:u.displayName||'(İsimsiz)', score, count:c});
+      qs.forEach(doc=>{
+        const u=doc.data(), c=u.ratingCount||0;
+        if(c<=0) return;
+        const score=lcbScoreFromAggregates(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
+        arr.push({id:doc.id, name:u.displayName||'(İsimsiz)', score, count:c});
       });
       $('#rankTotal').textContent='Puanlanan üye: '+arr.length;
       arr.sort((a,b)=> b.score - a.score || b.count - a.count);
       if(arr.length===0){ wrap.textContent='Puanlanan üye yok.'; return; }
       let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
-      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+      arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${toComma2(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
       html+='</tbody></table>'; wrap.innerHTML=html;
     }
 
@@ -398,28 +367,38 @@
       const udat=uDoc.data();
       const cnt=udat.ratingCount||0, sum=udat.ratingSumMicro||0, sumsq=udat.ratingSumSqMicro||0;
 
+      // KPI’lar
       if(cnt>0){
         const myScore = lcbScoreFromAggregates(sum, sumsq, cnt);
-        $('#profScore').textContent = 'Puan: '+toComma5(myScore);
-        $('#profCount').textContent = 'Oy: '+cnt;
+        $('#kpiLCB').textContent   = toComma2(myScore);
+        $('#kpiVotes').textContent = String(cnt);
 
-        // Sıralama: sadece puanlananlar arasında
         const all=await db.collection('users').get();
         const arr=[];
         all.forEach(d=>{
-          const x=d.data();
-          const c=x.ratingCount||0; if(c<=0) return;
-          const s=x.ratingSumMicro||0, ss=x.ratingSumSqMicro||0;
-          arr.push({id:d.id, score:lcbScoreFromAggregates(s, ss, c), count:c});
+          const x=d.data(); const c=x.ratingCount||0; if(c<=0) return;
+          arr.push({id:d.id, score:lcbScoreFromAggregates(x.ratingSumMicro||0, x.ratingSumSqMicro||0, c), count:c});
         });
         arr.sort((a,b)=> b.score - a.score || b.count - a.count);
         const pos=arr.findIndex(x=>x.id===uid);
-        $('#profRank').textContent='Sıra: '+(pos>=0? pos+1 : '—')+' / '+arr.length;
+        $('#kpiRank').textContent = (pos>=0? pos+1 : '—');
+        if(arr.length>0 && pos>=0){
+          const pct = Math.ceil(100 * (pos+1) / arr.length);
+          $('#kpiTop').textContent = String(pct);
+          $('#kpiTopWrap').style.display='inline-flex';
+        }else{
+          $('#kpiTopWrap').style.display='none';
+        }
       }else{
-        $('#profScore').textContent = 'Puan: — (henüz oy yok)';
-        $('#profCount').textContent = 'Oy: 0';
-        $('#profRank').textContent  = 'Sıra: — (en az 1 oy sonrası)';
+        $('#kpiLCB').textContent   = '—';
+        $('#kpiVotes').textContent = '0';
+        $('#kpiRank').textContent  = '—';
+        $('#kpiTopWrap').style.display='none';
       }
+
+      // ağ metrikleri
+      $('#netRatedBy').textContent = String(udat.ratingCount||0);
+      $('#netGiven').textContent   = String(udat.givenCount||0);
 
       // profile doc
       const pRef=db.collection('profiles').doc(uid);
@@ -438,7 +417,6 @@
       $('#profMeta').textContent = meta.join('   ');
 
       const own = me && me.uid===uid;
-      // Edit butonu global kilit yüzünden CSS ile kapalı; rate kutusu yine kendi profili değilse açık
       $('#btnRateOpen').style.display = own ? 'none' : 'inline-block';
       $('#rateBox').style.display     = own ? 'none' : 'flex';
 
@@ -447,7 +425,7 @@
         navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: ' + link));
       };
 
-      // received list
+      // received list (puan gizli)
       loadReceived(uid);
     }
 
@@ -456,19 +434,19 @@
       try{
         const snap=await db.collection('users').doc(uid).collection('ratings').orderBy('updatedAt','desc').limit(20).get();
         if(snap.empty){ box.textContent='Henüz oy yok.'; return; }
-        let html='<table><thead><tr><th>Veren</th><th>Puan</th><th>Tarih</th></tr></thead><tbody>';
+        let html='<table><thead><tr><th>Veren</th><th>Tarih</th></tr></thead><tbody>';
         for(const d of snap.docs){
-          const r=d.data(); const score=(r.micro/100000).toFixed(5).replace('.', ',');
+          const r=d.data();
           let who=d.id;
           try{ const pp=await db.collection('profiles').doc(d.id).get(); if(pp.exists){ const pd=pp.data(); who=pd.displayName || '@'+(pd.handle||'user'); } }catch{}
           const t = r.updatedAt && r.updatedAt.toDate ? r.updatedAt.toDate().toLocaleString() : '-';
-          html+=`<tr><td>${who}</td><td>${score}</td><td>${t}</td></tr>`;
+          html+=`<tr><td>${who}</td><td>${t}</td></tr>`;
         }
         html+='</tbody></table>'; box.innerHTML=html;
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // PUANLAMA
+    // PUANLAMA  (mimari eklendi: givenCount & given/ alt koleksiyonu + sumSqMicro)
     $('#btnRate').addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
@@ -478,17 +456,35 @@
 
       try{
         await db.runTransaction(async (tx)=>{
-          const userRef = db.collection('users').doc(uid);
-          const rateRef = userRef.collection('ratings').doc(me.uid);
-          const uSnap = await tx.get(userRef);
-          if(!uSnap.exists) throw new Error('Kullanıcı yok');
+          const targetRef = db.collection('users').doc(uid);
+          const rateRef   = targetRef.collection('ratings').doc(me.uid);
+          const meRef     = db.collection('users').doc(me.uid);
+          const givenRef  = meRef.collection('given').doc(uid);
+
+          const tSnap = await tx.get(targetRef);
+          if(!tSnap.exists) throw new Error('Kullanıcı yok');
 
           const rSnap = await tx.get(rateRef);
-          const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
+          const mSnap = await tx.get(meRef);
+          const gSnap = await tx.get(givenRef);
+
+          const oldMicro = rSnap.exists ? (rSnap.data().micro||0) : 0;
           const newMicro = parsed.micro;
 
-          const deltaSum   = newMicro - old;
-          const deltaCount = rSnap.exists ? 0 : 1;
+          // hedef kullanıcının toplamları
+          let ratingCount = tSnap.data().ratingCount||0;
+          let ratingSum   = tSnap.data().ratingSumMicro||0;
+          let ratingSumSq = tSnap.data().ratingSumSqMicro||0;
+
+          if(!rSnap.exists){
+            ratingCount += 1;
+            ratingSum   += newMicro;
+            ratingSumSq += (newMicro*newMicro);
+          }else{
+            ratingSum   += (newMicro - oldMicro);
+            ratingSumSq += (newMicro*newMicro - oldMicro*oldMicro);
+          }
+          const avgMicroCache = ratingCount>0 ? Math.floor(ratingSum / ratingCount) : 0;
 
           tx.set(rateRef, {
             micro: newMicro,
@@ -496,25 +492,23 @@
             createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
           }, { merge:true });
 
-          const oSum=uSnap.data().ratingSumMicro||0, oCnt=uSnap.data().ratingCount||0;
-          const nSum=oSum+deltaSum, nCnt=oCnt+deltaCount;
-          const newAvgMicro = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
-
-          tx.set(userRef, {
-            ratingSumMicro:nSum,
-            ratingCount:nCnt,
-            avgMicroCache:newAvgMicro
+          tx.set(targetRef, {
+            ratingCount, ratingSumMicro:ratingSum, ratingSumSqMicro:ratingSumSq, avgMicroCache
           }, { merge:true });
+
+          // rater tarafı: ilk defaysa givenCount++ ve given/{target} oluştur
+          if(!gSnap.exists){
+            const givenCount = (mSnap.exists ? (mSnap.data().givenCount||0) : 0) + 1;
+            tx.set(meRef, { givenCount }, { merge:true });
+            tx.set(givenRef, { createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+          }
         });
         msg.textContent='Kaydedildi ✔'; msg.className='ok';
         renderProfile(currentProfileUid);
-      }catch(e){ msg.textContent='Hata: '+e.message; msg.className='err'; }
+      }catch(e){ console.error(e); msg.textContent='Hata: '+e.message; msg.className='err'; }
     });
 
-    /* ===== Edit modal fonksiyonunu da kilitle (güvenlik) ===== */
-    window.openEditModal = function(){ if(EDIT_LOCKED) alert('Profil düzenleme geçici olarak kapalı.'); };
-
-    /* ===== Router ===== */
+    /* Router */
     function router(){
       const h=location.hash||'#/';
       if(h==='#/'||h==='#'){ renderHome(); return; }
