@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>piann — keşfet & puanlama (beta)</title>
+  <title>piann</title>
   <style>
     :root{
       --bg:#f7f8fb; --card:#ffffff; --line:#e6e9ef;
@@ -17,7 +17,7 @@
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--ink);background:var(--bg)}
     a{color:var(--accent-700);text-decoration:none} a:hover{text-decoration:underline}
 
-    /* NAV */
+    /* NAV (login'de gizli) */
     .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
     .nav-inner{max-width:1160px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .brand{font-weight:800;color:var(--accent-700);display:flex;align-items:center;gap:8px}
@@ -43,14 +43,14 @@
     .num{font-variant-numeric:tabular-nums}
     footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 
-    /* DISCOVER */
+    /* DISCOVER (3 kart, alt alta) */
     .disco-grid{display:flex;flex-direction:column;gap:14px}
     .disco-card{display:grid;grid-template-columns:1fr 170px;gap:12px;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fff}
     .disco-left{display:flex;flex-direction:column;gap:8px}
     .disco-head{display:flex;align-items:center;gap:10px}
     .avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
     .handle{color:var(--muted);font-size:13px}
-    .bio{font-size:14px;color:var(--muted);line-height:1.4;max-height:3.2em;overflow:hidden}
+    .bio{font-size:14px;color:var(--muted);line-height:1.45;max-height:5.2em;overflow:hidden}
     .chips{display:flex;gap:6px;flex-wrap:wrap}
     .chip{padding:3px 8px;border-radius:999px;border:1px solid var(--accent-200);background:#fff;color:var(--accent-700);font-size:12px}
     .quick{display:flex;gap:6px}
@@ -60,7 +60,7 @@
     .disco-score{font-size:24px;font-weight:800;color:var(--accent)}
     .disco-rank{font-size:13px;color:var(--muted);margin-top:4px}
 
-    /* LOGIN (full-screen) */
+    /* LOGIN tam sayfa */
     .login-shell{min-height:100vh;display:grid;place-items:center;padding:32px 16px}
     .login-card{width:min(520px, 92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 48px rgba(2,32,71,.08);padding:24px}
     .login-logo{display:flex;justify-content:center;margin-bottom:8px}
@@ -230,10 +230,24 @@
 
     /* ===== Auth ===== */
     let me=null;
+
+    // Redirect dönüşünü yakala (takılmayı önler)
+    (async ()=>{
+      try{
+        const res = await auth.getRedirectResult();
+        if(res && res.user){
+          const m = document.getElementById('loginMsg');
+          if(m) m.textContent = '';
+        }
+      }catch(e){
+        const m = document.getElementById('loginMsg');
+        if(m) m.textContent = e?.message || 'Giriş hatası.';
+      }
+    })();
+
     auth.onAuthStateChanged(async (u)=>{
       me=u;
       if(u){
-        // Nav görünür, butonlar görünür
         $('#btnSignOut').style.display='inline-block';
         $('#btnMyProfile').style.display='inline-block';
         $('#btnMyProfile').href = '#/u/'+u.uid;
@@ -241,11 +255,9 @@
         await ensureUserDocs(u);
         await updateCounters();
 
-        // Giriş yaptı → keşfet
         if(location.hash.startsWith('#/login')){ location.hash = '#/'; return; }
         router();
       }else{
-        // Çıkış yaptı → login
         $('#btnSignOut').style.display='none';
         $('#btnMyProfile').style.display='none';
         location.hash = '#/login';
@@ -319,7 +331,7 @@
     async function renderDiscover3(){
       const wrap = $('#discoverGrid');
       wrap.innerHTML = '';
-      if(!me){ return; } // guard, zaten login'e düşüreceğiz
+      if(!me){ return; }
 
       const excluded = await getExcludedIds(me.uid);
       const qs = await db.collection('users').limit(120).get();
@@ -419,25 +431,20 @@
       const msg     = el.querySelector('.msg');
       el.querySelectorAll('.q').forEach(ch => ch.onclick = ()=>{ inScore.value = ch.dataset.q; inScore.focus(); });
 
-      if(!me || p.demo){
-        btnSave.onclick = ()=> location.hash = '#/login';
-        btnSkip.onclick = ()=> location.hash = '#/login';
-      }else{
-        btnSave.onclick = async ()=>{
-          const parsed = (inScore.value||'').replace(',', '.');
-          const pr = Number(parsed);
-          if(!isFinite(pr) || pr<=0 || pr>100){ msg.textContent='Geçersiz değer'; return; }
-          const micro = Math.round(pr*100000);
-          msg.textContent='Kaydediliyor…';
-          try{
-            await rateUser(p.uid, micro);
-            await markSeen(p.uid);
-            msg.textContent='Kaydedildi ✔';
-            el.style.opacity = .6; setTimeout(()=> el.remove(), 350);
-          }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
-        };
-        btnSkip.onclick = async ()=>{ try{ await markSeen(p.uid); }catch{} el.style.opacity=.6; setTimeout(()=> el.remove(),200); };
-      }
+      btnSave.onclick = async ()=>{
+        const parsed = (inScore.value||'').replace(',', '.');
+        const pr = Number(parsed);
+        if(!isFinite(pr) || pr<=0 || pr>100){ msg.textContent='Geçersiz değer'; return; }
+        const micro = Math.round(pr*100000);
+        msg.textContent='Kaydediliyor…';
+        try{
+          await rateUser(p.uid, micro);
+          await markSeen(p.uid);
+          msg.textContent='Kaydedildi ✔';
+          el.style.opacity = .6; setTimeout(()=> el.remove(), 350);
+        }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
+      };
+      btnSkip.onclick = async ()=>{ try{ await markSeen(p.uid); }catch{} el.style.opacity=.6; setTimeout(()=> el.remove(),200); };
       return el;
     }
 
@@ -608,36 +615,41 @@
       }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
     });
 
-    /* ===== LOGIN actions: Google ile ===== */
+    /* ===== LOGIN: Google (popup + timeout + redirect fallback) ===== */
     document.getElementById('loginGoogle')?.addEventListener('click', async ()=>{
-      const msg = $('#loginMsg');
+      const msg = document.getElementById('loginMsg');
       msg.textContent = 'Google ile giriş yapılıyor…';
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      function withTimeout(promise, ms = 2000){
+        return Promise.race([
+          promise,
+          new Promise((_, reject)=> setTimeout(()=> reject({ code:'timeout' }), ms))
+        ]);
+      }
+
       try{
-        await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        await withTimeout(auth.signInWithPopup(provider), 2000);
+        // başarılı olursa onAuthStateChanged tetiklenecek
       }catch(err){
-        if(err && (err.code==='auth/popup-blocked' || err.code==='auth/popup-closed-by-user')){
-          try{
-            await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
-          }catch(e2){ msg.textContent = e2.message || 'Giriş başarısız.'; }
-        }else{
-          msg.textContent = err?.message || 'Giriş başarısız.';
+        try{
+          await auth.signInWithRedirect(provider);
+        }catch(e2){
+          msg.textContent = e2?.message || 'Giriş başarısız.';
         }
       }
     });
 
-    /* ===== Router + sayfa görünürlüğü ===== */
+    /* ===== Router + guard ===== */
     function showPage(name){
-      // Login sayfasındayken NAV tamamen gizli
       const showLogin = name==='login';
       document.getElementById('topNav').style.display = showLogin ? 'none':'block';
-
       document.getElementById('pageLogin').style.display   = showLogin ? 'block':'none';
       document.getElementById('pageHome').style.display    = name==='home'   ? 'block':'none';
       document.getElementById('pageRank').style.display    = name==='rank'   ? 'block':'none';
       document.getElementById('pageProfile').style.display = name==='profile'? 'block':'none';
       document.getElementById('sideTop').style.display     = name==='home'   ? 'block':'none';
     }
-
     async function renderHomeTop10(){
       const box = document.getElementById('homeTop10');
       box.textContent = 'Yükleniyor…';
@@ -659,28 +671,17 @@
         box.innerHTML=html;
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
-
     function guardAuthOrLogin(next){
       if(!me){ location.hash = '#/login'; return false; }
       return true;
     }
-
     function router(){
       const h=location.hash||'#/login';
-      // Giriş yapılmamışsa daima login
-      if(!me){
-        showPage('login');
-        return;
-      }
-      // Mevcut kullanıcı varsa sayfalara yönlendir
-      if(h==='#/' || h==='#'){
-        if(!guardAuthOrLogin()) return;
-        renderHome(); return;
-      }
+      if(!me){ showPage('login'); return; } // login guard
+      if(h==='#/' || h==='#'){ if(!guardAuthOrLogin()) return; renderHome(); return; }
       if(h.startsWith('#/login')){ showPage('login'); return; }
       if(h.startsWith('#/rank')) { if(!guardAuthOrLogin()) return; renderRank(); return; }
       if(h.startsWith('#/u/'))   { if(!guardAuthOrLogin()) return; renderProfile(h.split('/')[2]); return; }
-      // default
       if(!guardAuthOrLogin()) return;
       renderHome();
     }
