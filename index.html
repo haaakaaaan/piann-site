@@ -60,6 +60,40 @@
     .disco-right{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--accent-50);border-radius:10px;padding:10px}
     .disco-score{font-size:24px;font-weight:800;color:var(--accent)}
     .disco-rank{font-size:13px;color:var(--muted);margin-top:4px}
+
+    /* === Login page (kurumsal sade) === */
+    .login-wrap{
+      min-height: calc(100vh - 60px);
+      display:grid; grid-template-columns:1.1fr .9fr; gap:20px;
+      align-items:center; justify-content:center; padding:40px 16px;
+      max-width:1160px; margin:0 auto;
+    }
+    @media (max-width:980px){ .login-wrap{grid-template-columns:1fr} }
+    .login-hero{
+      background:linear-gradient(135deg,#0A66C2 0%, #3f8ce2 100%);
+      border-radius:16px; color:#fff; padding:26px; box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .login-hero h1{margin:0 0 8px; font-size:28px}
+    .login-hero p{margin:0 0 8px; color:#e7f2ff}
+    .login-pts{display:grid; gap:8px; margin-top:10px}
+    .login-pts span{display:flex; gap:8px; align-items:flex-start}
+    .login-card{
+      width:min(520px, 92vw);
+      background:#fff; border:1px solid var(--line); border-radius:14px;
+      box-shadow:0 18px 48px rgba(2,32,71,.08); justify-self:center;
+    }
+    .login-card .hd{ padding:18px 20px; border-bottom:1px solid var(--line); font-weight:800; }
+    .login-card .bd{ padding:20px; }
+    .login-title{ font-size:22px; font-weight:800; margin:0 0 6px }
+    .login-sub{ color:var(--muted); margin:0 0 16px }
+    .login-btn{ width:100%; display:flex; align-items:center; gap:10px;
+      padding:12px 14px; border:1px solid var(--line); border-radius:10px;
+      background:#fff; cursor:pointer; font-weight:600; margin-bottom:10px;
+    }
+    .login-btn:hover{ background:#f9fafb }
+    .login-btn img{ width:20px; height:20px }
+    .login-note{ font-size:12px; color:var(--muted); margin-top:8px }
   </style>
 </head>
 <body>
@@ -72,15 +106,45 @@
       <div class="spacer"></div>
       <span id="memberCount" class="count">Üye: —</span>
       <span id="ratedCount" class="count">Puanlanan: —</span>
-      <button id="btnSignIn" class="btn primary">Google ile giriş yap</button>
+      <a href="#/login" id="btnGoLogin" class="btn">Giriş</a>
       <a id="btnMyProfile" href="#/" class="btn" style="display:none">Profilim</a>
       <button id="btnSignOut" class="btn" style="display:none">Çıkış</button>
     </div>
   </div>
 
   <main class="wrap">
+    <!-- LOGIN (sade) -->
+    <section id="pageLogin" class="login-wrap" style="display:none">
+      <div class="login-hero">
+        <h1>Saygılı puanlama, güvenli sıralama.</h1>
+        <p>Tek görünür skor: <b>LCB</b> — düşük oylarda temkinli, çok oylarda güvenli.</p>
+        <div class="login-pts">
+          <span>✅ 0–100 arası puan, 5 ondalık hassasiyet</span>
+          <span>✅ LCB sıralaması: Ortalama − 1.96 × (StdSapma / √Oy)</span>
+          <span>✅ Spam ve suistimal tespit kuralları</span>
+        </div>
+      </div>
+      <div class="login-card">
+        <div class="hd">Giriş yap</div>
+        <div class="bd">
+          <h2 class="login-title">piann’a hoş geldin</h2>
+          <p class="login-sub">Keşfetmek, puan vermek ve sıralamaya girmek için giriş yap.</p>
+
+          <!-- Sadece Google ile devam et -->
+          <button class="login-btn" id="btnLoginGoogle">
+            <img alt="" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+            <span>Google ile devam et</span>
+          </button>
+
+          <div class="login-note">
+            Girişle birlikte profilin oluşturulur. <a href="#/privacy">Gizlilik</a> • <a href="#/terms">Kullanım</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOME / DISCOVER -->
     <div class="split">
-      <!-- LEFT: HOME / DISCOVER -->
       <section id="pageHome" class="card" style="display:none">
         <div class="hd">Keşfet</div>
         <div class="bd">
@@ -90,8 +154,6 @@
           </div>
         </div>
       </section>
-
-      <!-- RIGHT: SMALL TOP10 -->
       <aside class="card" id="sideTop" style="display:none">
         <div class="hd">Top 10</div>
         <div class="bd" id="homeTop10">Yükleniyor…</div>
@@ -227,23 +289,40 @@
     let me=null;
     auth.onAuthStateChanged(async (u)=>{
       me=u;
-      if(u){
-        $('#btnSignIn').style.display='none';
-        $('#btnSignOut').style.display='inline-block';
-        $('#btnMyProfile').style.display='inline-block';
-        $('#btnMyProfile').href = '#/u/'+u.uid;
 
+      // NAV görünürlük
+      $('#btnGoLogin').style.display = u ? 'none':'inline-block';
+      $('#btnSignOut').style.display = u ? 'inline-block':'none';
+      $('#btnMyProfile').style.display = u ? 'inline-block':'none';
+      if(u) $('#btnMyProfile').href = '#/u/'+u.uid;
+
+      if(u){
         await ensureUserDocs(u);
         await updateCounters();
-        await renderHome(); // keşfet + top10
+
+        // login sayfasındayken giriş yapıldıysa profilime gönder
+        if(location.hash.startsWith('#/login')){ location.hash = '#/u/'+u.uid; return; }
       }else{
-        $('#btnSignIn').style.display='inline-block';
-        $('#btnSignOut').style.display='none';
-        $('#btnMyProfile').style.display='none';
-        router(); // demoları göster
+        // Giriş yoksa her rotayı login'e zorunlu yönlendir
+        if(!location.hash.startsWith('#/login')){ location.hash = '#/login'; return; }
       }
+      router();
     });
-    $('#btnSignIn').onclick = ()=> auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+
+    // Login tık
+    $('#btnLoginGoogle').onclick = async ()=>{
+      try{
+        await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      }catch(err){
+        if(err && (err.code==='auth/popup-blocked' || err.code==='auth/popup-closed-by-user')){
+          try{ await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider()); }
+          catch(e2){ alert(e2.message); }
+        }else{
+          alert(err.message || 'Giriş başarısız.');
+        }
+      }
+    };
+
     $('#btnSignOut').onclick = ()=> auth.signOut();
 
     async function ensureUserDocs(u){
@@ -282,7 +361,7 @@
       }catch{}
     }
 
-    /* ===== Home (Discover + Side Top10) ===== */
+    /* ===== Home (Discover + Side Top10) — Giriş zorunlu ===== */
     async function renderHome(){
       showPage('home');
       await renderDiscover3();
@@ -312,26 +391,11 @@
       }catch(e){ box.textContent='Hata: '+e.message; }
     }
 
-    // DEMO set (girişsiz)
-    const demoProfiles = [
-      { id:'d1', name:'Ada Yılmaz', handle:'adayilmaz', bio:'Üretim mühendisi, kahve ve deniz tutkunu.', photo:'https://i.pravatar.cc/100?img=5', lcb:68.36, cnt:3, isNew:true },
-      { id:'d2', name:'Bora Demir',  handle:'borademir',  bio:'Verimlilik saplantılı, sade kod savunucusu.', photo:'https://i.pravatar.cc/100?img=12', lcb:82.10, cnt:25, isNew:false },
-      { id:'d3', name:'Ceyda Kaya',  handle:'ceyda',      bio:'Tasarım sistemleri ve tipografi.', photo:'https://i.pravatar.cc/100?img=32', lcb:null,  cnt:0,  isNew:true }
-    ];
-
     async function renderDiscover3(){
       const wrap = $('#discoverGrid');
       wrap.innerHTML = '';
 
-      if(!me){
-        demoProfiles.forEach(p=> wrap.appendChild(buildDiscoverCard({
-          uid: p.id, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
-          lcb: p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true, rank:null, total:null
-        })));
-        $('#btnDiscoRefresh').onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
-        return;
-      }
-
+      // Adayları topla
       const excluded = await getExcludedIds(me.uid);
       const qs = await db.collection('users').limit(120).get();
       const cand=[];
@@ -349,6 +413,8 @@
         });
       });
       cand.sort(()=> Math.random()-0.5);
+
+      // profile alanlarını ekle
       const pick = cand.slice(0,12);
       for(const c of pick){
         try{
@@ -364,13 +430,13 @@
           }
         }catch{ c.handle = c.uid.slice(0,6); c.bio=''; }
       }
+
       const three = pick.slice(0,3);
       if(three.length===0){
         wrap.innerHTML = '<div class="muted">Gösterilecek profil bulunamadı.</div>';
         return;
       }
 
-      // Sıra haritasını al
       const rm = await getRankMap();
 
       three.forEach(p=>{
@@ -437,38 +503,34 @@
         ch.onclick = ()=>{ inScore.value = ch.dataset.q; inScore.focus(); };
       });
 
-      if(!me || p.demo){
-        btnSave.onclick = ()=> alert('Puan vermek için Google ile giriş yapın.');
-        btnSkip.onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
-      }else{
-        btnSave.onclick = async ()=>{
-          const parsed = parseScore(inScore.value);
-          if(!parsed){ msg.textContent='Geçersiz değer'; return; }
-          msg.textContent='Kaydediliyor…';
-          try{
-            await rateUser(p.uid, parsed.micro);
-            await markSeen(p.uid);
-            msg.textContent='Kaydedildi ✔';
-            el.style.opacity = .6;
-            setTimeout(()=>{ el.remove(); }, 350);
-          }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
-        };
-        btnSkip.onclick = async ()=>{
-          try{ await markSeen(p.uid); }catch{}
+      btnSave.onclick = async ()=>{
+        const parsed = parseScore(inScore.value);
+        if(!parsed){ msg.textContent='Geçersiz değer'; return; }
+        msg.textContent='Kaydediliyor…';
+        try{
+          await rateUser(p.uid, parsed.micro);
+          await markSeen(p.uid);
+          msg.textContent='Kaydedildi ✔';
           el.style.opacity = .6;
-          setTimeout(()=>{ el.remove(); }, 200);
-        };
-      }
+          setTimeout(()=>{ el.remove(); }, 350);
+        }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
+      };
+      btnSkip.onclick = async ()=>{
+        try{ await markSeen(p.uid); }catch{}
+        el.style.opacity = .6;
+        setTimeout(()=>{ el.remove(); }, 200);
+      };
+
       return el;
     }
 
     async function getExcludedIds(myUid){
       const set = new Set();
-      try{ // verilen oylar
+      try{
         const g = await db.collection('users').doc(myUid).collection('given').limit(1000).get();
         g.forEach(d=> set.add(d.id));
       }catch{}
-      try{ // son 14 gün görülen
+      try{
         const since = new Date(Date.now() - 14*24*60*60*1000);
         const s = await db.collection('users').doc(myUid).collection('discoverSeen')
                   .where('seenAt','>=', since).limit(1000).get();
@@ -536,6 +598,8 @@
 
     /* ===== Rank page ===== */
     async function renderRank(){
+      // giriş yoksa login'e
+      if(!me){ location.hash = '#/login'; return; }
       showPage('rank');
       const wrap=$('#rankTableWrap'); wrap.textContent='Yükleniyor…';
       const qs=await db.collection('users').get();
@@ -557,6 +621,7 @@
     /* ===== Profile page ===== */
     let currentProfileUid=null;
     async function renderProfile(uid){
+      if(!me){ location.hash = '#/login'; return; }
       showPage('profile'); currentProfileUid=uid;
 
       const uRef = db.collection('users').doc(uid);
@@ -652,27 +717,20 @@
 
     /* ===== Router ===== */
     function showPage(name){
+      $('#pageLogin').style.display  = name==='login' ? 'grid':'none';
       $('#pageHome').style.display   = name==='home' ? 'block':'none';
       $('#pageRank').style.display   = name==='rank' ? 'block':'none';
       $('#pageProfile').style.display= name==='profile' ? 'block':'none';
       $('#sideTop').style.display    = name==='home' ? 'block':'none';
     }
-    async function renderHomeAnonymous(){
-      showPage('home');
-      const wrap=$('#discoverGrid'); wrap.innerHTML='';
-      demoProfiles.forEach(p=> wrap.appendChild(buildDiscoverCard({
-        uid:p.id, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
-        lcb:p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true, rank:null, total:null
-      })));
-      await renderHomeTop10();
-      $('#btnDiscoRefresh').onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
-    }
     function router(){
-      const h=location.hash||'#/';
-      if(h==='#/'||h==='#'){ me ? renderHome() : renderHomeAnonymous(); return; }
+      const h=location.hash||'#/login';
+      if(h==='#/login'){ showPage('login'); return; }
+      if(!me){ showPage('login'); return; } // güvenlik: giriş yoksa kilit
+      if(h==='#/'||h==='#'){ renderHome(); return; }
       if(h.startsWith('#/rank')){ renderRank(); return; }
       if(h.startsWith('#/u/')){ renderProfile(h.split('/')[2]); return; }
-      me ? renderHome() : renderHomeAnonymous();
+      renderHome();
     }
     window.addEventListener('hashchange', router);
     router();
