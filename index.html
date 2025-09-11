@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>piann</title>
+  <title>piann — keşfet & puanlama (beta)</title>
   <style>
     :root{
       --bg:#f7f8fb; --card:#ffffff; --line:#e6e9ef;
@@ -20,7 +20,8 @@
     /* NAV */
     .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
     .nav-inner{max-width:1160px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .brand{font-weight:800;color:var(--accent-700)}
+    .brand{font-weight:800;color:var(--accent-700);display:flex;align-items:center;gap:8px}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
     .spacer{flex:1}
     .count{color:var(--muted);font-size:14px}
 
@@ -32,7 +33,6 @@
     .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:800}
     .bd{padding:16px}
     .muted{color:var(--muted)}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
     .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -84,7 +84,7 @@
   <!-- NAV -->
   <div class="nav">
     <div class="nav-inner">
-      <div class="brand">piann</div>
+      <div class="brand">piann <span class="pill">beta</span></div>
       <a href="#/" class="btn">Keşfet</a>
       <a href="#/rank" class="btn">Liderboard</a>
       <div class="spacer"></div>
@@ -101,8 +101,14 @@
     <section id="pageLogin" class="login-shell" style="display:none">
       <div class="login-split">
         <div class="login-hero">
+          <!-- SLOGAN: güncellendi -->
           <h1>Gerçek değerini keşfet; skorun senin imzan.</h1>
           <p>piann, insanların birbirini puanladığı ve gerçek değerini gördüğü topluluk.</p>
+          <ul>
+            <li>Basit ve hızlı giriş</li>
+            <li>Tek görünür skor: LCB</li>
+            <li>En az 1 oy alanlar listede</li>
+          </ul>
         </div>
         <div class="login-card">
           <div class="hd">Giriş yap</div>
@@ -122,7 +128,7 @@
       </div>
     </section>
 
-    <!-- HOME -->
+    <!-- HOME (Keşfet) -->
     <div class="split">
       <section id="pageHome" class="card" style="display:none">
         <div class="hd">Keşfet</div>
@@ -365,7 +371,6 @@
       wrap.innerHTML = '';
 
       if(!me){
-        // giriş yoksa: login mimarisiyle uyumlu akış -> demo, oy verilemez
         demoProfiles.forEach(p=> wrap.appendChild(buildDiscoverCard({
           uid: p.id, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
           lcb: p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true, rank:null, total:null
@@ -411,7 +416,6 @@
         return;
       }
 
-      // Sıra haritası
       const rm = await getRankMap();
 
       three.forEach(p=>{
@@ -649,7 +653,7 @@
     }
 
     // Profile inline rate
-    $('#btnRate')?.addEventListener('click', async ()=>{
+    document.getElementById('btnRate')?.addEventListener('click', async ()=>{
       const uid=currentProfileUid, msg=$('#rateMsg');
       if(!me){ msg.textContent='Önce giriş yap.'; return; }
       if(me.uid===uid){ msg.textContent='Kendini puanlayamazsın.'; return; }
@@ -662,8 +666,8 @@
       }catch(e){ msg.textContent='Hata: '+(e?.message||e); }
     });
 
-    /* ===== LOGIN actions ===== */
-    $('#loginSubmit')?.addEventListener('click', async ()=>{
+    /* ===== LOGIN actions (arka planda Google ile) ===== */
+    document.getElementById('loginSubmit')?.addEventListener('click', async ()=>{
       const msg = $('#loginMsg');
       msg.textContent = 'Giriş yapılıyor…';
       try{
@@ -681,14 +685,14 @@
 
     /* ===== Router ===== */
     function showPage(name){
-      $('#pageLogin').style.display  = name==='login'  ? 'block':'none';
-      $('#pageHome').style.display   = name==='home'   ? 'block':'none';
-      $('#pageRank').style.display   = name==='rank'   ? 'block':'none';
-      $('#pageProfile').style.display= name==='profile'? 'block':'none';
-      $('#sideTop').style.display    = name==='home'   ? 'block':'none';
+      document.getElementById('pageLogin').style.display   = name==='login'  ? 'block':'none';
+      document.getElementById('pageHome').style.display    = name==='home'   ? 'block':'none';
+      document.getElementById('pageRank').style.display    = name==='rank'   ? 'block':'none';
+      document.getElementById('pageProfile').style.display = name==='profile'? 'block':'none';
+      document.getElementById('sideTop').style.display     = name==='home'   ? 'block':'none';
     }
     async function renderHomeTop10(){
-      const box = $('#homeTop10');
+      const box = document.getElementById('homeTop10');
       box.textContent = 'Yükleniyor…';
       try{
         const qs = await db.collection('users').get();
@@ -724,4 +728,3 @@
   </script>
 </body>
 </html>
-
