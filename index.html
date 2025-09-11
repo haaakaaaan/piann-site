@@ -59,7 +59,7 @@
     .disco-actions{display:flex;gap:8px;flex-wrap:wrap}
     .disco-right{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--accent-50);border-radius:10px;padding:10px}
     .disco-score{font-size:24px;font-weight:800;color:var(--accent)}
-    .disco-rank{font-size:13px;color:var(--muted)}
+    .disco-rank{font-size:13px;color:var(--muted);margin-top:4px}
   </style>
 </head>
 <body>
@@ -192,6 +192,29 @@
       const z = 1.96, se = sd / Math.sqrt(n);
       return clamp01_100(mean - z * se);
     }
+
+    // ---- Rank map cache (1 dk) ----
+    let _rankCache = { ts: 0, map: {}, total: 0 };
+    async function getRankMap(){
+      const now = Date.now();
+      if (now - _rankCache.ts < 60_000 && _rankCache.total) return _rankCache;
+
+      const qs = await db.collection('users').get();
+      const arr = [];
+      qs.forEach(d=>{
+        const u = d.data(), c = u.ratingCount||0;
+        if (c <= 0) return;
+        const score = lcbScoreFromAggregates(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
+        arr.push({ id: d.id, score, count: c });
+      });
+      arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+
+      const map = {};
+      arr.forEach((x,i)=> map[x.id] = i+1);
+      _rankCache = { ts: now, map, total: arr.length };
+      return _rankCache;
+    }
+
     function parseScore(s){
       if(!s) return null; s=String(s).trim().replace(',', '.');
       const v=Number(s); if(!isFinite(v)) return null;
@@ -237,7 +260,6 @@
       }else if(uSnap.exists && (uSnap.data().rand==null)){
         await uRef.set({ rand: Math.random() }, { merge:true });
       }
-      // profile doc opsiyonel (handle/bio eklemek istersen)
       const pRef = db.collection('profiles').doc(u.uid);
       const pSnap= await pRef.get();
       if(!pSnap.exists){
@@ -302,18 +324,15 @@
       wrap.innerHTML = '';
 
       if(!me){
-        // DEMO 3 kart
         demoProfiles.forEach(p=> wrap.appendChild(buildDiscoverCard({
           uid: p.id, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
-          lcb: p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true
+          lcb: p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true, rank:null, total:null
         })));
         $('#btnDiscoRefresh').onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
         return;
       }
 
-      // Authed: exclusions (given + seen in 14d)
       const excluded = await getExcludedIds(me.uid);
-      // Candidate users
       const qs = await db.collection('users').limit(120).get();
       const cand=[];
       qs.forEach(d=>{
@@ -329,7 +348,6 @@
           sumsq: u.ratingSumSqMicro||0
         });
       });
-      // Shuffle & enrich profile bits (first 12)
       cand.sort(()=> Math.random()-0.5);
       const pick = cand.slice(0,12);
       for(const c of pick){
@@ -347,17 +365,22 @@
         }catch{ c.handle = c.uid.slice(0,6); c.bio=''; }
       }
       const three = pick.slice(0,3);
-
       if(three.length===0){
         wrap.innerHTML = '<div class="muted">Gösterilecek profil bulunamadı.</div>';
         return;
       }
 
+      // Sıra haritasını al
+      const rm = await getRankMap();
+
       three.forEach(p=>{
         const lcb = lcbScoreFromAggregates(p.sum, p.sumsq, p.cnt);
+        const rank = (p.cnt > 0 && rm.map[p.uid]) ? rm.map[p.uid] : null;
+        const total = rm.total || null;
         wrap.appendChild(buildDiscoverCard({
           uid:p.uid, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
-          lcb: Number.isFinite(lcb)? lcb : null, cnt:p.cnt, isNew:(p.cnt||0)===0
+          lcb: Number.isFinite(lcb)? lcb : null, cnt:p.cnt, isNew:(p.cnt||0)===0,
+          rank, total
         }));
       });
     }
@@ -395,9 +418,14 @@
             <span class="muted msg"></span>
           </div>
         </div>
+
         <div class="disco-right">
           <div class="disco-score">${Number.isFinite(p.lcb)? toComma2(p.lcb) : '—'}</div>
-          <div class="disco-rank">${(p.cnt||0)>0? 'Oy: '+p.cnt : 'Yeni'}</div>
+          <div class="disco-rank">
+            ${ p.rank ? ('Sıra: #'+p.rank+' / '+(p.total||'—'))
+                      : ( (p.cnt||0)>0 ? 'Sıra: —' : 'Yeni') }
+          </div>
+          <div class="disco-rank">Oy: ${p.cnt||0}</div>
         </div>
       `;
 
@@ -436,13 +464,11 @@
 
     async function getExcludedIds(myUid){
       const set = new Set();
-      // Zaten puanladıkların
-      try{
+      try{ // verilen oylar
         const g = await db.collection('users').doc(myUid).collection('given').limit(1000).get();
         g.forEach(d=> set.add(d.id));
       }catch{}
-      // Son 14 günde görülenler
-      try{
+      try{ // son 14 gün görülen
         const since = new Date(Date.now() - 14*24*60*60*1000);
         const s = await db.collection('users').doc(myUid).collection('discoverSeen')
                   .where('seenAt','>=', since).limit(1000).get();
@@ -633,11 +659,10 @@
     }
     async function renderHomeAnonymous(){
       showPage('home');
-      // Girişsiz: DEMO kartlar
       const wrap=$('#discoverGrid'); wrap.innerHTML='';
       demoProfiles.forEach(p=> wrap.appendChild(buildDiscoverCard({
         uid:p.id, name:p.name, handle:p.handle, bio:p.bio, photo:p.photo,
-        lcb:p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true
+        lcb:p.lcb, cnt:p.cnt, isNew:p.isNew, demo:true, rank:null, total:null
       })));
       await renderHomeTop10();
       $('#btnDiscoRefresh').onclick = ()=> alert('Daha fazla keşfetmek için Google ile giriş yapın.');
