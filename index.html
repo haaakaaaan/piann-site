@@ -49,7 +49,7 @@
   .bd{padding:16px}
   .muted{color:var(--muted)}
 
-  /* PROFILE/ROW */
+  /* DISCOVER ROW */
   .row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
   .left{display:flex;gap:14px}
   .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
@@ -66,22 +66,21 @@
   th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
   th{color:#111827}
 
-  /* CAROUSEL (duels) */
-  .carousel{display:flex;gap:10px;overflow:auto;padding-bottom:6px}
-  .dc{min-width:220px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px}
-  .dc .title{font-weight:700;margin:4px 0}
-  .dc .mini{display:flex;align-items:center;gap:6px}
-  .dc img{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);object-fit:cover}
-
-  /* RISING GRID */
-  .grid2x3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  @media (max-width:700px){.grid2x3{grid-template-columns:repeat(2,1fr)}}
-  .rise{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;display:flex;gap:10px;align-items:center}
-  .rise .up{color:var(--ok);font-weight:700}
-
-  /* TICKER */
-  .ticker{display:flex;gap:12px;flex-wrap:wrap;font-size:14px;color:#0a3e78}
-  .tick-b{background:#eef5ff;border:1px solid #d5e7ff;border-radius:999px;padding:6px 10px}
+  /* DUEL — NEW LOOK */
+  .duel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:900px){.duel-grid{grid-template-columns:1fr}}
+  .duel-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:12px;position:relative}
+  .duel-head{display:flex;align-items:center;gap:12px}
+  .duel-head img{width:64px;height:64px;border-radius:50%;border:1px solid var(--line)}
+  .duel-title{font-weight:800}
+  .rank-badge{position:absolute;top:12px;right:12px;background:#0a3e7833;color:#0a3e78;font-weight:800;border-radius:999px;padding:6px 10px;border:1px solid #cfe2ff}
+  .bigscore{font-size:40px;font-weight:900;color:#0a3e78}
+  .statline{display:flex;gap:10px;flex-wrap:wrap}
+  .meta{font-size:13px;color:#475569}
+  .duel-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .duel-footer{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:4px}
+  .swap-tip{font-size:12px;color:#64748b}
+  .skip-hint{font-size:12px;color:#64748b;text-align:center;margin-top:4px}
 
   footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 </style>
@@ -111,12 +110,18 @@
   <div class="grid">
     <!-- LEFT COLUMN -->
     <div>
-      <!-- DUEL ARENA -->
-      <section class="card">
+      <!-- DUEL ARENA (single matchup) -->
+      <section class="card" id="duelCard">
         <div class="hd">Düello Arenası</div>
-        <div class="bd">
-          <div class="carousel" id="duelCarousel">Yükleniyor…</div>
-          <div id="duelStage" style="margin-top:12px">Bir düello seç.</div>
+        <div class="bd" id="duelStage">
+          Yükleniyor…
+        </div>
+        <div class="bd" style="border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;align-items:center">
+          <span class="swap-tip">İpucu: <b>Sağa kaydır</b> → atla • Klavye: <b>→</b> atla, <b>←</b> yer değiştir</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost" id="btnSkip">Atla →</button>
+            <button class="btn" id="btnShuffle">Karıştır (Yeni Düello)</button>
+          </div>
         </div>
       </section>
 
@@ -124,14 +129,6 @@
       <section class="card" style="margin-top:16px">
         <div class="hd">Keşfet</div>
         <div class="bd" id="discoverBox">Yükleniyor…</div>
-      </section>
-
-      <!-- RISING -->
-      <section class="card" style="margin-top:16px">
-        <div class="hd">Yükselenler</div>
-        <div class="bd">
-          <div id="risingWrap" class="grid2x3">Yükleniyor…</div>
-        </div>
       </section>
     </div>
 
@@ -184,7 +181,7 @@
 <footer>© piann.com — demo prototip</footer>
 
 <script>
-/* ====== Basit hata yakalama (sayfa içi debug) ====== */
+/* ====== Basit hata yakalama ====== */
 (function(){
   const dbg=document.getElementById('debug');
   window.addEventListener('error', e=>{
@@ -219,7 +216,7 @@ const randInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=(arr,n)=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
 const shuffle=(a)=>pick(a,a.length);
 
-/* ===== Yerel avatar (harici yok) ===== */
+/* ===== Yerel avatar ===== */
 function initials(name){
   const parts = (name||'').trim().split(/\s+/);
   const a = (parts[0]||'').charAt(0);
@@ -238,7 +235,7 @@ function avatarDataURL(name, tone='brand'){
   return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
 }
 
-/* ===== Seed Data (500 profiles) — harici istek yok ===== */
+/* ===== Seed Data (500 profiles) ===== */
 const fixedPeople=["Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr",
 "Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook","Taylor Swift","Ariana Grande",
 "Beyoncé","Ed Sheeran","Rihanna","Hakan Kocapüskül"];
@@ -297,6 +294,7 @@ function rankArray(list=profiles){
   arr.sort((a,b)=> b.score - a.score || b.count - a.count);
   return arr;
 }
+function rankOf(id){ const arr=rankArray(); const i=arr.findIndex(x=>x.id===id); return i>=0? i+1 : null; }
 function percentileOf(id){
   const arr=rankArray(); const pos=arr.findIndex(x=>x.id===id); if(pos<0||arr.length===0) return {rank:'—',total:arr.length,p:0};
   const rank=pos+1, total=arr.length, p = Math.round((1 - (rank-1)/total)*100);
@@ -306,8 +304,7 @@ function percentileOf(id){
 /* ===== In-memory rating ===== */
 const activityLog=[]; // {t,id,v}
 function rateInMemory(targetId, val){
-  const ME = window.__ME__;
-  if(targetId===ME.id){ alert('Kendini puanlayamazsın (demo).'); return; }
+  if(targetId===window.__ME__.id){ alert('Kendini puanlayamazsın (demo).'); return; }
   const u=profiles.find(p=>p.id===targetId); if(!u) return;
   const micro=Math.round(val*1e5); const old=0; const deltaSum=micro-old; const deltaCnt=1;
   u.ratingSumMicro += deltaSum;
@@ -318,9 +315,9 @@ function rateInMemory(targetId, val){
 }
 
 /* ===== Home render ===== */
-function renderAllHome(){ renderDuels(); loadDiscover(); loadTop50(); renderMeCard(); renderRising(); renderTicker(); }
+function renderAllHome(){ renderDuelSingle(); loadDiscover(); loadTop50(); renderMeCard(); renderTicker(); }
 
-/* ===== DUEL ARENA ===== */
+/* ===== DUEL — Single matchup ===== */
 function idByName(name){ const p=profiles.find(x=>x.displayName===name); return p?.id; }
 const duelNames = [
   ["Cristiano Ronaldo","Lionel Messi"],
@@ -332,118 +329,157 @@ const duelNames = [
   ["Taylor Swift","Rihanna"],
   ["BMW","Mercedes-Benz"]
 ];
-function duelPairs(){
-  return duelNames.map(([a,b])=>{
+let duelQueue = [];
+let currentDuel = null;
+
+function refillDuelQueue(){
+  const base = duelNames.map(([a,b])=>{
     const la=idByName(a) || profiles[1].id; const rb=idByName(b) || profiles[2].id;
     return [la,rb];
   });
+  // ayrıca rastgele 5 çift ekleyelim (ME hariç)
+  const others = profiles.filter(p=>p.id!==window.__ME__.id);
+  for(let i=0;i<5;i++){
+    const [x,y] = pick(others,2);
+    base.push([x.id,y.id]);
+  }
+  duelQueue = shuffle(base);
 }
-function renderDuels(){
-  const car = $('#duelCarousel');
-  const pairs = duelPairs();
-  const cards = pairs.map(([l,r])=>{
-    const L=profiles.find(p=>p.id===l), R=profiles.find(p=>p.id===r);
-    const lS=lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
-    const rS=lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
-    return `
-      <div class="dc">
-        <div class="mini"><img src="${L.photoURL}"><span>${L.displayName}</span></div>
-        <div class="mini"><img src="${R.photoURL}"><span>${R.displayName}</span></div>
-        <div class="title">${to5(lS)} vs ${to5(rS)}</div>
-        <button class="btn primary pick-duel" data-l="${L.id}" data-r="${R.id}" style="width:100%">Karşılaştır</button>
-      </div>`;
-  }).join('');
-  car.innerHTML = cards;
-  car.querySelectorAll('.pick-duel').forEach(b=>{
-    b.onclick = ()=> renderDuelStage(b.dataset.l, b.dataset.r);
-  });
-  const [l0,r0]=pairs[0]; renderDuelStage(l0,r0);
+function nextDuel(){
+  if(duelQueue.length===0) refillDuelQueue();
+  currentDuel = duelQueue.shift();
+  renderDuelSingle();
 }
-function renderDuelStage(leftId,rightId){
+function shuffleDuel(){
+  refillDuelQueue();
+  nextDuel();
+}
+function swapDuel(){
+  if(!currentDuel) return;
+  currentDuel = [currentDuel[1], currentDuel[0]];
+  renderDuelSingle();
+}
+
+function renderDuelSingle(){
+  if(!currentDuel){ refillDuelQueue(); currentDuel = duelQueue.shift(); }
+  const [leftId,rightId] = currentDuel;
   const L=profiles.find(p=>p.id===leftId), R=profiles.find(p=>p.id===rightId);
   const lS=lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
   const rS=lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
+  const lRank=rankOf(L.id); const rRank=rankOf(R.id);
+  const lMeta=(L.location?('📍 '+L.location):'') + (L.website?(' • 🔗 '+L.website):'');
+  const rMeta=(R.location?('📍 '+R.location):'') + (R.website?(' • 🔗 '+R.website):'');
+
   $('#duelStage').innerHTML = `
-    <div class="row">
-      <div class="left">
-        <img class="avatar" src="${L.photoURL}">
-        <div style="flex:1">
-          <div class="name">${L.displayName}</div>
-          <div class="handle">@${L.id.slice(0,8)}</div>
-          <div class="bio">${L.bio||''}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button class="btn ql" data-id="${L.id}" data-v="70">70</button>
-            <button class="btn ql" data-id="${L.id}" data-v="80">80</button>
-            <button class="btn ql" data-id="${L.id}" data-v="90">90</button>
-            <button class="btn ql" data-id="${L.id}" data-v="95">95</button>
-            <input class="score-input" id="inL" type="text" placeholder="0–100 (örn: 92,50000)" style="max-width:200px">
-            <button class="btn primary svL" data-id="${L.id}">Puanla</button>
+    <div class="duel-grid" id="duelGrid">
+      <!-- LEFT CARD -->
+      <div class="duel-card" id="duelLeft">
+        <div class="rank-badge">Rank #${lRank ?? '—'}</div>
+        <div class="duel-head">
+          <img src="${L.photoURL}" alt="">
+          <div>
+            <div class="duel-title">${L.displayName}</div>
+            <div class="handle">@${L.id.slice(0,8)} • <span class="muted">${L.type}</span></div>
           </div>
         </div>
+        <div class="statline">
+          <span class="bigscore" id="scL">${to5(lS)}</span>
+          <span class="pill">Oy: ${L.ratingCount}</span>
+        </div>
+        <div class="meta">${lMeta}</div>
+        <div class="bio">${L.bio||''}</div>
+        <div class="duel-actions">
+          <button class="btn ql" data-v="70">70</button>
+          <button class="btn ql" data-v="80">80</button>
+          <button class="btn ql" data-v="90">90</button>
+          <button class="btn ql" data-v="95">95</button>
+          <input class="score-input" id="inL" type="text" placeholder="0–100 (örn: 92,50000)" style="max-width:200px">
+          <button class="btn primary" id="btnRateL">Puanla</button>
+        </div>
       </div>
-      <div class="rightbox">
-        <div class="score" id="scL">${to5(lS)}</div>
-        <div class="sub">Oy: ${L.ratingCount}</div>
+
+      <!-- RIGHT CARD -->
+      <div class="duel-card" id="duelRight">
+        <div class="rank-badge">Rank #${rRank ?? '—'}</div>
+        <div class="duel-head">
+          <img src="${R.photoURL}" alt="">
+          <div>
+            <div class="duel-title">${R.displayName}</div>
+            <div class="handle">@${R.id.slice(0,8)} • <span class="muted">${R.type}</span></div>
+          </div>
+        </div>
+        <div class="statline">
+          <span class="bigscore" id="scR">${to5(rS)}</span>
+          <span class="pill">Oy: ${R.ratingCount}</span>
+        </div>
+        <div class="meta">${rMeta}</div>
+        <div class="bio">${R.bio||''}</div>
+        <div class="duel-actions">
+          <button class="btn qr" data-v="70">70</button>
+          <button class="btn qr" data-v="80">80</button>
+          <button class="btn qr" data-v="90">90</button>
+          <button class="btn qr" data-v="95">95</button>
+          <input class="score-input" id="inR" type="text" placeholder="0–100 (örn: 87,00000)" style="max-width:200px">
+          <button class="btn primary" id="btnRateR">Puanla</button>
+        </div>
       </div>
     </div>
 
-    <div style="display:flex;gap:8px;justify-content:center;margin:10px 0">
-      <button class="btn ghost choose" data-w="L">◀ Daha iyi (sol)</button>
-      <button class="btn ghost swap">Yer değiştir</button>
-      <button class="btn ghost choose" data-w="R">Daha iyi (sağ) ▶</button>
+    <div class="duel-footer">
+      <button class="btn ghost" id="chooseL">◀ Sol daha iyi</button>
+      <button class="btn ghost" id="btnSwap">Yer değiştir</button>
+      <button class="btn ghost" id="chooseR">Sağ daha iyi ▶</button>
     </div>
-
-    <div class="row" style="margin-top:10px">
-      <div class="left">
-        <img class="avatar" src="${R.photoURL}">
-        <div style="flex:1">
-          <div class="name">${R.displayName}</div>
-          <div class="handle">@${R.id.slice(0,8)}</div>
-          <div class="bio">${R.bio||''}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button class="btn qr" data-id="${R.id}" data-v="70">70</button>
-            <button class="btn qr" data-id="${R.id}" data-v="80">80</button>
-            <button class="btn qr" data-id="${R.id}" data-v="90">90</button>
-            <button class="btn qr" data-id="${R.id}" data-v="95">95</button>
-            <input class="score-input" id="inR" type="text" placeholder="0–100 (örn: 87,00000)" style="max-width:200px">
-            <button class="btn primary svR" data-id="${R.id}">Puanla</button>
-          </div>
-        </div>
-      </div>
-      <div class="rightbox">
-        <div class="score" id="scR">${to5(rS)}</div>
-        <div class="sub">Oy: ${R.ratingCount}</div>
-      </div>
-    </div>
+    <div class="skip-hint">Sağa kaydır → Düelloyu atla</div>
   `;
 
-  // wires
-  $('#duelStage').querySelectorAll('.ql').forEach(b=> b.onclick=()=> $('#inL').value = b.dataset.v.replace('.',','));
-  $('#duelStage').querySelectorAll('.qr').forEach(b=> b.onclick=()=> $('#inR').value = b.dataset.v.replace('.',','));
-  $('#duelStage').querySelector('.svL').onclick = ()=>{
-    const v=Number(($('#inL').value||'').replace(',','.')); if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
-    rateInMemory(leftId,v); postUpdate();
-  };
-  $('#duelStage').querySelector('.svR').onclick = ()=>{
-    const v=Number(($('#inR').value||'').replace(',','.')); if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
-    rateInMemory(rightId,v); postUpdate();
-  };
-  $('#duelStage').querySelector('.swap').onclick = ()=> renderDuelStage(rightId,leftId);
-  $('#duelStage').querySelectorAll('.choose').forEach(b=>{
-    b.onclick=()=>{
-      const hi=92.5, lo=75;
-      if(b.dataset.w==='L'){ rateInMemory(leftId,hi); rateInMemory(rightId,lo); }
-      else { rateInMemory(rightId,hi); rateInMemory(leftId,lo); }
-      postUpdate(true);
-    };
-  });
+  // quick fill
+  $('#duelLeft').querySelectorAll('.ql').forEach(b=> b.onclick=()=> $('#inL').value=b.dataset.v.replace('.',','));
+  $('#duelRight').querySelectorAll('.qr').forEach(b=> b.onclick=()=> $('#inR').value=b.dataset.v.replace('.',','));
 
-  function postUpdate(confetti=false){
+  // buttons
+  $('#btnRateL').onclick=()=>{
+    const v=Number(($('#inL').value||'').replace(',','.'));
+    if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+    rateInMemory(L.id,v); afterScore();
+  };
+  $('#btnRateR').onclick=()=>{
+    const v=Number(($('#inR').value||'').replace(',','.'));
+    if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+    rateInMemory(R.id,v); afterScore();
+  };
+  $('#chooseL').onclick=()=>{ rateInMemory(L.id,92.5); rateInMemory(R.id,75); afterScore(true); };
+  $('#chooseR').onclick=()=>{ rateInMemory(R.id,92.5); rateInMemory(L.id,75); afterScore(true); };
+  $('#btnSwap').onclick=()=> swapDuel();
+  $('#btnSkip').onclick=()=> nextDuel();
+  $('#btnShuffle').onclick=()=> shuffleDuel();
+
+  // keyboard shortcuts
+  document.onkeydown=(e)=>{
+    if(e.key==='ArrowRight'){ nextDuel(); }
+    else if(e.key==='ArrowLeft'){ swapDuel(); }
+  };
+
+  // swipe to skip (right swipe)
+  const grid = $('#duelGrid');
+  let sx=null, sy=null;
+  grid.addEventListener('touchstart', (ev)=>{ const t=ev.changedTouches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+  grid.addEventListener('touchend', (ev)=>{
+    if(sx==null) return;
+    const t=ev.changedTouches[0]; const dx=t.clientX - sx; const dy=t.clientY - sy;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy) && dx>0){ nextDuel(); }
+    sx=sy=null;
+  }, {passive:true});
+
+  function afterScore(confetti=false){
     if(confetti){
-      [$('#scL'),$('#scR')].forEach(el=>{ el.style.transition='transform .15s'; el.style.transform='scale(1.1)'; setTimeout(()=>el.style.transform='scale(1)',180); });
+      ['#scL','#scR'].forEach(id=>{
+        const el=$(id); el.style.transition='transform .15s'; el.style.transform='scale(1.1)'; setTimeout(()=>el.style.transform='scale(1)',180);
+      });
     }
-    renderDuelStage(leftId,rightId);
-    loadTop50(); renderMeCard(); renderRising(); renderTicker();
+    // re-render current (scores & ranks may değişti)
+    renderDuelSingle();
+    loadTop50(); renderMeCard(); renderTicker();
   }
 }
 
@@ -501,7 +537,7 @@ function loadDiscover(){
       const v=Number((inp.value||'').replace(',','.'));
       if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
       rateInMemory(uid,v);
-      loadDiscover(); loadTop50(); renderMeCard(); renderRising(); renderTicker();
+      loadDiscover(); loadTop50(); renderMeCard(); renderTicker();
     };
   });
   box.querySelectorAll('.btn.skip').forEach(b=> b.onclick=()=> loadDiscover());
@@ -546,39 +582,6 @@ function renderMeCard(){
       </div>
     </div>
   `;
-}
-
-/* ===== RISING ===== */
-function renderRising(){
-  const now=Date.now(); const oneH=3600e3;
-  const incMap=new Map();
-  activityLog.filter(a=> now-a.t<=oneH).forEach(a=>{
-    const prev = incMap.get(a.id)||0;
-    incMap.set(a.id, prev + (a.v-50));
-  });
-  const list = Array.from(incMap.entries()).map(([id,delta])=>{
-    const p=profiles.find(x=>x.id===id);
-    return {id, name:p.displayName, photo:p.photoURL, up: Math.max(0, Math.round(delta*100)/100)};
-  }).sort((a,b)=> b.up - a.up).slice(0,6);
-
-  const wrap=$('#risingWrap');
-  if(list.length===0){
-    const generic = shuffle(rankArray()).slice(0,6).map(u=>{
-      const p=profiles.find(x=>x.id===u.id);
-      return `<div class="rise"><img class="avatar" src="${p.photoURL}"><div><div>${p.displayName}</div><div class="muted">LCB: ${to5(u.score)} • Oy: ${u.count}</div></div></div>`;
-    }).join('');
-    wrap.innerHTML = generic; return;
-  }
-  wrap.innerHTML = list.map(x=>`
-    <div class="rise">
-      <img class="avatar" src="${x.photo}">
-      <div style="flex:1">
-        <div>${x.name} <span class="up">↑ ${x.up}</span></div>
-        <div class="muted">@${x.id.slice(0,8)}</div>
-      </div>
-      <a class="btn" href="#/profile/${x.id}">Gör</a>
-    </div>
-  `).join('');
 }
 
 /* ===== TICKER ===== */
@@ -654,7 +657,7 @@ function renderProfile(uid){
     $('#btnRate').onclick=()=>{
       const v=Number(($('#rateInput').value||'').replace(',','.'));
       if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
-      rateInMemory(uid,v); renderProfile(uid); loadTop50(); renderMeCard(); renderRising(); renderTicker();
+      rateInMemory(uid,v); renderProfile(uid); loadTop50(); renderMeCard(); renderTicker();
     };
   }
 }
@@ -666,12 +669,12 @@ function boot(){
   $('#memberCount').textContent = 'Üye: '+profiles.length;
   attachRankingButtons();
   route();
-  // hafif canlılık simülasyonu (harici yok)
+  // canlılık simülasyonu (hafif)
   setInterval(()=>{
     const target = profiles[randInt(0,profiles.length-1)];
     const val = randInt(60,95);
     rateInMemory(target.id, val);
-    loadTop50(); renderMeCard(); renderRising(); renderTicker();
+    loadTop50(); renderMeCard(); renderTicker();
   }, 9000);
   console.log('Ready: profiles=', profiles.length);
 }
