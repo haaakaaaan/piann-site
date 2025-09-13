@@ -4,655 +4,196 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>piann — puan & sıralama</title>
-<meta name="color-scheme" content="light" />
 <style>
   :root{
-    --ink:#0f172a; --muted:#64748b; --line:#e6e9ef;
-    --bg:#f7f8fb; --card:#ffffff;
-    --accent:#0A66C2; --accent-600:#0857A6;
-    --ok:#10b981; --err:#ef4444;
-    --container:min(1080px, 96vw);
+    --ink:#0f172a; --muted:#64748b; --line:#e6e9ef; --card:#fff;
+    --accent:#0A66C2; --accent-600:#0857A6; --bg:#f7f8fb;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
+  *{box-sizing:border-box} html,body{height:100%}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--ink);background:var(--bg)}
-
-  /* NAV (girişten sonra) */
-  .nav{display:none; position:sticky; top:0; z-index:5; background:#fff; border-bottom:1px solid var(--line)}
-  .nav .in{max-width:var(--container); margin:0 auto; padding:10px 12px; display:flex; gap:10px; align-items:center}
-  .brand{font-weight:800; letter-spacing:.2px}
-  .nav a, .nav button{appearance:none; border:1px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; color:var(--ink); text-decoration:none; cursor:pointer; font-weight:600}
-  .nav .sp{flex:1}
-  .nav .pill{border-radius:999px; background:#eef2ff; border-color:#e6e9ef; color:#3730a3; font-size:12px}
-
-  /* WRAP + COMMON */
-  main{max-width:var(--container); margin:24px auto 72px; padding:0 12px}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 10px 24px rgba(15,23,42,.04)}
-  .hd{padding:14px 16px; border-bottom:1px solid var(--line); font-weight:800}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px}
+  /* topbar */
+  .top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+  .topin{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+  .brand{font-weight:800}
+  .sp{flex:1}
+  .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:var(--accent-600)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
+  .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
   .bd{padding:16px}
+  .hero h1{font-size:42px;line-height:1.15;margin:24px 0 8px}
   .muted{color:var(--muted)}
-  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-  .btn{appearance:none; border:1px solid var(--line); background:#fff; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700}
-  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
-  .btn.primary:hover{background:var(--accent-600); border-color:var(--accent-600)}
-  .btn:disabled{opacity:.6; cursor:not-allowed}
-  input,textarea{width:100%; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px; color:var(--ink)}
-  textarea{min-height:80px; resize:vertical}
-
-  /* LOGIN VIEW */
-  #login{display:flex; align-items:flex-start; gap:28px; margin-top:28px}
-  #login .left{flex:1 1 60%}
-  #login .left h1{font-size:42px; line-height:1.2; margin:0 0 12px; color:#0b4f8f}
-  #login .right{flex:1 1 40%}
-  #login .panel{max-width:420px; margin-left:auto}
-  #login .status{font-size:13px; color:var(--muted); margin-top:6px}
-
-  /* DISCOVER */
-  .discover-col{display:flex; flex-direction:column; gap:14px}
-  .dcard{display:flex; gap:14px; padding:14px}
-  .d-left{flex:1 1 auto; min-width:0}
-  .avatar{width:56px; height:56px; border-radius:50%; object-fit:cover; border:1px solid var(--line); background:#f1f5f9}
-  .bio{font-size:15px; color:#111827; line-height:1.45}
-  .chip{font-size:13px; padding:6px 8px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer}
-  .d-right{flex:0 0 190px; display:flex; align-items:center; justify-content:center}
-  .scorebox{width:100%; text-align:center; background:#eef4ff; border:1px solid #dce6ff; border-radius:12px; padding:18px}
-  .scorebox .big{font-size:26px; font-weight:800; color:#0b4f8f}
-  .scorebox small{display:block; color:#445}
-  .rank{font-size:12px; color:#0b4f8f; font-weight:700; margin-top:6px}
-
-  /* TABLE */
-  table{width:100%; border-collapse:collapse}
-  th,td{padding:10px 8px; border-bottom:1px solid var(--line); text-align:left; font-size:14px}
-  th{color:#111827; font-weight:800}
-
-  /* PROFILE */
-  .kp{display:flex; gap:12px; align-items:center}
-  .pill{padding:6px 10px; border:1px solid var(--line); border-radius:999px; background:#fff; font-size:12px; color:var(--muted)}
-
-  footer{margin:32px 0; text-align:center; color:var(--muted); font-size:12px}
+  section[hidden]{display:none !important}
+  .warn{background:#fff8e1;border:1px solid #f6e3a1;color:#6b5b17;padding:10px 12px;border-radius:10px}
+  .center{display:flex;justify-content:center}
+  footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
 
-<!-- NAV (yalnızca girişten sonra görünür) -->
-<nav class="nav" id="nav">
-  <div class="in">
+<!-- NAV (oturumdan sonra görünür) -->
+<div id="topbar" class="top" hidden>
+  <div class="topin">
     <div class="brand">piann</div>
-    <a id="navDiscover" href="#/discover">Keşfet</a>
-    <a id="navBoard" href="#/board">Leaderboard</a>
     <div class="sp"></div>
-    <span id="countUsers" class="pill">Üye: —</span>
-    <a id="navMe" href="#/me" style="display:none">Profilim</a>
-    <button id="btnOut" class="btn">Çıkış</button>
+    <a class="btn" href="#/discover">Keşfet</a>
+    <a class="btn" href="#/rank">Leaderboard</a>
+    <a class="btn" href="#/profile">Profilim</a>
+    <button id="btnSignOut" class="btn">Çıkış</button>
   </div>
-</nav>
+</div>
 
-<main>
-
+<main class="wrap">
   <!-- LOGIN -->
-  <section id="login">
-    <div class="left">
+  <section id="view-login">
+    <div class="hero">
       <h1>Gerçek değerini keşfet; skorun senin imzan</h1>
-      <p class="muted">
-        piann, insanların birbirini puanladığı ve gerçek değerini gördüğü topluluk.
-      </p>
+      <p class="muted">piann, insanların birbirini puanladığı ve gerçek değerini gördüğü topluluk.</p>
     </div>
-    <div class="right">
-      <div class="card panel">
-        <div class="hd">Giriş yap</div>
-        <div class="bd">
-          <button id="btnGoogle" class="btn primary" style="width:100%">
-            <span style="display:inline-flex; gap:8px; align-items:center">
-              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12 s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C33.041,6.053,28.741,4,24,4C12.955,4,4,12.955,4,24 s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.349,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.814C14.406,16.108,18.878,12,24,12c3.059,0,5.842,1.154,7.961,3.039 l5.657-5.657C33.041,6.053,28.741,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.176,0,9.86-1.977,13.409-5.197l-6.19-5.238C29.127,35.399,26.715,36,24,36 c-5.202,0-9.62-3.317-11.283-7.946l-6.521,5.025C9.5,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.097,5.571 c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.773,44,34,44,24C44,22.659,43.862,21.349,43.611,20.083z"></path></svg>
-              Google ile giriş yap
-            </span>
-          </button>
-          <div id="loginStatus" class="status"></div>
-        </div>
+
+    <!-- in-app browser uyarısı -->
+    <div id="iabWarn" class="warn" hidden>
+      Tarayıcı yönlendirmesi bu uygulama içi pencere tarafından engellenebilir.
+      Lütfen <b>“Tarayıcıda aç”</b> deyip sistem tarayıcısında deneyin.
+    </div>
+
+    <div class="card" style="max-width:520px;margin-top:18px">
+      <div class="hd">Giriş yap</div>
+      <div class="bd">
+        <button id="btnGoogle" class="btn primary" style="width:100%">Google ile giriş yap</button>
+        <div id="loginMsg" class="muted" style="margin-top:10px"></div>
       </div>
     </div>
   </section>
 
   <!-- DISCOVER -->
-  <section id="pageDiscover" style="display:none">
+  <section id="view-discover" hidden>
     <div class="card">
       <div class="hd">Keşfet</div>
-      <div class="bd discover-col" id="discoverList">Yükleniyor…</div>
+      <div class="bd">
+        <p class="muted">Buraya 3’lü dikey profil kartlarını koyacağız. (Şablon)</p>
+        <p>Giriş başarılı — router <code>#/discover</code>’a geçti.</p>
+      </div>
     </div>
   </section>
 
-  <!-- LEADERBOARD -->
-  <section id="pageBoard" style="display:none">
+  <!-- RANK -->
+  <section id="view-rank" hidden>
     <div class="card">
-      <div class="hd row" style="justify-content:space-between">
-        <span>Liderboard</span>
-        <span id="rankMeta" class="pill">Puanlanan üye: —</span>
+      <div class="hd">Leaderboard</div>
+      <div class="bd">
+        <p class="muted">Sıralama tablosu burada (şablon).</p>
       </div>
-      <div class="bd" id="boardWrap">Yükleniyor…</div>
     </div>
   </section>
 
   <!-- PROFILE -->
-  <section id="pageProfile" style="display:none">
+  <section id="view-profile" hidden>
     <div class="card">
       <div class="hd">Profil</div>
       <div class="bd">
-        <div class="kp">
-          <img id="pAvatar" class="avatar" alt="">
-          <div style="flex:1">
-            <div id="pName" style="font-weight:800; font-size:20px">—</div>
-            <div id="pHandle" class="muted">@—</div>
-          </div>
-          <button id="btnEdit" class="btn" style="display:none">Profili düzenle</button>
-          <button id="btnShare" class="btn">Paylaş</button>
-        </div>
-        <p id="pBio" class="muted" style="margin:10px 0 6px"></p>
-        <div id="pMeta" class="muted" style="font-size:14px"></div>
-
-        <div class="row" style="margin:12px 0">
-          <span id="pillScore" class="pill">Puan: —</span>
-          <span id="pillCount" class="pill">Oy: —</span>
-          <span id="pillRank" class="pill">Sıra: —</span>
-        </div>
-
-        <div id="rateBox" class="row" style="display:none">
-          <input id="rateInput" placeholder="0–100 (örn: 89.12345)" style="max-width:220px" />
-          <button id="btnRate" class="btn primary">Puanla / Güncelle</button>
-          <span id="rateMsg" class="muted"></span>
-        </div>
-
-        <h3 style="margin:18px 0 8px">Alınan Puanlar</h3>
-        <div id="receivedList" class="muted">Yükleniyor…</div>
+        <div id="meBox">Oturum bilgisi yükleniyor…</div>
       </div>
     </div>
   </section>
-
 </main>
 
 <footer>© piann.com</footer>
 
-<!-- Firebase compat SDK -->
+<!-- Firebase compat -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-  /* ===== Firebase config (piann-c58b8) ===== */
-  const firebaseConfig = {
-    apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
-    authDomain: "piann-c58b8.firebaseapp.com",
-    projectId: "piann-c58b8",
-    storageBucket: "piann-c58b8.appspot.com",
-    messagingSenderId: "1086334896697",
-    appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db   = firebase.firestore();
+/** 1) Firebase config — KENDİ PROJENİN AYNI CONFIG’İNİ YAPIŞTIR **/
+const firebaseConfig = {
+  apiKey: "AI...S8Q",
+  authDomain: "piann-c58b8.firebaseapp.com",
+  projectId: "piann-c58b8",
+  storageBucket: "piann-c58b8.appspot.com",
+  messagingSenderId: "1086334896697",
+  appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-  /* ===== Helpers ===== */
-  const $ = s => document.querySelector(s);
-  const nav = $('#nav');
-  const loginView = $('#login');
-  const pageDiscover = $('#pageDiscover');
-  const pageBoard    = $('#pageBoard');
-  const pageProfile  = $('#pageProfile');
+/** 2) Yardımcılar **/
+const $ = s => document.querySelector(s);
+function isInAppBrowser(){
+  const ua = navigator.userAgent || navigator.vendor || "";
+  return /(FBAN|FBAV|Instagram|Line|Twitter|TikTok|Pinterest|Snapchat|LinkedIn)/i.test(ua);
+}
+function show(id){
+  for (const el of document.querySelectorAll('section[id^="view-"]')) el.hidden = true;
+  document.getElementById(id).hidden = false;
+}
+function showTopbar(showIt){ $('#topbar').hidden = !showIt; }
 
-  function show(...ids){
-    // giriş sonrası görünür nav
-    nav.style.display = auth.currentUser ? 'block':'none';
-    const map = {discover:pageDiscover, board:pageBoard, profile:pageProfile, login:loginView};
-    for(const k of Object.keys(map)) map[k].style.display = 'none';
-    ids.forEach(id=> map[id].style.display = 'block');
+/** 3) Router **/
+function router(){
+  const h = location.hash || '#/';
+  if (h.startsWith('#/discover')) show('view-discover');
+  else if (h.startsWith('#/rank')) show('view-rank');
+  else if (h.startsWith('#/profile')) show('view-profile');
+  else show('view-login');
+}
+window.addEventListener('hashchange', router);
+
+/** 4) Giriş — POPUP ONLY + fallback SESSION **/
+async function signInWithGooglePopupOnly(){
+  const msg = $('#loginMsg');
+  msg.textContent = 'Google açılıyor…';
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  try{
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+  }catch{
+    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
   }
-
-  function to5(x){ return (Math.round(x*100000)/100000).toFixed(5).replace('.', ','); }
-  function clamp100(x){ return Math.max(0, Math.min(100, x)); }
-  const pick = (arr,n)=> arr.sort(()=>Math.random()-0.5).slice(0,n);
-
-  // LCB: mean − 1.96 * (sd / sqrt(n))
-  function lcbFrom(sumMicro, sumSqMicro, n){
-    if(!n || n<=0) return 0;
-    const mean = (sumMicro/n)/100000;
-    let sd = 25; // sumSq yoksa korumacı varsayım
-    if (typeof sumSqMicro === 'number' && n>1){
-      const ex2 = (sumSqMicro/n)/1e10;
-      const ex  = (sumMicro/n)/1e5;
-      const variance = Math.max(0, ex2 - ex*ex);
-      sd = Math.sqrt(variance) || 25;
-    } else if(n===1){ sd = 25; }
-    const lcb = mean - 1.96 * (sd / Math.sqrt(n));
-    return clamp100(lcb);
+  try{
+    await auth.signInWithPopup(provider);
+    msg.textContent = 'Giriş tamamlandı.';
+  }catch(err){
+    console.error(err);
+    msg.textContent = 'Giriş hatası: ' + (err?.message || err);
   }
+}
 
-  function normUrl(u){ if(!u) return ''; return /^https?:\/\//i.test(u) ? u : 'https://' + u; }
-
-  async function ensureUserDocs(u){
-    if(!u) return;
-    const uRef = db.collection('users').doc(u.uid);
-    const pRef = db.collection('profiles').doc(u.uid);
-
-    const uSnap = await uRef.get();
-    if(!uSnap.exists){
-      await uRef.set({
-        displayName: u.displayName || u.email || null,
-        photoURL: u.photoURL || null,
-        joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        ratingCount:0,
-        ratingSumMicro:0,
-        avgMicroCache:0
-      }, {merge:true});
-    }else{
-      await uRef.set({
-        displayName: u.displayName || uSnap.data().displayName || null,
-        photoURL: u.photoURL || uSnap.data().photoURL || null
-      }, {merge:true});
+/** 5) onAuthStateChanged — oturum durumuna göre görünüm **/
+auth.onAuthStateChanged(async (user)=>{
+  if(user){
+    showTopbar(true);
+    // basit profil kutusu
+    $('#meBox').innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center">
+        <img src="${user.photoURL || 'https://i.pravatar.cc/100?u='+user.uid}"
+             style="width:56px;height:56px;border-radius:50%;object-fit:cover">
+        <div>
+          <div style="font-weight:700">${user.displayName || user.email}</div>
+          <div class="muted" style="font-size:14px">${user.email || ''}</div>
+        </div>
+      </div>`;
+    // girişten sonra keşfete
+    if (!location.hash || location.hash==='#/' || location.hash==='#') {
+      location.hash = '#/discover';
+    } else {
+      router();
     }
-
-    const pSnap = await pRef.get();
-    if(!pSnap.exists){
-      const base = ((u.displayName||u.email||'user').split(/[ @]/)[0] || 'user').toLowerCase().replace(/[^a-z0-9_]+/g,'_').slice(0,15);
-      await pRef.set({
-        displayName: u.displayName || (u.email||'Kullanıcı'),
-        displayNameLower: (u.displayName || (u.email||'Kullanıcı')).toLowerCase(),
-        handle: base, handleLower: base,
-        bio:'', website:'', location:'', photoURL: u.photoURL || '', coverURL:'',
-        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge:true});
-    }
+  }else{
+    showTopbar(false);
+    location.hash = '#/';
+    router();
   }
+});
 
-  /* ====== AUTH: mobilde redirect, desktop popup (fallback) ====== */
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                    || window.navigator.standalone === true;
-  const isMobileUA = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
-  const preferRedirect =
-      isStandalone || isMobileUA ||
-      new URLSearchParams(location.search).get('method') === 'redirect' ||
-      location.hash.includes('forceRedirect');
-  const REDIRECT_FLAG = 'piann_auth_redirect';
+/** 6) UI bağla **/
+$('#btnGoogle').onclick = signInWithGooglePopupOnly;
+$('#btnSignOut').onclick = ()=> auth.signOut();
+if(isInAppBrowser()){ $('#iabWarn').hidden = false; }
 
-  async function ensurePersistence(){
-    try{
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    }catch{ await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); }
-  }
-
-  async function handleRedirectResult(){
-    try{
-      const res = await auth.getRedirectResult();
-      if(res && res.user){ localStorage.removeItem(REDIRECT_FLAG); }
-      else if(localStorage.getItem(REDIRECT_FLAG)){
-        $('#loginStatus').textContent = 'Tarayıcı yönlendirmeyi engellemiş olabilir. Lütfen reklam engelleyiciyi kapatıp tekrar deneyin.';
-        localStorage.removeItem(REDIRECT_FLAG);
-      }
-    }catch(err){
-      console.error('getRedirectResult',err);
-      localStorage.removeItem(REDIRECT_FLAG);
-      $('#loginStatus').textContent = 'Giriş hata (redirect sonucu): ' + (err.message||err.code);
-    }
-  }
-
-  async function signInWithGoogle(){
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    await ensurePersistence();
-
-    if(preferRedirect){
-      try{
-        $('#loginStatus').textContent = 'Google’a yönlendiriliyor…';
-        localStorage.setItem(REDIRECT_FLAG,'1');
-        await auth.signInWithRedirect(provider);
-      }catch(err){
-        localStorage.removeItem(REDIRECT_FLAG);
-        $('#loginStatus').textContent = 'Giriş başlatılamadı (redirect): ' + (err.message||err.code);
-      }
-    }else{
-      try{
-        $('#loginStatus').textContent = 'Google açılıyor…';
-        await auth.signInWithPopup(provider);
-      }catch(err){
-        console.error('popup err',err);
-        if(err && err.code==='auth/popup-blocked'){
-          try{
-            $('#loginStatus').textContent = 'Açılır pencere engellendi, yönlendiriliyor…';
-            localStorage.setItem(REDIRECT_FLAG,'1');
-            await auth.signInWithRedirect(provider);
-          }catch(e2){
-            localStorage.removeItem(REDIRECT_FLAG);
-            $('#loginStatus').textContent = 'Giriş hatası: '+(e2.message||e2.code);
-          }
-          return;
-        }
-        $('#loginStatus').textContent = 'Giriş hatası: '+(err.message||err.code);
-      }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    handleRedirectResult();
-    $('#btnGoogle').addEventListener('click', signInWithGoogle);
-    $('#btnOut').addEventListener('click', ()=> auth.signOut());
-    $('#navDiscover').onclick = ()=>{ location.hash='#/discover'; };
-    $('#navBoard').onclick    = ()=>{ location.hash='#/board'; };
-    $('#navMe').onclick       = ()=>{ location.hash='#/me'; };
-  });
-
-  /* ====== onAuthStateChanged ====== */
-  auth.onAuthStateChanged(async (u)=>{
-    if(u){
-      await ensureUserDocs(u);
-      // nav sayacı
-      refreshCounts();
-      $('#navMe').style.display = 'inline-block';
-      show('discover');
-      renderDiscover();
-    }else{
-      $('#navMe').style.display = 'none';
-      show('login');
-    }
-  });
-
-  /* ====== Counts ====== */
-  async function refreshCounts(){
-    try{
-      const snap = await db.collection('users').get();
-      $('#countUsers').textContent = 'Üye: ' + snap.size;
-    }catch{ $('#countUsers').textContent = 'Üye: —'; }
-  }
-
-  /* ====== DISCOVER (3 profil, dikey) ====== */
-  async function renderDiscover(){
-    const list = $('#discoverList');
-    list.textContent = 'Yükleniyor…';
-    try{
-      const us = await db.collection('users').get();
-      const arr = [];
-      us.forEach(d=>{
-        const u = d.data();
-        if(auth.currentUser && d.id === auth.currentUser.uid) return;
-        const c  = u.ratingCount||0;
-        const s  = u.ratingSumMicro||0;
-        const ss = u.ratingSumSqMicro; // olabilir/yok olabilir
-        const lcb = lcbFrom(s, ss, c);
-        arr.push({uid:d.id, name:u.displayName||'(Kullanıcı)', photo:u.photoURL||'', c, s, ss, lcb});
-      });
-      // Rank için tüm puanlananlar arasında sırala
-      const ranked = arr.filter(x=>x.c>0).sort((a,b)=> b.lcb - a.lcb || b.c - a.c);
-      ranked.forEach((x,i)=> x.rank = i+1);
-      // c==0 olanlara rank yok
-      const pick3 = pick(arr, 3);
-
-      // profilleri çek
-      const profs = {};
-      await Promise.all(pick3.map(async x=>{
-        const p = await db.collection('profiles').doc(x.uid).get();
-        profs[x.uid] = p.exists? p.data() : {};
-      }));
-
-      list.innerHTML = '';
-      if(pick3.length===0){ list.textContent='Gösterilecek profil bulunamadı.'; return; }
-
-      for(const x of pick3){
-        const p = profs[x.uid] || {};
-        const img = p.photoURL || x.photo || 'https://i.pravatar.cc/100?u='+x.uid;
-        const bio = (p.bio||'').trim() || '—';
-        const name = p.displayName || x.name || '(Kullanıcı)';
-        const handle = p.handle ? '@'+p.handle : '';
-
-        const rankText = x.c>0 && x.rank ? `<div class="rank">Sıra: ${x.rank}</div>` : `<div class="rank">Sıra: —</div>`;
-        const html = `
-          <div class="dcard card">
-            <div class="d-left">
-              <div class="row" style="align-items:center">
-                <img src="${img}" class="avatar" alt="">
-                <div>
-                  <div style="font-weight:800">${name}</div>
-                  <div class="muted">${handle} · <span class="pill">Oy: ${x.c}</span></div>
-                </div>
-              </div>
-              <div class="bio" style="margin:10px 0">${bio}</div>
-              <div class="row">
-                <span class="chip" data-q="70">70</span>
-                <span class="chip" data-q="80">80</span>
-                <span class="chip" data-q="90">90</span>
-                <span class="chip" data-q="95">95</span>
-              </div>
-              <div class="row" style="margin-top:8px">
-                <input class="in-rate" placeholder="0–100 (örn: 88.5)" style="max-width:220px" />
-                <button class="btn primary act-save">Puanla</button>
-                <button class="btn act-skip">Atla</button>
-                <a class="btn" href="#/u/${x.uid}">Profili gör</a>
-                <span class="muted act-msg"></span>
-              </div>
-            </div>
-            <div class="d-right">
-              <div class="scorebox">
-                <div class="big">${to5(x.lcb).replace(',','.')}</div>
-                <small>LCB</small>
-                ${rankText}
-              </div>
-            </div>
-          </div>
-        `;
-        const wrap = document.createElement('div');
-        wrap.innerHTML = html;
-        const node = wrap.firstElementChild;
-
-        // quick chips
-        node.querySelectorAll('[data-q]').forEach(el=>{
-          el.onclick = ()=> node.querySelector('.in-rate').value = el.dataset.q;
-        });
-        // save
-        node.querySelector('.act-save').onclick = ()=> saveRatingUI(x.uid, node);
-        // skip
-        node.querySelector('.act-skip').onclick = ()=> renderDiscover();
-
-        list.appendChild(node);
-      }
-
-    }catch(err){
-      console.error(err);
-      list.textContent = 'Hata: '+(err.message||err.code);
-    }
-  }
-
-  function parseRate(s){
-    if(!s) return null; s=String(s).trim().replace(',', '.');
-    const v=Number(s); if(!isFinite(v)) return null;
-    const r=Math.round(v*100000)/100000;
-    if(!(r>0 && r<=100)) return null;
-    return {val:r, micro:Math.round(r*100000)};
-  }
-
-  async function saveRatingUI(targetUid, cardEl){
-    const input = cardEl.querySelector('.in-rate');
-    const msg   = cardEl.querySelector('.act-msg');
-    const parsed = parseRate(input.value);
-    if(!auth.currentUser){ msg.textContent='Önce giriş yap.'; return; }
-    if(auth.currentUser.uid===targetUid){ msg.textContent='Kendini puanlayamazsın.'; return; }
-    if(!parsed){ msg.textContent='Geçersiz değer.'; return; }
-    msg.textContent='Kaydediliyor…';
-
-    try{
-      await db.runTransaction(async (tx)=>{
-        const uDoc = db.collection('users').doc(targetUid);
-        const rDoc = uDoc.collection('ratings').doc(auth.currentUser.uid);
-
-        const uSnap = await tx.get(uDoc);
-        if(!uSnap.exists) throw new Error('Kullanıcı yok');
-
-        const rSnap = await tx.get(rDoc);
-        const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
-        const deltaSum   = parsed.micro - old;
-        const deltaCount = rSnap.exists ? 0 : 1;
-
-        tx.set(rDoc, {
-          micro: parsed.micro,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
-        }, {merge:true});
-
-        const d=uSnap.data();
-        const nSum=(d.ratingSumMicro||0)+deltaSum;
-        const nCnt=(d.ratingCount||0)+deltaCount;
-        const newAvg = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
-
-        tx.set(uDoc, {ratingSumMicro:nSum, ratingCount:nCnt, avgMicroCache:newAvg}, {merge:true});
-      });
-      msg.textContent='Kaydedildi ✔';
-      renderDiscover();
-    }catch(err){
-      console.error(err);
-      msg.textContent='Hata: '+(err.message||err.code);
-    }
-  }
-
-  /* ====== BOARD (Top 25, 5 ondalık) ====== */
-  async function renderBoard(){
-    const wrap = $('#boardWrap'); wrap.textContent='Yükleniyor…';
-    try{
-      const snap = await db.collection('users').get();
-      const arr=[];
-      snap.forEach(d=>{
-        const u=d.data();
-        const c=u.ratingCount||0;
-        if(c<=0) return; // en az 1 oy şartı
-        const s=u.ratingSumMicro||0;
-        const ss=u.ratingSumSqMicro;
-        arr.push({uid:d.id, name:u.displayName||'(Kullanıcı)', c, lcb:lcbFrom(s,ss,c)});
-      });
-      $('#rankMeta').textContent='Puanlanan üye: '+arr.length;
-      arr.sort((a,b)=> b.lcb - a.lcb || b.c - a.c);
-      const top = arr.slice(0,25);
-      if(!top.length){ wrap.textContent='Puanlanan üye yok.'; return; }
-
-      let html = '<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
-      top.forEach((u,i)=>{
-        html += `<tr>
-          <td>${i+1}</td>
-          <td>${u.name}</td>
-          <td>${to5(u.lcb)}</td>
-          <td>${u.c}</td>
-          <td><a class="btn" href="#/u/${u.uid}">Gör</a></td>
-        </tr>`;
-      });
-      html += '</tbody></table>';
-      wrap.innerHTML = html;
-    }catch(err){
-      wrap.textContent='Hata: '+(err.message||err.code);
-    }
-  }
-
-  /* ====== PROFILE ====== */
-  let currentProfileUid=null;
-
-  async function renderProfile(uid){
-    currentProfileUid = uid || (auth.currentUser && auth.currentUser.uid);
-    if(!currentProfileUid){ show('discover'); return; }
-
-    show('profile');
-
-    const uRef = db.collection('users').doc(currentProfileUid);
-    const uDoc = await uRef.get();
-    if(!uDoc.exists){ $('#pageProfile .bd').innerHTML='<p class="muted">Kullanıcı bulunamadı.</p>'; return; }
-    const u = uDoc.data();
-    const cnt=u.ratingCount||0, sum=u.ratingSumMicro||0, sumsq=u.ratingSumSqMicro;
-    const myLCB = lcbFrom(sum, sumsq, cnt);
-
-    $('#pillScore').textContent = 'Puan: '+to5(myLCB);
-    $('#pillCount').textContent = 'Oy: '+cnt;
-
-    // rank
-    const all = await db.collection('users').get();
-    const arr=[]; all.forEach(d=>{
-      const x=d.data(); const c=x.ratingCount||0; if(c<=0) return;
-      arr.push({uid:d.id, lcb:lcbFrom(x.ratingSumMicro||0, x.ratingSumSqMicro, c), c});
-    });
-    arr.sort((a,b)=> b.lcb - a.lcb || b.c - a.c);
-    const pos = arr.findIndex(x=>x.uid===currentProfileUid);
-    $('#pillRank').textContent = 'Sıra: ' + (pos>=0? (pos+1) : '—');
-
-    // profile doc
-    const pSnap = await db.collection('profiles').doc(currentProfileUid).get();
-    const p = pSnap.exists? pSnap.data() : {};
-    $('#pName').textContent   = p.displayName || u.displayName || '(Kullanıcı)';
-    $('#pHandle').textContent = p.handle ? '@'+p.handle : '';
-    $('#pBio').textContent    = p.bio || '';
-    $('#pAvatar').src         = p.photoURL || u.photoURL || 'https://i.pravatar.cc/100?u='+currentProfileUid;
-    const meta = [];
-    if(p.location) meta.push('📍 '+p.location);
-    if(p.website)  meta.push('🔗 '+normUrl(p.website));
-    $('#pMeta').textContent = meta.join('   ');
-
-    const own = auth.currentUser && auth.currentUser.uid===currentProfileUid;
-    $('#btnEdit').style.display = own ? 'inline-block' : 'none';
-    $('#rateBox').style.display = own ? 'none' : 'flex';
-
-    $('#btnShare').onclick = ()=>{
-      const link = location.origin + '/#/u/' + currentProfileUid;
-      navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: ' + link));
-    };
-    $('#btnRate').onclick = async ()=>{
-      const parsed = parseRate($('#rateInput').value);
-      const msg = $('#rateMsg');
-      if(!parsed){ msg.textContent='Geçersiz değer.'; return; }
-      try{
-        await db.runTransaction(async (tx)=>{
-          const rDoc = uRef.collection('ratings').doc(auth.currentUser.uid);
-          const rSnap = await tx.get(rDoc);
-          const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
-          const deltaSum   = parsed.micro - old;
-          const deltaCount = rSnap.exists ? 0 : 1;
-
-          tx.set(rDoc, {
-            micro: parsed.micro,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
-          }, {merge:true});
-
-          const d=uDoc.data();
-          const nSum=(d.ratingSumMicro||0)+deltaSum;
-          const nCnt=(d.ratingCount||0)+deltaCount;
-          const newAvg = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
-
-          tx.set(uRef, {ratingSumMicro:nSum, ratingCount:nCnt, avgMicroCache:newAvg}, {merge:true});
-        });
-        msg.textContent='Kaydedildi ✔';
-        renderProfile(currentProfileUid);
-      }catch(err){
-        msg.textContent='Hata: '+(err.message||err.code);
-      }
-    };
-
-    // received ratings
-    const box = $('#receivedList'); box.textContent='Yükleniyor…';
-    const rs = await uRef.collection('ratings').orderBy('updatedAt','desc').limit(20).get();
-    if(rs.empty){ box.textContent='Henüz oy yok.'; return; }
-    let html='<table><thead><tr><th>Veren</th><th>Puan</th><th>Tarih</th></tr></thead><tbody>';
-    for(const d of rs.docs){
-      const r=d.data();
-      let who = d.id;
-      try{
-        const pp = await db.collection('profiles').doc(d.id).get();
-        if(pp.exists){ const pd=pp.data(); who=pd.displayName || '@'+(pd.handle||'user'); }
-      }catch{}
-      const t = r.updatedAt && r.updatedAt.toDate ? r.updatedAt.toDate().toLocaleString() : '-';
-      html+=`<tr><td>${who}</td><td>${to5((r.micro||0)/100000)}</td><td>${t}</td></tr>`;
-    }
-    html+='</tbody></table>'; box.innerHTML=html;
-  }
-
-  /* ===== Router (girişten sonra) ===== */
-  window.addEventListener('hashchange', router);
-  function router(){
-    const h = location.hash||'#/';
-    if(!auth.currentUser){ show('login'); return; }
-    if(h.startsWith('#/board')){ show('board'); renderBoard(); return; }
-    if(h.startsWith('#/u/')){ const uid=h.split('/')[2]; renderProfile(uid); return; }
-    if(h.startsWith('#/me')){ renderProfile(auth.currentUser.uid); return; }
-    show('discover'); renderDiscover();
-  }
+router(); // ilk yüklemede
 </script>
 </body>
 </html>
