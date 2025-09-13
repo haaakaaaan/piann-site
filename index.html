@@ -41,10 +41,19 @@
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
   @media (max-width:960px){.grid{grid-template-columns:1fr}}
 
-  /* PLACEHOLDERS */
-  .ph{border:2px dashed #d5e7ff;border-radius:12px;padding:16px;color:#0a3e78;background:#f7fbff}
-  .ph b{color:#0A66C2}
-  .avatar{width:56px;height:56px;border-radius:50%;background:#e9eef8;border:1px solid var(--line)}
+  /* DISCOVER CARD */
+  .disc-row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
+  .disc-left{display:flex;gap:14px}
+  .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
+  .name{font-weight:800}
+  .handle{color:var(--muted);font-size:14px}
+  .bio{color:#1f2937;margin:8px 0 10px;font-size:15px;line-height:1.4}
+  input[type=text]{padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+  .rightbox{background:#eef5ff;border:1px solid #d5e7ff;border-radius:12px;padding:20px;text-align:center}
+  .rightbox .score{font-weight:900;font-size:28px;color:#0a3e78}
+  .rightbox .sub{color:var(--muted);font-size:12px}
+
+  /* TABLE */
   table{width:100%;border-collapse:collapse}
   th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
   th{color:#111827}
@@ -61,7 +70,8 @@
     <a href="#/" class="btn">Keşfet</a>
     <a href="#/ranking" class="btn">Leaderboard</a>
     <div class="spacer"></div>
-    <a href="#/profile/demo123" class="btn">Profil (örnek)</a>
+    <a href="#/profile/me" class="btn">Profil (Hakan)</a>
+    <span id="memberCount" class="count">Üye: —</span>
   </div>
 </nav>
 
@@ -75,15 +85,11 @@
   <div class="grid">
     <section class="card">
       <div class="hd">Keşfet</div>
-      <div class="bd" id="discoverBox">
-        <div class="ph">Buraya 3 profil kartı gelecek. <b>Puanla</b> &amp; <b>Atla</b> butonları olacak.</div>
-      </div>
+      <div class="bd" id="discoverBox">Yükleniyor…</div>
     </section>
     <aside class="card">
       <div class="hd">Top 50</div>
-      <div class="bd" id="top50Wrap">
-        <div class="ph">LCB’ye göre ilk 50 tablo görünümü.</div>
-      </div>
+      <div class="bd" id="top50Wrap">Yükleniyor…</div>
     </aside>
   </div>
 </main>
@@ -104,14 +110,12 @@
         <label class="pill">Min. Oy:
           <select id="fltMin">
             <option value="1">1</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
+            <option value="10" selected>10</option>
+            <option value="50">50</option>
           </select>
         </label>
       </div>
-      <div id="rankWrap">
-        <div class="ph">Burada 500’e kadar sıralama listesi + sayfalama olacak.</div>
-      </div>
+      <div id="rankWrap">Yükleniyor…</div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
         <button class="btn" id="btnPrev">Önceki</button>
         <span class="muted" id="pageInfo">—</span>
@@ -125,55 +129,317 @@
 <section id="pageProfile" class="wrap" style="display:none">
   <div class="card">
     <div class="hd">Profil</div>
-    <div class="bd" id="profWrap">
-      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
-        <div class="avatar"></div>
-        <div>
-          <div style="font-weight:800">Kullanıcı Adı</div>
-          <div class="muted">@handle</div>
-          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-            <span class="pill">Puan: —</span>
-            <span class="pill">Oy: —</span>
-            <span class="pill">Sıra: — / —</span>
-          </div>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:8px">
-          <button class="btn primary" disabled>Puan ver</button>
-          <button class="btn">Paylaş</button>
-        </div>
-      </div>
-      <div class="muted">Bio / website / konum alanları burada görünecek.</div>
-      <div class="ph" style="margin-top:12px">Kendi profilinde düzenleme formu bu bloğa gelecek.</div>
-    </div>
+    <div class="bd" id="profWrap">—</div>
   </div>
 </section>
 
-<footer>© piann.com</footer>
+<footer>© piann.com — demo prototip</footer>
 
 <script>
-/* Basit hash router — login yok; iskelet görünürlüğü */
-const views = ['#pageHome','#pageRanking','#pageProfile'];
-function showOnly(ids){
-  views.forEach(id=> document.querySelector(id).style.display = ids.includes(id) ? 'block':'none');
+/* ========= Utilities ========= */
+const $=(s)=>document.querySelector(s);
+const to5=(n)=>Number.isFinite(n)?n.toFixed(5).replace('.',','):'—';
+const clip=(x)=>Math.max(0,Math.min(100,x));
+function lcb(sumMicro,sumSqMicro,n){
+  if(!n||n<=0) return 0;
+  const mean=(sumMicro/n)/1e5;
+  let sd=25;
+  if(n>1){
+    const ex2=(sumSqMicro/n)/1e10;
+    const ex =(sumMicro/n)/1e5;
+    const variance=Math.max(0,ex2-ex*ex);
+    sd=Math.sqrt(variance);
+  }
+  return clip(mean - 1.96*(sd/Math.sqrt(n)));
 }
+const randInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=(arr,n)=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
+
+/* ========= Fake Data (100 profile) ========= */
+const seedPeople=[
+  "Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr",
+  "Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook",
+  "Taylor Swift","Ariana Grande","Beyoncé","Ed Sheeran","Rihanna",
+  "Hakan Kocapüskül","Ada Yılmaz","Efe Demir","Zeynep Kaya","Mert Aydın",
+  "Ayşe Çelik","Can Yıldız","Deniz Aksoy","Emre Koç","Selin Arslan",
+  "Barış Yaman","Derya Kurt","Kerem Öz","Seda Şahin","Burak Tunç",
+  "Melis Korkmaz","Oğuzhan Kara","Gizem Yalçın","Cem Uçar","İrem Taş",
+  "Ahmet Kaya","Mehmet Can","Fatma Nur","Gamze Kır","Onur Ege"
+];
+const seedBrands=[
+  "Coca-Cola","Pepsi","Nike","Adidas","Apple","Samsung","Microsoft","Google","Amazon","Tesla",
+  "BMW","Mercedes-Benz","Audi","Ferrari","Puma",
+  "Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"
+];
+const bios = [
+  "Kısa ve net: skor konuşur.","Her gün biraz daha iyi.","Veri takıntılı, kahve bağımlısı.",
+  "Sade, hızlı, net.","Yıldızları hedefle.","Takım oyuncusu.","Minimalist, sonuç odaklı.",
+  "Bugün daha iyi.","Deney ve öğren.","Puanlarınla şekilleniyorum."
+];
+function makeId(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,16) || ('id'+Math.random().toString(36).slice(2,8)); }
+function mkAgg(n, mean, sd){
+  // E[X]=mean, Var=sd^2 -> E[X^2]=Var+mean^2
+  const sumMicro = Math.round(n*mean*1e5);
+  const ex2 = sd*sd + mean*mean;
+  const sumSqMicro = Math.round(n*ex2*1e10);
+  return {ratingCount:n, ratingSumMicro:sumMicro, ratingSumSqMicro:sumSqMicro, avgMicroCache: Math.floor(sumMicro/n)};
+}
+function avatarUrl(id){ return `https://i.pravatar.cc/100?u=${encodeURIComponent(id)}`; }
+function brandImg(name){ return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0A66C2&color=fff&size=100&bold=true`; }
+
+const profiles=[];
+(function seed(){
+  // People
+  seedPeople.forEach((name,i)=>{
+    const id = (name==="Hakan Kocapüskül")?"me":makeId(name)+(i%7);
+    const n  = randInt(12,1200);
+    const m  = randInt(50,95); // ortalama
+    const sd = randInt(6,18);  // standart sapma
+    const agg= mkAgg(n, m, sd);
+    profiles.push({
+      id, displayName:name, type:"person", tags:["general"],
+      photoURL: avatarUrl(id),
+      bio: bios[randInt(0,bios.length-1)],
+      ...agg
+    });
+  });
+  // Brands/Teams
+  seedBrands.forEach((name,i)=>{
+    const id = makeId(name)+ (i%5);
+    const n  = randInt(20,2000);
+    const m  = randInt(45,92);
+    const sd = randInt(5,16);
+    const agg= mkAgg(n, m, sd);
+    profiles.push({
+      id, displayName:name, type: (["Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"].includes(name)?"team":"brand"),
+      tags: ["popular"],
+      photoURL: brandImg(name),
+      bio: `${name} için topluluk skoru.`,
+      ...agg
+    });
+  });
+  // Fill up to 100 with generic users
+  const baseN = profiles.length;
+  const need = 100 - baseN;
+  for(let i=0;i<need;i++){
+    const name = `Kullanıcı ${i+1}`;
+    const id   = makeId(name)+i;
+    const n    = randInt(5,800);
+    const m    = randInt(40,90);
+    const sd   = randInt(6,20);
+    const agg  = mkAgg(n,m,sd);
+    profiles.push({
+      id, displayName:name, type:"person", tags:["demo"],
+      photoURL: avatarUrl(id),
+      bio: bios[randInt(0,bios.length-1)],
+      ...agg
+    });
+  }
+})();
+const ME = profiles.find(p=>p.id==="me") || profiles[0];
+$('#memberCount').textContent = 'Üye: ' + profiles.length;
+
+/* ========= Router ========= */
+const views = ['#pageHome','#pageRanking','#pageProfile'];
+function showOnly(ids){ views.forEach(id=> $(id).style.display = ids.includes(id)?'block':'none'); }
 function route(){
-  const h = location.hash || '#/';
-  if(h.startsWith('#/ranking')){ showOnly(['#pageRanking']); return; }
-  if(h.startsWith('#/profile/')){ showOnly(['#pageProfile']); return; }
-  // default home
-  showOnly(['#pageHome']);
+  const h=location.hash||'#/';
+  if(h.startsWith('#/ranking')){ showOnly(['#pageRanking']); loadRanking(); return; }
+  if(h.startsWith('#/profile/')){ const uid=h.split('/')[2]; showOnly(['#pageProfile']); renderProfile(uid); return; }
+  showOnly(['#pageHome']); loadDiscover(); loadTop50();
 }
 window.addEventListener('hashchange', route);
 route();
 
-/* NOTLAR (gelecek adımlar):
-  - /login sayfası ayrı bölüm olarak eklenecek; solda slogan, sağda Google ile giriş kartı.
-  - Firebase Auth + Firestore bağları burada takılacak.
-  - Keşfet: 3 profil kartı komponeni; Puanla/Atla aksiyonları.
-  - Top50: tablo bileşeni (LCB, oy sayısı).
-  - Ranking: Top500 + filtre + sayfalama (startAfter ile optimize).
-  - Profil: KPI’lar, “Puan ver”, “Profilim” düzenleme.
-*/
+/* ========= In-memory rating (demo) ========= */
+function rateInMemory(targetId, val){
+  // self-rate engel
+  if(targetId===ME.id){ alert('Kendini puanlayamazsın (demo).'); return; }
+  const u=profiles.find(p=>p.id===targetId);
+  if(!u) return;
+  const micro = Math.round(val*1e5);
+  // sanki ilk kez oy veriyormuşuz gibi güncelle (demo)
+  const old = 0;
+  const deltaSum = micro - old;
+  const deltaCnt = 1; // yeni oy gibi
+  u.ratingSumMicro += deltaSum;
+  u.ratingSumSqMicro += (micro*micro - old*old);
+  u.ratingCount += deltaCnt;
+  u.avgMicroCache = Math.floor(u.ratingSumMicro/u.ratingCount);
+}
+
+/* ========= HOME: Discover (3) ========= */
+function loadDiscover(){
+  const box=$('#discoverBox'); box.textContent='Yükleniyor…';
+  // 3 farklı kişi/marka, ME hariç
+  const candidates = profiles.filter(p=>p.id!==ME.id);
+  const pick3 = pick(candidates, 3);
+  const html = pick3.map(u=>{
+    const score=lcb(u.ratingSumMicro,u.ratingSumSqMicro,u.ratingCount);
+    return `
+    <div class="card" style="margin-bottom:12px">
+      <div class="bd">
+        <div class="disc-row">
+          <div class="disc-left">
+            <img class="avatar" src="${u.photoURL}">
+            <div style="flex:1">
+              <div class="name">${u.displayName}</div>
+              <div class="handle">@${u.id.slice(0,8)} • <span class="muted">${u.type}</span></div>
+              <div class="bio">${u.bio||''}</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <button class="btn q" data-id="${u.id}" data-v="70">70</button>
+                <button class="btn q" data-id="${u.id}" data-v="80">80</button>
+                <button class="btn q" data-id="${u.id}" data-v="90">90</button>
+                <button class="btn q" data-id="${u.id}" data-v="95">95</button>
+                <input class="score-input" data-id="${u.id}" type="text" placeholder="0–100 (örn: 88,75000)" style="max-width:200px">
+                <button class="btn primary save" data-id="${u.id}">Puanla</button>
+                <button class="btn skip">Atla</button>
+                <a href="#/profile/${u.id}" class="btn">Profili gör</a>
+              </div>
+            </div>
+          </div>
+          <div class="rightbox">
+            <div class="score">${to5(score)}</div>
+            <div class="sub">Oy: ${u.ratingCount}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  box.innerHTML=html;
+
+  // wiring
+  box.querySelectorAll('.btn.q').forEach(b=>{
+    b.onclick=()=>{
+      const id=b.dataset.id, v=b.dataset.v;
+      const inp=box.querySelector(`.score-input[data-id="${id}"]`);
+      if(inp) inp.value=v.replace('.',',');
+    };
+  });
+  box.querySelectorAll('.btn.save').forEach(b=>{
+    b.onclick=()=>{
+      const uid=b.dataset.id;
+      const inp=box.querySelector(`.score-input[data-id="${uid}"]`);
+      const v = Number((inp.value||'').trim().replace(',', '.'));
+      if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
+      rateInMemory(uid, v);
+      loadDiscover(); loadTop50(); // anında güncelle
+    };
+  });
+  box.querySelectorAll('.btn.skip').forEach(b=>{
+    b.onclick=()=> loadDiscover();
+  });
+}
+
+/* ========= HOME: Top 50 ========= */
+function loadTop50(){
+  const wrap=$('#top50Wrap'); wrap.textContent='Yükleniyor…';
+  const arr = profiles
+    .filter(p=>p.ratingCount>0)
+    .map(p=>({id:p.id, name:p.displayName, count:p.ratingCount,
+              score:lcb(p.ratingSumMicro,p.ratingSumSqMicro,p.ratingCount)}));
+  arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+  const top=arr.slice(0,50);
+  if(!top.length){ wrap.textContent='Henüz veri yok.'; return; }
+  let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
+  top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/profile/${u.id}">${u.name}</a></td><td>${to5(u.score)}</td><td>${u.count}</td></tr>`);
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+
+/* ========= RANKING (Top 500 demo) ========= */
+const paging = { list:[], page:1, per:50 };
+$('#btnPrev').onclick=()=>{ if(paging.page>1){ paging.page--; renderRankingPage(); } };
+$('#btnNext').onclick=()=>{ const max=Math.ceil(paging.list.length/paging.per)||1; if(paging.page<max){ paging.page++; renderRankingPage(); } };
+$('#fltType').onchange=()=> loadRanking();
+$('#fltMin').onchange =()=> loadRanking();
+
+function loadRanking(){
+  const wrap=$('#rankWrap'); wrap.textContent='Yükleniyor…';
+  const type=$('#fltType').value; const min=Number($('#fltMin').value||1);
+  let arr = profiles.filter(p=>p.ratingCount>=min);
+  if(type) arr = arr.filter(p=>p.type===type);
+  const list = arr.map(p=>({
+    id:p.id, name:p.displayName, count:p.ratingCount,
+    score:lcb(p.ratingSumMicro,p.ratingSumSqMicro,p.ratingCount)
+  }));
+  list.sort((a,b)=> b.score - a.score || b.count - a.count);
+  paging.list = list.slice(0,500);
+  paging.page = 1;
+  renderRankingPage();
+}
+function renderRankingPage(){
+  const wrap=$('#rankWrap');
+  const start=(paging.page-1)*paging.per, end=start+paging.per;
+  const pageItems=paging.list.slice(start,end);
+  if(!pageItems.length){ wrap.textContent='Kayıt yok.'; $('#pageInfo').textContent='—'; return; }
+  let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+  pageItems.forEach((u,i)=> html+=`<tr><td>${start+i+1}</td><td>${u.name}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/profile/${u.id}">Gör</a></td></tr>`);
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+  const max=Math.ceil(paging.list.length/paging.per)||1;
+  $('#pageInfo').textContent=`Sayfa ${paging.page}/${max}`;
+}
+
+/* ========= PROFILE ========= */
+function renderProfile(uid){
+  const box=$('#profWrap'); box.textContent='Yükleniyor…';
+  const p = profiles.find(x=>x.id===uid) || profiles[0];
+  const cnt=p.ratingCount||0;
+  const s  =lcb(p.ratingSumMicro,p.ratingSumSqMicro,cnt);
+
+  // Rank hesapla
+  const arr = profiles
+    .filter(x=>x.ratingCount>0)
+    .map(x=>({id:x.id,score:lcb(x.ratingSumMicro,x.ratingSumSqMicro,x.ratingCount),count:x.ratingCount}));
+  arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+  const rank = arr.findIndex(x=>x.id===p.id);
+  const total=arr.length;
+
+  box.innerHTML=`
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
+      <img class="avatar" src="${p.photoURL}">
+      <div>
+        <div class="name">${p.displayName}</div>
+        <div class="muted">@${p.id.slice(0,8)} • ${p.type}</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <span class="pill">Puan: ${to5(s)}</span>
+          <span class="pill">Oy: ${cnt}</span>
+          <span class="pill">Sıra: ${rank>=0?(rank+1):'—'} / ${total}</span>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        ${ uid===ME.id ? '' : '<button class="btn primary" id="btnRateOpen">Puan ver</button>'}
+        <button class="btn" id="btnShare">Paylaş</button>
+      </div>
+    </div>
+    <div class="muted" style="margin:6px 0">${p.bio||''}</div>
+
+    ${ uid===ME.id ? `
+      <div class="muted" style="margin-top:8px">Bu demo sürümünde profil düzenleme kapalıdır.</div>
+    `:`
+      <div id="rateBox" style="margin-top:12px">
+        <input id="rateInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px">
+        <button class="btn primary" id="btnRate">Puanla / Güncelle</button>
+      </div>
+    `}
+  `;
+
+  $('#btnShare').onclick=()=>{
+    const link = location.origin + location.pathname + '#/profile/' + p.id;
+    navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link));
+  };
+  if(uid!==ME.id){
+    $('#btnRateOpen') && ($('#btnRateOpen').onclick=()=> $('#rateInput').focus());
+    $('#btnRate').onclick=()=>{
+      const s = ($('#rateInput').value||'').trim().replace(',', '.');
+      const v = Number(s);
+      if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
+      rateInMemory(uid, v);
+      renderProfile(uid); loadTop50();
+    };
+  }
+}
 </script>
 </body>
 </html>
