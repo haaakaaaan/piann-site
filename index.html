@@ -6,110 +6,127 @@
 <title>piann — puan & sıralama</title>
 <style>
   :root{
-    --ink:#0f172a; --muted:#64748b; --line:#e6e9ef; --card:#fff;
-    --accent:#0A66C2; --accent-600:#0857A6; --bg:#f7f8fb;
+    --bg:#f7f8fb; --ink:#0f172a; --muted:#64748b;
+    --card:#ffffff; --line:#e6e9ef;
+    --accent:#0A66C2; --accent-600:#0857A6;
+    --ok:#10b981; --err:#ef4444;
   }
-  *{box-sizing:border-box} html,body{height:100%}
+  *{box-sizing:border-box}
+  html,body{height:100%}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--ink);background:var(--bg)}
-  .wrap{max-width:1080px;margin:0 auto;padding:20px}
-  /* topbar */
-  .top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
-  .topin{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
-  .brand{font-weight:800}
-  .sp{flex:1}
+  a{color:inherit;text-decoration:none}
   .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-  .btn.primary:hover{background:var(--accent-600)}
+  .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+
+  /* NAV */
+  .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);display:none}
+  .nav-inner{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .brand{font-weight:800;color:var(--accent)}
+  .spacer{flex:1}
+  .count{color:var(--muted);font-size:14px}
+
+  /* WRAP + CARDS */
+  .wrap{max-width:1080px;margin:24px auto 64px;padding:0 16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
   .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
   .bd{padding:16px}
-  .hero h1{font-size:42px;line-height:1.15;margin:24px 0 8px}
   .muted{color:var(--muted)}
-  section[hidden]{display:none !important}
-  .warn{background:#fff8e1;border:1px solid #f6e3a1;color:#6b5b17;padding:10px 12px;border-radius:10px}
-  .center{display:flex;justify-content:center}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+  /* HERO */
+  .hero{max-width:1080px;margin:44px auto;padding:0 16px}
+  .hero h1{font-size:48px;line-height:1.15;margin:0 0 8px;color:#0a3e78}
+  .hero p{color:var(--muted);font-size:18px}
+
+  /* DISCOVER CARD */
+  .disc-row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
+  .disc-left{display:flex;gap:14px}
+  .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
+  .name{font-weight:800}
+  .handle{color:var(--muted);font-size:14px}
+  .bio{color:#1f2937;margin:8px 0 10px;font-size:15px;line-height:1.4}
+  .chip{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  input[type=text]{padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+  .right-box{background:#eef5ff;border:1px solid #d5e7ff;border-radius:12px;padding:20px;text-align:center}
+  .right-box .score{font-weight:900;font-size:28px;color:#0a3e78}
+  .right-box .sub{color:var(--muted);font-size:12px}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+  th{color:#111827}
+
   footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
 
-<!-- NAV (oturumdan sonra görünür) -->
-<div id="topbar" class="top" hidden>
-  <div class="topin">
+<!-- NAV (girişten sonra görünür) -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
     <div class="brand">piann</div>
-    <div class="sp"></div>
-    <a class="btn" href="#/discover">Keşfet</a>
-    <a class="btn" href="#/rank">Leaderboard</a>
-    <a class="btn" href="#/profile">Profilim</a>
-    <button id="btnSignOut" class="btn">Çıkış</button>
+    <a href="#/discover" class="btn" id="lnkDiscover">Keşfet</a>
+    <a href="#/board" class="btn">Leaderboard</a>
+    <div class="spacer"></div>
+    <span id="memberCount" class="count">Üye: —</span>
+    <button id="btnMy" class="btn" style="display:none">Profilim</button>
+    <button id="btnOut" class="btn" style="display:none">Çıkış</button>
   </div>
-</div>
+</nav>
 
-<main class="wrap">
-  <!-- LOGIN -->
-  <section id="view-login">
-    <div class="hero">
-      <h1>Gerçek değerini keşfet; skorun senin imzan</h1>
-      <p class="muted">piann, insanların birbirini puanladığı ve gerçek değerini gördüğü topluluk.</p>
-    </div>
-
-    <!-- in-app browser uyarısı -->
-    <div id="iabWarn" class="warn" hidden>
-      Tarayıcı yönlendirmesi bu uygulama içi pencere tarafından engellenebilir.
-      Lütfen <b>“Tarayıcıda aç”</b> deyip sistem tarayıcısında deneyin.
-    </div>
-
-    <div class="card" style="max-width:520px;margin-top:18px">
+<!-- LOGIN HERO (giriş yoksa görünür) -->
+<section id="loginHero" class="hero" style="display:none">
+  <h1>Gerçek değerini keşfet; skorun senin imzan</h1>
+  <p>piann, insanların birbirini puanladığı ve gerçek değerini gördüğü topluluk.</p>
+  <div class="wrap" style="padding:0">
+    <div class="card" style="max-width:520px">
       <div class="hd">Giriş yap</div>
       <div class="bd">
-        <button id="btnGoogle" class="btn primary" style="width:100%">Google ile giriş yap</button>
-        <div id="loginMsg" class="muted" style="margin-top:10px"></div>
+        <button class="btn primary" id="btnGoogle" style="width:100%">Google ile giriş yap</button>
+        <div class="muted" id="loginInfo" style="margin-top:8px"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
+<main class="wrap">
   <!-- DISCOVER -->
-  <section id="view-discover" hidden>
-    <div class="card">
-      <div class="hd">Keşfet</div>
-      <div class="bd">
-        <p class="muted">Buraya 3’lü dikey profil kartlarını koyacağız. (Şablon)</p>
-        <p>Giriş başarılı — router <code>#/discover</code>’a geçti.</p>
-      </div>
-    </div>
+  <section id="pageDiscover" class="card" style="display:none">
+    <div class="hd">Keşfet</div>
+    <div class="bd" id="discoverBox">Yükleniyor…</div>
   </section>
 
-  <!-- RANK -->
-  <section id="view-rank" hidden>
-    <div class="card">
-      <div class="hd">Leaderboard</div>
-      <div class="bd">
-        <p class="muted">Sıralama tablosu burada (şablon).</p>
-      </div>
+  <!-- LEADERBOARD -->
+  <section id="pageBoard" class="card" style="display:none">
+    <div class="hd">Leaderboard</div>
+    <div class="bd">
+      <div class="muted" style="margin-bottom:10px">Sadece <b>en az 1 oy almış</b> profiller gösterilir.</div>
+      <div id="boardWrap">Yükleniyor…</div>
     </div>
   </section>
 
   <!-- PROFILE -->
-  <section id="view-profile" hidden>
-    <div class="card">
-      <div class="hd">Profil</div>
-      <div class="bd">
-        <div id="meBox">Oturum bilgisi yükleniyor…</div>
-      </div>
-    </div>
+  <section id="pageProfile" class="card" style="display:none">
+    <div class="hd">Profil</div>
+    <div class="bd" id="profWrap">—</div>
   </section>
 </main>
 
 <footer>© piann.com</footer>
 
-<!-- Firebase compat -->
+<!-- Firebase SDK (Compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-/** 1) Firebase config — KENDİ PROJENİN AYNI CONFIG’İNİ YAPIŞTIR **/
+/* 🔐 Firebase config — kendi konsolundakiyle birebir kontrol et! */
 const firebaseConfig = {
-  apiKey: "AI...S8Q",
+  apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
   authDomain: "piann-c58b8.firebaseapp.com",
   projectId: "piann-c58b8",
   storageBucket: "piann-c58b8.appspot.com",
@@ -118,82 +135,335 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db   = firebase.firestore();
 
-/** 2) Yardımcılar **/
-const $ = s => document.querySelector(s);
-function isInAppBrowser(){
-  const ua = navigator.userAgent || navigator.vendor || "";
-  return /(FBAN|FBAV|Instagram|Line|Twitter|TikTok|Pinterest|Snapchat|LinkedIn)/i.test(ua);
-}
-function show(id){
-  for (const el of document.querySelectorAll('section[id^="view-"]')) el.hidden = true;
-  document.getElementById(id).hidden = false;
-}
-function showTopbar(showIt){ $('#topbar').hidden = !showIt; }
+/* ===== Helpers ===== */
+const $ = (s)=>document.querySelector(s);
+const show = (id)=>{ $('#pageDiscover').style.display='none'; $('#pageBoard').style.display='none'; $('#pageProfile').style.display='none'; if(id) $(id).style.display='block'; };
+const to5  = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
+const clip = (x)=> Math.max(0, Math.min(100, x));
+const rand = (arr,n)=> {const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a.slice(0,n);};
 
-/** 3) Router **/
-function router(){
-  const h = location.hash || '#/';
-  if (h.startsWith('#/discover')) show('view-discover');
-  else if (h.startsWith('#/rank')) show('view-rank');
-  else if (h.startsWith('#/profile')) show('view-profile');
-  else show('view-login');
+/* LCB */
+function lcb(sumMicro, sumSqMicro, n){
+  if(!n||n<=0) return 0;
+  const mean = (sumMicro/n)/100000;
+  let sd = 25;
+  if(n>1){
+    const ex2 = (sumSqMicro/n)/1e10;
+    const ex  = (sumMicro/n)/1e5;
+    const variance = Math.max(0, ex2 - ex*ex);
+    sd = Math.sqrt(variance);
+  }
+  return clip(mean - 1.96 * (sd/Math.sqrt(n)));
 }
-window.addEventListener('hashchange', router);
 
-/** 4) Giriş — POPUP ONLY + fallback SESSION **/
-async function signInWithGooglePopupOnly(){
-  const msg = $('#loginMsg');
-  msg.textContent = 'Google açılıyor…';
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
+/* STATE */
+let me=null;
+
+/* ===== Auth wiring (POPUP only, no redirect) ===== */
+const nav = $('#nav'), loginHero=$('#loginHero');
+const btnGoogle = $('#btnGoogle'), btnOut=$('#btnOut'), btnMy=$('#btnMy');
+const memberCount=$('#memberCount');
+
+btnGoogle.onclick = async ()=>{
   try{
-    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-  }catch{
-    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    $('#loginInfo').textContent = 'Google açılıyor…';
+    await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  }catch(e){
+    $('#loginInfo').textContent = 'Hata: '+ (e.message || e.code || e);
   }
-  try{
-    await auth.signInWithPopup(provider);
-    msg.textContent = 'Giriş tamamlandı.';
-  }catch(err){
-    console.error(err);
-    msg.textContent = 'Giriş hatası: ' + (err?.message || err);
-  }
-}
+};
 
-/** 5) onAuthStateChanged — oturum durumuna göre görünüm **/
-auth.onAuthStateChanged(async (user)=>{
-  if(user){
-    showTopbar(true);
-    // basit profil kutusu
-    $('#meBox').innerHTML = `
-      <div style="display:flex;gap:12px;align-items:center">
-        <img src="${user.photoURL || 'https://i.pravatar.cc/100?u='+user.uid}"
-             style="width:56px;height:56px;border-radius:50%;object-fit:cover">
-        <div>
-          <div style="font-weight:700">${user.displayName || user.email}</div>
-          <div class="muted" style="font-size:14px">${user.email || ''}</div>
-        </div>
-      </div>`;
-    // girişten sonra keşfete
-    if (!location.hash || location.hash==='#/' || location.hash==='#') {
-      location.hash = '#/discover';
-    } else {
-      router();
-    }
-  }else{
-    showTopbar(false);
-    location.hash = '#/';
-    router();
-  }
+btnOut.onclick = ()=> auth.signOut();
+btnMy.onclick = ()=> { location.hash = '#/u/'+me.uid; renderProfile(me.uid); show('#pageProfile'); };
+
+auth.onAuthStateChanged(async (u)=>{
+  me=u||null;
+  // Nav/Login toggle
+  if(me){ nav.style.display='block'; loginHero.style.display='none'; btnOut.style.display='inline-block'; btnMy.style.display='inline-block'; }
+  else  { nav.style.display='none';  loginHero.style.display='block'; btnOut.style.display='none'; btnMy.style.display='none'; }
+  await ensureUserDocs();
+  await refreshCounters();
+  if(me){ loadDiscover(); loadBoard(); }
 });
 
-/** 6) UI bağla **/
-$('#btnGoogle').onclick = signInWithGooglePopupOnly;
-$('#btnSignOut').onclick = ()=> auth.signOut();
-if(isInAppBrowser()){ $('#iabWarn').hidden = false; }
+/* ===== Counters ===== */
+async function refreshCounters(){
+  try{
+    const s = await db.collection('users').get();
+    memberCount.textContent = 'Üye: ' + s.size;
+  }catch{ memberCount.textContent = 'Üye: —'; }
+}
 
-router(); // ilk yüklemede
+/* ===== Ensure user docs ===== */
+async function ensureUserDocs(){
+  if(!me) return;
+  const uRef = db.collection('users').doc(me.uid);
+  const uSnap= await uRef.get();
+  if(!uSnap.exists){
+    await uRef.set({
+      displayName: me.displayName || me.email || 'Kullanıcı',
+      photoURL: me.photoURL || '',
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      ratingCount:0, ratingSumMicro:0, ratingSumSqMicro:0, avgMicroCache:0
+    }, {merge:true});
+  }else{
+    await uRef.set({
+      displayName: me.displayName || uSnap.data().displayName || 'Kullanıcı',
+      photoURL: me.photoURL || uSnap.data().photoURL || ''
+    }, {merge:true});
+  }
+
+  const pRef = db.collection('profiles').doc(me.uid);
+  const pSnap= await pRef.get();
+  if(!pSnap.exists){
+    const base = (me.displayName||'').split(' ')[0] || (me.email||'user').split('@')[0];
+    const handle = (base||'user').toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/_+/g,'_').slice(0,15) || 'user';
+    await pRef.set({
+      displayName: me.displayName || (me.email||'Kullanıcı'),
+      displayNameLower: (me.displayName||'kullanıcı').toLowerCase(),
+      handle, handleLower:handle,
+      bio:'', website:'', location:'', photoURL: me.photoURL || '', coverURL:'',
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+}
+
+/* ===== Router (basit) ===== */
+window.addEventListener('hashchange', route); route();
+function route(){
+  const h=location.hash||'#/';
+  if(h==='#/' || h==='#'){
+    if(me){ show('#pageDiscover'); } else { loginHero.style.display='block'; }
+    return;
+  }
+  if(h.startsWith('#/discover')){ show('#pageDiscover'); return; }
+  if(h.startsWith('#/board')){ show('#pageBoard'); return; }
+  if(h.startsWith('#/u/')){ const uid=h.split('/')[2]; renderProfile(uid); show('#pageProfile'); return; }
+  show('#pageDiscover');
+}
+
+/* ===== Discover (3 profil, alt alta) ===== */
+async function loadDiscover(){
+  if(!me){ $('#discoverBox').textContent='Giriş yapın.'; return; }
+  $('#discoverBox').textContent = 'Yükleniyor…';
+  const all = await db.collection('users').get();
+  const arr=[];
+  all.forEach(d=>{
+    if(d.id===me.uid) return;
+    const u=d.data();
+    const c=u.ratingCount||0;
+    const sum=u.ratingSumMicro||0, sq=u.ratingSumSqMicro||0;
+    arr.push({id:d.id, name:u.displayName||'(Kullanıcı)', photo:u.photoURL||'', bio:'', c, sum, sq});
+  });
+  const three = rand(arr,3);
+  if(!three.length){ $('#discoverBox').textContent='Gösterilecek kullanıcı yok.'; return; }
+
+  // Profil bio’ları çek
+  const bioMap={};
+  await Promise.all( three.map(async it=>{
+    try{ const p=await db.collection('profiles').doc(it.id).get(); if(p.exists) bioMap[it.id]=(p.data().bio||''); }catch{}
+  }) );
+
+  const html = three.map(u=>{
+    const score=lcb(u.sum, u.sq, u.c), cnt=u.c;
+    return `
+      <div class="card" style="margin-bottom:12px">
+        <div class="bd">
+          <div class="disc-row">
+            <div class="disc-left">
+              <img class="avatar" src="${u.photo||'https://i.pravatar.cc/100?u='+u.id}">
+              <div style="flex:1">
+                <div class="name">${u.name}</div>
+                <div class="handle">@${u.id.slice(0,6)}</div>
+                <div class="bio">${(bioMap[u.id]||'')}</div>
+
+                <div class="chips">
+                  <span class="chip q" data-v="70">70</span>
+                  <span class="chip q" data-v="80">80</span>
+                  <span class="chip q" data-v="90">90</span>
+                  <span class="chip q" data-v="95">95</span>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                  <input class="score-input" type="text" placeholder="0–100 (ör: 88,75000)" style="max-width:220px">
+                  <button class="btn primary save" data-id="${u.id}">Puanla</button>
+                  <button class="btn skip">Atla</button>
+                  <a href="#/u/${u.id}" class="btn">Profili gör</a>
+                </div>
+              </div>
+            </div>
+            <div class="right-box">
+              <div class="score">${to5(score)}</div>
+              <div class="sub">Oy: ${cnt}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  const box=$('#discoverBox'); box.innerHTML=html;
+
+  // Quick chips ve Puanla/Atla wiring
+  box.querySelectorAll('.chip.q').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      el.closest('.disc-row').querySelector('.score-input').value = el.dataset.v.replace('.',',');
+    });
+  });
+  box.querySelectorAll('.btn.skip').forEach(el=>{
+    el.addEventListener('click', ()=>{ loadDiscover(); });
+  });
+  box.querySelectorAll('.btn.save').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      const uid = el.dataset.id;
+      const input = el.closest('.disc-row').querySelector('.score-input');
+      let s = (input.value||'').trim().replace(',', '.');
+      const v = Number(s);
+      if(!isFinite(v) || v<=0 || v>100){ alert('0<puan≤100 olmalı.'); return; }
+      const micro = Math.round(v*100000);
+      try{
+        await db.runTransaction(async tx=>{
+          const userRef = db.collection('users').doc(uid);
+          const rateRef = userRef.collection('ratings').doc(me.uid);
+          const uSnap = await tx.get(userRef);
+          if(!uSnap.exists) throw new Error('Kullanıcı yok.');
+          const rSnap = await tx.get(rateRef);
+
+          const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
+          const deltaSum = micro - old;
+          const deltaCnt = rSnap.exists ? 0 : 1;
+
+          tx.set(rateRef, {
+            micro, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
+          }, {merge:true});
+
+          const d=uSnap.data();
+          const nSum=(d.ratingSumMicro||0)+deltaSum;
+          const nCnt=(d.ratingCount||0)+deltaCnt;
+          const nSq =(d.ratingSumSqMicro||0)+ (micro*micro - old*old); // kareler toplamı (LCB’yi net yapmak istersen kullan)
+          const avg = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
+
+          tx.set(userRef, { ratingSumMicro:nSum, ratingCount:nCnt, ratingSumSqMicro:nSq, avgMicroCache:avg }, {merge:true});
+        });
+        loadDiscover(); loadBoard();
+      }catch(e){ alert('Hata: '+(e.message||e)); }
+    });
+  });
+}
+
+/* ===== Leaderboard (Top 25, 5 hane) ===== */
+async function loadBoard(limitN=25){
+  const wrap=$('#boardWrap'); wrap.textContent='Yükleniyor…';
+  try{
+    const qs=await db.collection('users').get();
+    const arr=[];
+    qs.forEach(d=>{
+      const u=d.data(); const c=u.ratingCount||0; if(c<=0) return;
+      const s=lcb(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
+      arr.push({id:d.id,name:u.displayName||'(Kullanıcı)',score:s, count:c});
+    });
+    arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+    const top = arr.slice(0,limitN);
+    if(!top.length){ wrap.textContent='Henüz veri yok.'; return; }
+    let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+    top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+    html+='</tbody></table>'; wrap.innerHTML=html;
+  }catch(e){ wrap.textContent='Hata: '+(e.message||e); }
+}
+
+/* ===== Profil ===== */
+async function renderProfile(uid){
+  const box=$('#profWrap'); box.textContent='Yükleniyor…';
+  try{
+    const uDoc=await db.collection('users').doc(uid).get();
+    if(!uDoc.exists){ box.textContent='Kullanıcı bulunamadı.'; return; }
+    const u=uDoc.data();
+    const pDoc=await db.collection('profiles').doc(uid).get();
+    const p=pDoc.exists?pDoc.data():{};
+    const cnt=u.ratingCount||0, s=lcb(u.ratingSumMicro||0, u.ratingSumSqMicro||0, cnt);
+    // genel sıra
+    const all=await db.collection('users').get();
+    const arr=[]; all.forEach(d=>{ const x=d.data(); const c=x.ratingCount||0; if(c<=0) return; arr.push({id:d.id,score:lcb(x.ratingSumMicro||0,x.ratingSumSqMicro||0,c),count:c}); });
+    arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+    const rank = arr.findIndex(x=>x.id===uid); const total = arr.length;
+
+    const own = me && me.uid===uid;
+    box.innerHTML = `
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
+        <img class="avatar" src="${(p.photoURL||u.photoURL||'https://i.pravatar.cc/100?u='+uid)}">
+        <div>
+          <div class="name">${p.displayName||u.displayName||'(Kullanıcı)'}</div>
+          <div class="handle">@${(p.handle||uid.slice(0,6))}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          ${ own ? `<button class="btn" id="btnEdit">Profili düzenle</button>` : `` }
+          ${ own ? `` : `<button class="btn primary" id="btnRateOpen">Puan ver</button>` }
+          <button class="btn" id="btnShare">Paylaş</button>
+        </div>
+      </div>
+
+      <div class="muted" style="margin:6px 0">${p.bio||''}</div>
+      <div class="muted" style="font-size:14px">${p.location?('📍 '+p.location):''}  ${p.website?('🔗 '+p.website):''}</div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0">
+        <span class="chip">Puan: ${to5(s)}</span>
+        <span class="chip">Oy: ${cnt}</span>
+        <span class="chip">Sıra: ${rank>=0?(rank+1):'—'} / ${total}</span>
+      </div>
+
+      <div id="rateBox" style="display:${own?'none':'block'};margin:8px 0">
+        <input id="rateInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px">
+        <button class="btn primary" id="btnRate">Puanla / Güncelle</button>
+        <span id="rateMsg" class="muted"></span>
+      </div>
+    `;
+
+    $('#btnShare').onclick=()=>{
+      const link = location.origin + '/#/u/' + uid;
+      navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link));
+    };
+    if(!own){
+      $('#btnRateOpen') && ($('#btnRateOpen').onclick=()=> $('#rateInput').focus());
+      $('#btnRate').onclick=async ()=>{
+        if(!me){ alert('Önce giriş yapın.'); return; }
+        const s = ($('#rateInput').value||'').trim().replace(',', '.');
+        const v = Number(s); if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
+        const micro=Math.round(v*100000);
+        try{
+          await db.runTransaction(async tx=>{
+            const userRef=db.collection('users').doc(uid);
+            const rateRef=userRef.collection('ratings').doc(me.uid);
+            const uSnap=await tx.get(userRef); const rSnap=await tx.get(rateRef);
+            const old=rSnap.exists?(rSnap.data().micro||0):0;
+            const deltaSum=micro-old;
+            const deltaCnt=rSnap.exists?0:1;
+            const d=uSnap.data();
+            const nSum=(d.ratingSumMicro||0)+deltaSum;
+            const nCnt=(d.ratingCount||0)+deltaCnt;
+            const nSq =(d.ratingSumSqMicro||0)+ (micro*micro - old*old);
+            const avg=nCnt>0?Math.floor(nSum/nCnt):0;
+
+            tx.set(rateRef,{micro,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+              createdAt:rSnap.exists?rSnap.data().createdAt:firebase.firestore.FieldValue.serverTimestamp()
+            },{merge:true});
+            tx.set(userRef,{ratingSumMicro:nSum,ratingCount:nCnt,ratingSumSqMicro:nSq,avgMicroCache:avg},{merge:true});
+          });
+          renderProfile(uid); loadBoard();
+        }catch(e){ alert('Hata: '+(e.message||e)); }
+      };
+    }
+  }catch(e){ box.textContent='Hata: '+(e.message||e); }
+}
+
+/* ===== Basit sayfa açılış ===== */
+(function boot(){
+  // İstersen girişten sonra otomatik yönlendirme aktive et:
+  // auth.onAuthStateChanged(u=>{ if(u) location.hash='#/discover'; });
+  // Şimdilik yönlendirme yok; üstteki satır kapalı.
+  route();
+})();
 </script>
 </body>
 </html>
