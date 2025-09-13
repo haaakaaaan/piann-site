@@ -45,7 +45,7 @@
   .bd{padding:16px}
   .muted{color:var(--muted)}
 
-  /* DISCOVER CARD */
+  /* PROFILE/ROW */
   .row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
   .left{display:flex;gap:14px}
   .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
@@ -197,10 +197,19 @@ const randInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=(arr,n)=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
 const shuffle=(a)=>pick(a,a.length);
 
-/* ===== Seed Data (100 profiles) ===== */
-const seedPeople=["Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr","Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook","Taylor Swift","Ariana Grande","Beyoncé","Ed Sheeran","Rihanna","Hakan Kocapüskül","Ada Yılmaz","Efe Demir","Zeynep Kaya","Mert Aydın","Ayşe Çelik","Can Yıldız","Deniz Aksoy","Emre Koç","Selin Arslan","Barış Yaman","Derya Kurt","Kerem Öz","Seda Şahin","Burak Tunç","Melis Korkmaz","Oğuzhan Kara","Gizem Yalçın","Cem Uçar","İrem Taş","Ahmet Kaya","Mehmet Can","Fatma Nur","Gamze Kır","Onur Ege"];
-const seedBrands=["Coca-Cola","Pepsi","Nike","Adidas","Apple","Samsung","Microsoft","Google","Amazon","Tesla","BMW","Mercedes-Benz","Audi","Ferrari","Puma","Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"];
-const bios=["Kısa ve net: skor konuşur.","Her gün biraz daha iyi.","Veri takıntılı, kahve bağımlısı.","Sade, hızlı, net.","Takım oyuncusu.","Minimalist, sonuç odaklı.","Bugün daha iyi.","Deney ve öğren.","Puanlarınla şekilleniyorum."];
+/* ===== Seed Data (500 profiles) ===== */
+const fixedPeople=["Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr",
+"Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook","Taylor Swift","Ariana Grande",
+"Beyoncé","Ed Sheeran","Rihanna","Hakan Kocapüskül"];
+const fixedBrands=["Coca-Cola","Pepsi","Nike","Adidas","Apple","Samsung","Microsoft","Google","Amazon","Tesla",
+"BMW","Mercedes-Benz","Audi","Ferrari","Puma","Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"];
+
+const firstNames=["Hakan","Zeynep","Mert","Ayşe","Efe","Deniz","Can","Selin","Emre","Derya","Barış","Seda","Kerem","Burak","Melis","Oğuzhan","Gizem","Cem","İrem","Ahmet","Mehmet","Fatma","Gamze","Onur","Ada","Cansu","Ömer","Yunus","Elif","Berk","Naz","Sinem","Tolga","Gökçe","Eda","Kaan","Yasemin","Hüseyin","Beril","Arda"];
+const lastNames=["Yılmaz","Kaya","Demir","Çelik","Aydın","Koç","Arslan","Korkmaz","Kara","Şahin","Tunç","Öz","Taş","Can","Kurt","Uçar","Ege","Kır","Er","Polat","Aslan","Güneş","Yıldırım","Kaplan","Doğan","Sezer","Aksoy","Yalçın","Karaca","Işık","Öztürk","Yavuz","Bayraktar","Kılınç","Baş","Sarı","Taşkın","Tekin","Dağ","Uslu"];
+
+const bios=["Kısa ve net: skor konuşur.","Her gün biraz daha iyi.","Veri takıntılı, kahve bağımlısı.",
+"Sade, hızlı, net.","Takım oyuncusu.","Minimalist, sonuç odaklı.","Bugün daha iyi.","Deney ve öğren.",
+"Puanlarınla şekilleniyorum.","Zirve radarımda.","Yarış ruhu yüksek.","Rakamlara inanırım."];
 
 function makeId(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,16)||('id'+Math.random().toString(36).slice(2,8))}
 function mkAgg(n,mean,sd){const sumMicro=Math.round(n*mean*1e5);const ex2=sd*sd+mean*mean;const sumSqMicro=Math.round(n*ex2*1e10);return{ratingCount:n,ratingSumMicro:sumMicro,ratingSumSqMicro:sumSqMicro,avgMicroCache:Math.floor(sumMicro/n)}}
@@ -209,20 +218,28 @@ function brandImg(name){return `https://ui-avatars.com/api/?name=${encodeURIComp
 
 const profiles=[];
 (function seed(){
-  seedPeople.forEach((name,i)=>{
-    const id=(name==="Hakan Kocapüskül")?"me":makeId(name)+(i%7);
-    const n=randInt(12,1200), m=randInt(50,95), sd=randInt(6,18);
-    profiles.push({id,displayName:name,type:"person",tags:["general"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],...mkAgg(n,m,sd)});
+  // Fixed celebs/people
+  fixedPeople.forEach((name,i)=>{
+    const id=(name==="Hakan Kocapüskül")?"me":makeId(name)+(i%3);
+    const n=randInt(50,2500), m=randInt(55,95), sd=randInt(5,16);
+    profiles.push({id,displayName:name,type:"person",tags:["celebrity"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],location:"",website:"",...mkAgg(n,m,sd)});
   });
-  seedBrands.forEach((name,i)=>{
-    const id=makeId(name)+(i%5), n=randInt(20,2000), m=randInt(45,92), sd=randInt(5,16);
+  // Brands/Teams
+  fixedBrands.forEach((name,i)=>{
+    const id=makeId(name)+(i%3), n=randInt(80,3000), m=randInt(45,92), sd=randInt(5,16);
     const t=(["Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"].includes(name)?"team":"brand");
-    profiles.push({id,displayName:name,type:t,tags:["popular"],photoURL:brandImg(name),bio:`${name} için topluluk skoru.`,...mkAgg(n,m,sd)});
+    profiles.push({id,displayName:name,type:t,tags:["popular"],photoURL:brandImg(name),bio:`${name} için topluluk skoru.`,location:"",website:"",...mkAgg(n,m,sd)});
   });
-  const need=100-profiles.length;
-  for(let i=0;i<need;i++){
-    const name=`Kullanıcı ${i+1}`, id=makeId(name)+i, n=randInt(5,800), m=randInt(40,90), sd=randInt(6,20);
-    profiles.push({id,displayName:name,type:"person",tags:["demo"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],...mkAgg(n,m,sd)});
+  // Generated persons to reach 500
+  while(profiles.length<500){
+    const fn=firstNames[randInt(0,firstNames.length-1)];
+    const ln=lastNames[randInt(0,lastNames.length-1)];
+    const name=`${fn} ${ln}`;
+    const id=makeId(name)+randInt(0,9);
+    const n=randInt(5,1500), m=randInt(40,90), sd=randInt(6,20);
+    const locs=["İstanbul","Ankara","İzmir","Bursa","Tekirdağ","Antalya","Eskişehir","Konya","Gaziantep","Kayseri"];
+    const webs=["","https://piann.com","https://example.com","https://linktr.ee/demo",""];
+    profiles.push({id,displayName:name,type:"person",tags:["demo"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],location:locs[randInt(0,locs.length-1)],website:webs[randInt(0,webs.length-1)],...mkAgg(n,m,sd)});
   }
 })();
 const ME = profiles.find(p=>p.id==="me")||profiles[0];
@@ -253,6 +270,7 @@ function percentileOf(id){
 }
 
 /* ===== In-memory rating ===== */
+const activityLog=[]; // {t,id,v}
 function rateInMemory(targetId, val){
   if(targetId===ME.id){ alert('Kendini puanlayamazsın (demo).'); return; }
   const u=profiles.find(p=>p.id===targetId); if(!u) return;
@@ -261,7 +279,6 @@ function rateInMemory(targetId, val){
   u.ratingSumSqMicro += (micro*micro - old*old);
   u.ratingCount += deltaCnt;
   u.avgMicroCache = Math.floor(u.ratingSumMicro/u.ratingCount);
-  // aktivite günlüğü için kaydet
   activityLog.push({t:Date.now(), id:targetId, v:val});
 }
 
@@ -269,19 +286,21 @@ function rateInMemory(targetId, val){
 function renderAllHome(){ renderDuels(); loadDiscover(); loadTop50(); renderMeCard(); renderRising(); renderTicker(); }
 
 /* ===== DUEL ARENA ===== */
-const duelPairs = [
-  ['cristianoronaldo0','lionelmessi1'],
-  ['cocacola0','pepsi1'],
-  ['nike2','adidas3'],
-  ['apple4','samsung0'],
-  ['realmadrid3','barcelona4'],
-  ['elonmusk5','billgates6']
-].map(([a,b])=>{
-  // fallback by name contains
-  const findByPrefix=(pref)=>profiles.find(p=>p.id.startsWith(pref)) || profiles.find(p=>p.displayName.toLowerCase().includes(pref.replace(/[0-9]/g,'')));
-  return [findByPrefix(a)?.id || profiles[1].id, findByPrefix(b)?.id || profiles[2].id];
+function idByName(name){ const p=profiles.find(x=>x.displayName===name); return p?.id; }
+const duelNames = [
+  ["Cristiano Ronaldo","Lionel Messi"],
+  ["Coca-Cola","Pepsi"],
+  ["Nike","Adidas"],
+  ["Apple","Samsung"],
+  ["Real Madrid","Barcelona"],
+  ["Elon Musk","Bill Gates"],
+  ["Taylor Swift","Rihanna"],
+  ["BMW","Mercedes-Benz"]
+];
+const duelPairs = duelNames.map(([a,b])=>{
+  const la=idByName(a) || profiles[1].id; const rb=idByName(b) || profiles[2].id;
+  return [la,rb];
 });
-
 function renderDuels(){
   const car = $('#duelCarousel');
   const cards = duelPairs.map(([l,r])=>{
@@ -300,7 +319,6 @@ function renderDuels(){
   car.querySelectorAll('.pick-duel').forEach(b=>{
     b.onclick = ()=> renderDuelStage(b.dataset.l, b.dataset.r);
   });
-  // default pick first
   const [l0,r0]=duelPairs[0]; renderDuelStage(l0,r0);
 }
 function renderDuelStage(leftId,rightId){
@@ -375,7 +393,7 @@ function renderDuelStage(leftId,rightId){
   $('#duelStage').querySelector('.swap').onclick = ()=> renderDuelStage(rightId,leftId);
   $('#duelStage').querySelectorAll('.choose').forEach(b=>{
     b.onclick=()=>{
-      // hızlı karşılaştırma: kazanana 92.50000, diğerine 75.00000 verelim
+      // hızlı karşılaştırma: kazanana 92.50000, diğerine 75.00000
       const hi=92.5, lo=75;
       if(b.dataset.w==='L'){ rateInMemory(leftId,hi); rateInMemory(rightId,lo); }
       else { rateInMemory(rightId,hi); rateInMemory(leftId,lo); }
@@ -384,11 +402,9 @@ function renderDuelStage(leftId,rightId){
   });
 
   function postUpdate(confetti=false){
-    // küçük ödül: score alanını kısa highlight
     if(confetti){
       [$('#scL'),$('#scR')].forEach(el=>{ el.style.transition='transform .15s'; el.style.transform='scale(1.1)'; setTimeout(()=>el.style.transform='scale(1)',180); });
     }
-    // sayfa genelini güncelle
     renderDuelStage(leftId,rightId);
     loadTop50(); renderMeCard(); renderRising(); renderTicker();
   }
@@ -411,7 +427,8 @@ function loadDiscover(){
                 <div class="name">${u.displayName}</div>
                 <div class="handle">@${u.id.slice(0,8)} • <span class="muted">${u.type}</span></div>
                 <div class="bio">${u.bio||''}</div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <div class="muted" style="font-size:13px">${u.location?('📍 '+u.location):''} ${u.website?(' • 🔗 '+u.website):''}</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
                   <button class="btn q" data-id="${u.id}" data-v="70">70</button>
                   <button class="btn q" data-id="${u.id}" data-v="80">80</button>
                   <button class="btn q" data-id="${u.id}" data-v="90">90</button>
@@ -469,7 +486,6 @@ function renderMeCard(){
   const me = profiles.find(p=>p.id===ME.id);
   const cnt=me.ratingCount, s=lcb(me.ratingSumMicro,me.ratingSumSqMicro,cnt);
   const {rank,total,p} = percentileOf(me.id);
-  // bir üst hedef = ilk %PERCENT hedef; basitçe %80 -> %85 gibi
   const nextP = Math.min(99, Math.ceil(p/5)*5 + 5);
   const prog = Math.max(0, Math.min(100, (p/nextP)*100));
   $('#meCard').innerHTML = `
@@ -496,15 +512,12 @@ function renderMeCard(){
 }
 
 /* ===== RISING (son saat simülasyonu) ===== */
-const activityLog=[]; // {t,id,v}
 function renderRising(){
-  // son "simüle 1 saat"te artışı tahmin: activityLog'a dayalı topla
   const now=Date.now(); const oneH=3600e3;
   const incMap=new Map();
   activityLog.filter(a=> now-a.t<=oneH).forEach(a=>{
     const prev = incMap.get(a.id)||0;
-    // kabaca LCB değişimi yerine puan katkısını simüle edelim
-    incMap.set(a.id, prev + (a.v-50)); // 50 üstü pozitif kabul
+    incMap.set(a.id, prev + (a.v-50));
   });
   const list = Array.from(incMap.entries()).map(([id,delta])=>{
     const p=profiles.find(x=>x.id===id);
@@ -513,7 +526,6 @@ function renderRising(){
 
   const wrap=$('#risingWrap');
   if(list.length===0){
-    // Hiç aktivite yoksa genel skor artışı yüksek 6 kişiyi göster
     const generic = shuffle(rankArray()).slice(0,6).map(u=>{
       const p=profiles.find(x=>x.id===u.id);
       return `<div class="rise"><img class="avatar" src="${p.photoURL}"><div><div>${p.displayName}</div><div class="muted">LCB: ${to5(u.score)} • Oy: ${u.count}</div></div></div>`;
@@ -536,25 +548,23 @@ function renderRising(){
 function renderTicker(){
   const now=Date.now(), oneH=3600e3;
   const lastHour = activityLog.filter(a=> now-a.t<=oneH).length;
-  // bir iki "gündem" kalemi üret
   const arr=rankArray();
-  const hot = arr.slice(0,5);
+  const hot = arr.slice(0,3);
   const msg = [
     `<span class="tick-b">Son 1 saatte <b>${lastHour}</b> puan</span>`,
-    hot[0] ? `<span class="tick-b">${hot[0].name} Top #1</span>` : ``,
-    hot[1] ? `<span class="tick-b">${hot[1].name} Top #2</span>` : ``,
+    hot[0] ? `<span class="tick-b">Top #1: ${hot[0].name}</span>` : ``,
+    hot[1] ? `<span class="tick-b">Top #2: ${hot[1].name}</span>` : ``,
+    hot[2] ? `<span class="tick-b">Top #3: ${hot[2].name}</span>` : ``,
   ].filter(Boolean).join(' ');
   $('#ticker').innerHTML = msg || '<span class="muted">Henüz aktivite yok.</span>';
 }
-// periyodik ufak “canlılık” (sahte)
+// hafif canlılık simülasyonu (500 profilde de akıcı)
 setInterval(()=>{
-  // küçük rastgele bir oy simüle edelim
   const target = profiles[randInt(0,profiles.length-1)];
   const val = randInt(60,95);
   rateInMemory(target.id, val);
-  // canlılık güncelle
   loadTop50(); renderMeCard(); renderRising(); renderTicker();
-}, 8000);
+}, 9000);
 
 /* ===== RANKING PAGE ===== */
 const paging={list:[],page:1,per:50};
@@ -586,7 +596,7 @@ function renderProfile(uid){
       <img class="avatar" src="${p.photoURL}">
       <div>
         <div class="name">${p.displayName}</div>
-        <div class="muted">@${p.id.slice(0,8)} • ${p.type}</div>
+        <div class="muted">@${p.id.slice(0,8)} • ${p.type}${p.location?(' • '+p.location):''}</div>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <span class="pill">Puan: ${to5(s)}</span>
           <span class="pill">Oy: ${cnt}</span>
@@ -598,7 +608,8 @@ function renderProfile(uid){
         <button class="btn" id="btnShare">Paylaş</button>
       </div>
     </div>
-    <div class="muted" style="margin:6px 0">${p.bio||''}</div>
+    <div class="bio">${p.bio||''}</div>
+    <div class="muted" style="font-size:14px">${p.website?('🔗 '+p.website):''}</div>
     ${ uid===ME.id ? `<div class="muted" style="margin-top:8px">Bu demo sürümünde profil düzenleme kapalıdır.</div>`:`
       <div id="rateBox" style="margin-top:12px">
         <input id="rateInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px">
