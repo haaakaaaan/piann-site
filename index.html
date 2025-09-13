@@ -35,6 +35,10 @@
   .ribbon{background:#eef5ff;border-bottom:1px solid #d5e7ff}
   .ribbon .inner{max-width:var(--container);margin:0 auto;padding:8px 16px;color:#0a3e78;font-weight:600}
 
+  /* DEBUG */
+  #debug{display:none;background:#fff4f4;border-bottom:1px solid #ffd6d6;color:#991b1b;padding:8px 16px;font-size:14px}
+  #debug b{color:#b91c1c}
+
   /* WRAPS */
   .wrap{max-width:var(--container);margin:24px auto 64px;padding:0 16px}
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
@@ -98,6 +102,9 @@
 
 <!-- SLOGAN -->
 <div class="ribbon"><div class="inner">Gerçek değerini keşfet; skorun senin imzan.</div></div>
+
+<!-- DEBUG BAR -->
+<div id="debug"></div>
 
 <!-- LAYOUT -->
 <main class="wrap">
@@ -177,6 +184,21 @@
 <footer>© piann.com — demo prototip</footer>
 
 <script>
+/* ====== Basit hata yakalama (sayfa içi debug) ====== */
+(function(){
+  const dbg=document.getElementById('debug');
+  window.addEventListener('error', e=>{
+    dbg.style.display='block';
+    dbg.innerHTML = `<b>Hata:</b> ${e.message || e}`;
+    console.error(e.error || e.message || e);
+  });
+  window.addEventListener('unhandledrejection', e=>{
+    dbg.style.display='block';
+    dbg.innerHTML = `<b>Hata:</b> ${e.reason && e.reason.message ? e.reason.message : e.reason}`;
+    console.error(e.reason);
+  });
+})();
+
 /* ===== Utilities ===== */
 const $=(s)=>document.querySelector(s);
 const to5=(n)=>Number.isFinite(n)?n.toFixed(5).replace('.',','):'—';
@@ -197,7 +219,26 @@ const randInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=(arr,n)=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
 const shuffle=(a)=>pick(a,a.length);
 
-/* ===== Seed Data (500 profiles) ===== */
+/* ===== Yerel avatar (harici yok) ===== */
+function initials(name){
+  const parts = (name||'').trim().split(/\s+/);
+  const a = (parts[0]||'').charAt(0);
+  const b = (parts[1]||'').charAt(0);
+  return (a+b).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,2) || 'P';
+}
+function avatarDataURL(name, tone='brand'){
+  const bg = tone==='brand' ? '#0A66C2' : '#64748b';
+  const txt = '#ffffff';
+  const init = initials(name);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'>
+    <rect width='100' height='100' rx='50' ry='50' fill='${bg}'/>
+    <text x='50%' y='56%' text-anchor='middle' dominant-baseline='middle'
+      font-size='44' font-family='Arial, Helvetica, sans-serif' fill='${txt}'>${init}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+}
+
+/* ===== Seed Data (500 profiles) — harici istek yok ===== */
 const fixedPeople=["Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr",
 "Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook","Taylor Swift","Ariana Grande",
 "Beyoncé","Ed Sheeran","Rihanna","Hakan Kocapüskül"];
@@ -206,29 +247,26 @@ const fixedBrands=["Coca-Cola","Pepsi","Nike","Adidas","Apple","Samsung","Micros
 
 const firstNames=["Hakan","Zeynep","Mert","Ayşe","Efe","Deniz","Can","Selin","Emre","Derya","Barış","Seda","Kerem","Burak","Melis","Oğuzhan","Gizem","Cem","İrem","Ahmet","Mehmet","Fatma","Gamze","Onur","Ada","Cansu","Ömer","Yunus","Elif","Berk","Naz","Sinem","Tolga","Gökçe","Eda","Kaan","Yasemin","Hüseyin","Beril","Arda"];
 const lastNames=["Yılmaz","Kaya","Demir","Çelik","Aydın","Koç","Arslan","Korkmaz","Kara","Şahin","Tunç","Öz","Taş","Can","Kurt","Uçar","Ege","Kır","Er","Polat","Aslan","Güneş","Yıldırım","Kaplan","Doğan","Sezer","Aksoy","Yalçın","Karaca","Işık","Öztürk","Yavuz","Bayraktar","Kılınç","Baş","Sarı","Taşkın","Tekin","Dağ","Uslu"];
-
 const bios=["Kısa ve net: skor konuşur.","Her gün biraz daha iyi.","Veri takıntılı, kahve bağımlısı.",
 "Sade, hızlı, net.","Takım oyuncusu.","Minimalist, sonuç odaklı.","Bugün daha iyi.","Deney ve öğren.",
 "Puanlarınla şekilleniyorum.","Zirve radarımda.","Yarış ruhu yüksek.","Rakamlara inanırım."];
 
 function makeId(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,16)||('id'+Math.random().toString(36).slice(2,8))}
 function mkAgg(n,mean,sd){const sumMicro=Math.round(n*mean*1e5);const ex2=sd*sd+mean*mean;const sumSqMicro=Math.round(n*ex2*1e10);return{ratingCount:n,ratingSumMicro:sumMicro,ratingSumSqMicro:sumSqMicro,avgMicroCache:Math.floor(sumMicro/n)}}
-function avatarUrl(id){return `https://i.pravatar.cc/100?u=${encodeURIComponent(id)}`}
-function brandImg(name){return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0A66C2&color=fff&size=100&bold=true`}
 
 const profiles=[];
-(function seed(){
+function seedAll(){
   // Fixed celebs/people
   fixedPeople.forEach((name,i)=>{
     const id=(name==="Hakan Kocapüskül")?"me":makeId(name)+(i%3);
     const n=randInt(50,2500), m=randInt(55,95), sd=randInt(5,16);
-    profiles.push({id,displayName:name,type:"person",tags:["celebrity"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],location:"",website:"",...mkAgg(n,m,sd)});
+    profiles.push({id,displayName:name,type:"person",tags:["celebrity"],photoURL:avatarDataURL(name,'person'),bio:bios[randInt(0,bios.length-1)],location:"",website:"",...mkAgg(n,m,sd)});
   });
   // Brands/Teams
   fixedBrands.forEach((name,i)=>{
     const id=makeId(name)+(i%3), n=randInt(80,3000), m=randInt(45,92), sd=randInt(5,16);
     const t=(["Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"].includes(name)?"team":"brand");
-    profiles.push({id,displayName:name,type:t,tags:["popular"],photoURL:brandImg(name),bio:`${name} için topluluk skoru.`,location:"",website:"",...mkAgg(n,m,sd)});
+    profiles.push({id,displayName:name,type:t,tags:["popular"],photoURL:avatarDataURL(name,'brand'),bio:`${name} için topluluk skoru.`,location:"",website:"",...mkAgg(n,m,sd)});
   });
   // Generated persons to reach 500
   while(profiles.length<500){
@@ -239,11 +277,9 @@ const profiles=[];
     const n=randInt(5,1500), m=randInt(40,90), sd=randInt(6,20);
     const locs=["İstanbul","Ankara","İzmir","Bursa","Tekirdağ","Antalya","Eskişehir","Konya","Gaziantep","Kayseri"];
     const webs=["","https://piann.com","https://example.com","https://linktr.ee/demo",""];
-    profiles.push({id,displayName:name,type:"person",tags:["demo"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],location:locs[randInt(0,locs.length-1)],website:webs[randInt(0,webs.length-1)],...mkAgg(n,m,sd)});
+    profiles.push({id,displayName:name,type:"person",tags:["demo"],photoURL:avatarDataURL(name,'person'),bio:bios[randInt(0,bios.length-1)],location:locs[randInt(0,locs.length-1)],website:webs[randInt(0,webs.length-1)],...mkAgg(n,m,sd)});
   }
-})();
-const ME = profiles.find(p=>p.id==="me")||profiles[0];
-$('#memberCount').textContent = 'Üye: '+profiles.length;
+}
 
 /* ===== Router ===== */
 const views=['main','#pageRanking','#pageProfile'];
@@ -254,8 +290,6 @@ function route(){
   if(h.startsWith('#/profile/')){ const uid=h.split('/')[2]; showOnly(['#pageProfile']); renderProfile(uid); return; }
   showOnly(['main']); renderAllHome();
 }
-window.addEventListener('hashchange', route);
-route();
 
 /* ===== Core helpers ===== */
 function rankArray(list=profiles){
@@ -272,6 +306,7 @@ function percentileOf(id){
 /* ===== In-memory rating ===== */
 const activityLog=[]; // {t,id,v}
 function rateInMemory(targetId, val){
+  const ME = window.__ME__;
   if(targetId===ME.id){ alert('Kendini puanlayamazsın (demo).'); return; }
   const u=profiles.find(p=>p.id===targetId); if(!u) return;
   const micro=Math.round(val*1e5); const old=0; const deltaSum=micro-old; const deltaCnt=1;
@@ -297,13 +332,16 @@ const duelNames = [
   ["Taylor Swift","Rihanna"],
   ["BMW","Mercedes-Benz"]
 ];
-const duelPairs = duelNames.map(([a,b])=>{
-  const la=idByName(a) || profiles[1].id; const rb=idByName(b) || profiles[2].id;
-  return [la,rb];
-});
+function duelPairs(){
+  return duelNames.map(([a,b])=>{
+    const la=idByName(a) || profiles[1].id; const rb=idByName(b) || profiles[2].id;
+    return [la,rb];
+  });
+}
 function renderDuels(){
   const car = $('#duelCarousel');
-  const cards = duelPairs.map(([l,r])=>{
+  const pairs = duelPairs();
+  const cards = pairs.map(([l,r])=>{
     const L=profiles.find(p=>p.id===l), R=profiles.find(p=>p.id===r);
     const lS=lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
     const rS=lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
@@ -319,7 +357,7 @@ function renderDuels(){
   car.querySelectorAll('.pick-duel').forEach(b=>{
     b.onclick = ()=> renderDuelStage(b.dataset.l, b.dataset.r);
   });
-  const [l0,r0]=duelPairs[0]; renderDuelStage(l0,r0);
+  const [l0,r0]=pairs[0]; renderDuelStage(l0,r0);
 }
 function renderDuelStage(leftId,rightId){
   const L=profiles.find(p=>p.id===leftId), R=profiles.find(p=>p.id===rightId);
@@ -393,7 +431,6 @@ function renderDuelStage(leftId,rightId){
   $('#duelStage').querySelector('.swap').onclick = ()=> renderDuelStage(rightId,leftId);
   $('#duelStage').querySelectorAll('.choose').forEach(b=>{
     b.onclick=()=>{
-      // hızlı karşılaştırma: kazanana 92.50000, diğerine 75.00000
       const hi=92.5, lo=75;
       if(b.dataset.w==='L'){ rateInMemory(leftId,hi); rateInMemory(rightId,lo); }
       else { rateInMemory(rightId,hi); rateInMemory(leftId,lo); }
@@ -413,7 +450,7 @@ function renderDuelStage(leftId,rightId){
 /* ===== DISCOVER (3) ===== */
 function loadDiscover(){
   const box=$('#discoverBox'); box.textContent='Yükleniyor…';
-  const candidates = profiles.filter(p=>p.id!==ME.id);
+  const candidates = profiles.filter(p=>p.id!==window.__ME__.id);
   const three = pick(candidates,3);
   const html = three.map(u=>{
     const s=lcb(u.ratingSumMicro,u.ratingSumSqMicro,u.ratingCount);
@@ -483,7 +520,7 @@ function loadTop50(){
 
 /* ===== ME CARD ===== */
 function renderMeCard(){
-  const me = profiles.find(p=>p.id===ME.id);
+  const me = window.__ME__;
   const cnt=me.ratingCount, s=lcb(me.ratingSumMicro,me.ratingSumSqMicro,cnt);
   const {rank,total,p} = percentileOf(me.id);
   const nextP = Math.min(99, Math.ceil(p/5)*5 + 5);
@@ -511,7 +548,7 @@ function renderMeCard(){
   `;
 }
 
-/* ===== RISING (son saat simülasyonu) ===== */
+/* ===== RISING ===== */
 function renderRising(){
   const now=Date.now(); const oneH=3600e3;
   const incMap=new Map();
@@ -558,18 +595,13 @@ function renderTicker(){
   ].filter(Boolean).join(' ');
   $('#ticker').innerHTML = msg || '<span class="muted">Henüz aktivite yok.</span>';
 }
-// hafif canlılık simülasyonu (500 profilde de akıcı)
-setInterval(()=>{
-  const target = profiles[randInt(0,profiles.length-1)];
-  const val = randInt(60,95);
-  rateInMemory(target.id, val);
-  loadTop50(); renderMeCard(); renderRising(); renderTicker();
-}, 9000);
 
 /* ===== RANKING PAGE ===== */
 const paging={list:[],page:1,per:50};
-$('#btnPrev').onclick=()=>{ if(paging.page>1){ paging.page--; renderRankingPage(); } };
-$('#btnNext').onclick=()=>{ const max=Math.ceil(paging.list.length/paging.per)||1; if(paging.page<max){ paging.page++; renderRankingPage(); } };
+function attachRankingButtons(){
+  $('#btnPrev').onclick=()=>{ if(paging.page>1){ paging.page--; renderRankingPage(); } };
+  $('#btnNext').onclick=()=>{ const max=Math.ceil(paging.list.length/paging.per)||1; if(paging.page<max){ paging.page++; renderRankingPage(); } };
+}
 function loadRanking(){
   const wrap=$('#rankWrap'); wrap.textContent='Yükleniyor…';
   const list=rankArray().slice(0,500);
@@ -604,20 +636,20 @@ function renderProfile(uid){
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px">
-        ${ uid===ME.id ? '' : '<button class="btn primary" id="btnRateOpen">Puan ver</button>'}
+        ${ uid===window.__ME__.id ? '' : '<button class="btn primary" id="btnRateOpen">Puan ver</button>'}
         <button class="btn" id="btnShare">Paylaş</button>
       </div>
     </div>
     <div class="bio">${p.bio||''}</div>
     <div class="muted" style="font-size:14px">${p.website?('🔗 '+p.website):''}</div>
-    ${ uid===ME.id ? `<div class="muted" style="margin-top:8px">Bu demo sürümünde profil düzenleme kapalıdır.</div>`:`
+    ${ uid===window.__ME__.id ? `<div class="muted" style="margin-top:8px">Bu demo sürümünde profil düzenleme kapalıdır.</div>`:`
       <div id="rateBox" style="margin-top:12px">
         <input id="rateInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px">
         <button class="btn primary" id="btnRate">Puanla / Güncelle</button>
       </div>`}
   `;
-  $('#btnShare').onclick=()=>{ const link=location.origin+location.pathname+'#/profile/'+p.id; navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link)); };
-  if(uid!==ME.id){
+  $('#btnShare').onclick=()=>{ const link=location.origin+location.pathname+'#/profile/'+p.id; navigator.clipboard?.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link)).catch(()=>alert(link)); };
+  if(uid!==window.__ME__.id){
     $('#btnRateOpen') && ($('#btnRateOpen').onclick=()=> $('#rateInput').focus());
     $('#btnRate').onclick=()=>{
       const v=Number(($('#rateInput').value||'').replace(',','.'));
@@ -626,6 +658,25 @@ function renderProfile(uid){
     };
   }
 }
+
+/* ===== Boot ===== */
+function boot(){
+  seedAll();
+  window.__ME__ = profiles.find(p=>p.id==="me") || profiles[0];
+  $('#memberCount').textContent = 'Üye: '+profiles.length;
+  attachRankingButtons();
+  route();
+  // hafif canlılık simülasyonu (harici yok)
+  setInterval(()=>{
+    const target = profiles[randInt(0,profiles.length-1)];
+    const val = randInt(60,95);
+    rateInMemory(target.id, val);
+    loadTop50(); renderMeCard(); renderRising(); renderTicker();
+  }, 9000);
+  console.log('Ready: profiles=', profiles.length);
+}
+
+document.addEventListener('DOMContentLoaded', boot);
 </script>
 </body>
 </html>
