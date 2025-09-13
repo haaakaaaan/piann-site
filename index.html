@@ -10,6 +10,7 @@
     --bg:#f7f8fb; --ink:#0f172a; --muted:#64748b;
     --card:#ffffff; --line:#e6e9ef;
     --accent:#0A66C2; --accent-600:#0857A6;
+    --ok:#10b981; --err:#ef4444;
     --container:max(320px, min(1200px, 92vw));
   }
   *{box-sizing:border-box}
@@ -19,6 +20,8 @@
   .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
+  .btn.ghost{background:#fff;border-color:var(--line)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
   .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
 
   /* NAV */
@@ -34,29 +37,47 @@
 
   /* WRAPS */
   .wrap{max-width:var(--container);margin:24px auto 64px;padding:0 16px}
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  @media (max-width:960px){.grid{grid-template-columns:1fr}}
+
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
   .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
   .bd{padding:16px}
   .muted{color:var(--muted)}
-  .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-  @media (max-width:960px){.grid{grid-template-columns:1fr}}
 
   /* DISCOVER CARD */
-  .disc-row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
-  .disc-left{display:flex;gap:14px}
+  .row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
+  .left{display:flex;gap:14px}
   .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#f2f3f7;border:1px solid var(--line)}
   .name{font-weight:800}
   .handle{color:var(--muted);font-size:14px}
   .bio{color:#1f2937;margin:8px 0 10px;font-size:15px;line-height:1.4}
   input[type=text]{padding:10px 12px;border:1px solid var(--line);border-radius:10px}
   .rightbox{background:#eef5ff;border:1px solid #d5e7ff;border-radius:12px;padding:20px;text-align:center}
-  .rightbox .score{font-weight:900;font-size:28px;color:#0a3e78}
-  .rightbox .sub{color:var(--muted);font-size:12px}
+  .score{font-weight:900;font-size:28px;color:#0a3e78}
+  .sub{color:var(--muted);font-size:12px}
 
   /* TABLE */
   table{width:100%;border-collapse:collapse}
   th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
   th{color:#111827}
+
+  /* CAROUSEL (duels) */
+  .carousel{display:flex;gap:10px;overflow:auto;padding-bottom:6px}
+  .dc{min-width:220px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px}
+  .dc .title{font-weight:700;margin:4px 0}
+  .dc .mini{display:flex;align-items:center;gap:6px}
+  .dc img{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);object-fit:cover}
+
+  /* RISING GRID */
+  .grid2x3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:700px){.grid2x3{grid-template-columns:repeat(2,1fr)}}
+  .rise{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;display:flex;gap:10px;align-items:center}
+  .rise .up{color:var(--ok);font-weight:700}
+
+  /* TICKER */
+  .ticker{display:flex;gap:12px;flex-wrap:wrap;font-size:14px;color:#0a3e78}
+  .tick-b{background:#eef5ff;border:1px solid #d5e7ff;border-radius:999px;padding:6px 10px}
 
   footer{margin:32px 0;text-align:center;color:var(--muted);font-size:12px}
 </style>
@@ -67,7 +88,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <a href="#/" class="brand">piann</a>
-    <a href="#/" class="btn">Keşfet</a>
+    <a href="#/" class="btn">Ana sayfa</a>
     <a href="#/ranking" class="btn">Leaderboard</a>
     <div class="spacer"></div>
     <a href="#/profile/me" class="btn">Profil (Hakan)</a>
@@ -75,46 +96,66 @@
   </div>
 </nav>
 
-<!-- SLOGAN RIBBON -->
-<div class="ribbon">
-  <div class="inner">Gerçek değerini keşfet; skorun senin imzan.</div>
-</div>
+<!-- SLOGAN -->
+<div class="ribbon"><div class="inner">Gerçek değerini keşfet; skorun senin imzan.</div></div>
 
-<!-- HOME (DISCOVER + TOP50) -->
-<main id="pageHome" class="wrap" style="display:none">
+<!-- LAYOUT -->
+<main class="wrap">
   <div class="grid">
-    <section class="card">
-      <div class="hd">Keşfet</div>
-      <div class="bd" id="discoverBox">Yükleniyor…</div>
-    </section>
-    <aside class="card">
-      <div class="hd">Top 50</div>
-      <div class="bd" id="top50Wrap">Yükleniyor…</div>
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- DUEL ARENA -->
+      <section class="card">
+        <div class="hd">Düello Arenası</div>
+        <div class="bd">
+          <div class="carousel" id="duelCarousel">Yükleniyor…</div>
+          <div id="duelStage" style="margin-top:12px">Bir düello seç.</div>
+        </div>
+      </section>
+
+      <!-- DISCOVER -->
+      <section class="card" style="margin-top:16px">
+        <div class="hd">Keşfet</div>
+        <div class="bd" id="discoverBox">Yükleniyor…</div>
+      </section>
+
+      <!-- RISING -->
+      <section class="card" style="margin-top:16px">
+        <div class="hd">Yükselenler</div>
+        <div class="bd">
+          <div id="risingWrap" class="grid2x3">Yükleniyor…</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <aside>
+      <!-- MY RANK -->
+      <section class="card">
+        <div class="hd">Benim Sıram</div>
+        <div class="bd" id="meCard">—</div>
+      </section>
+
+      <!-- TOP 50 -->
+      <section class="card" style="margin-top:16px">
+        <div class="hd">Top 50</div>
+        <div class="bd" id="top50Wrap">Yükleniyor…</div>
+      </section>
+
+      <!-- LIVE TICKER -->
+      <section class="card" style="margin-top:16px">
+        <div class="hd">Canlı Aktivite</div>
+        <div class="bd"><div class="ticker" id="ticker">—</div></div>
+      </section>
     </aside>
   </div>
 </main>
 
-<!-- RANKING (TOP 500) -->
+<!-- RANKING PAGE -->
 <section id="pageRanking" class="wrap" style="display:none">
   <div class="card">
     <div class="hd">Leaderboard – İlk 500</div>
     <div class="bd">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-        <label class="pill">Kategori:
-          <select id="fltType">
-            <option value="">Tümü</option>
-            <option value="person">Kişiler</option>
-            <option value="brand">Markalar</option>
-          </select>
-        </label>
-        <label class="pill">Min. Oy:
-          <select id="fltMin">
-            <option value="1">1</option>
-            <option value="10" selected>10</option>
-            <option value="50">50</option>
-          </select>
-        </label>
-      </div>
       <div id="rankWrap">Yükleniyor…</div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
         <button class="btn" id="btnPrev">Önceki</button>
@@ -136,7 +177,7 @@
 <footer>© piann.com — demo prototip</footer>
 
 <script>
-/* ========= Utilities ========= */
+/* ===== Utilities ===== */
 const $=(s)=>document.querySelector(s);
 const to5=(n)=>Number.isFinite(n)?n.toFixed(5).replace('.',','):'—';
 const clip=(x)=>Math.max(0,Math.min(100,x));
@@ -154,161 +195,244 @@ function lcb(sumMicro,sumSqMicro,n){
 }
 const randInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=(arr,n)=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
+const shuffle=(a)=>pick(a,a.length);
 
-/* ========= Fake Data (100 profile) ========= */
-const seedPeople=[
-  "Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr",
-  "Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook",
-  "Taylor Swift","Ariana Grande","Beyoncé","Ed Sheeran","Rihanna",
-  "Hakan Kocapüskül","Ada Yılmaz","Efe Demir","Zeynep Kaya","Mert Aydın",
-  "Ayşe Çelik","Can Yıldız","Deniz Aksoy","Emre Koç","Selin Arslan",
-  "Barış Yaman","Derya Kurt","Kerem Öz","Seda Şahin","Burak Tunç",
-  "Melis Korkmaz","Oğuzhan Kara","Gizem Yalçın","Cem Uçar","İrem Taş",
-  "Ahmet Kaya","Mehmet Can","Fatma Nur","Gamze Kır","Onur Ege"
-];
-const seedBrands=[
-  "Coca-Cola","Pepsi","Nike","Adidas","Apple","Samsung","Microsoft","Google","Amazon","Tesla",
-  "BMW","Mercedes-Benz","Audi","Ferrari","Puma",
-  "Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"
-];
-const bios = [
-  "Kısa ve net: skor konuşur.","Her gün biraz daha iyi.","Veri takıntılı, kahve bağımlısı.",
-  "Sade, hızlı, net.","Yıldızları hedefle.","Takım oyuncusu.","Minimalist, sonuç odaklı.",
-  "Bugün daha iyi.","Deney ve öğren.","Puanlarınla şekilleniyorum."
-];
-function makeId(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,16) || ('id'+Math.random().toString(36).slice(2,8)); }
-function mkAgg(n, mean, sd){
-  // E[X]=mean, Var=sd^2 -> E[X^2]=Var+mean^2
-  const sumMicro = Math.round(n*mean*1e5);
-  const ex2 = sd*sd + mean*mean;
-  const sumSqMicro = Math.round(n*ex2*1e10);
-  return {ratingCount:n, ratingSumMicro:sumMicro, ratingSumSqMicro:sumSqMicro, avgMicroCache: Math.floor(sumMicro/n)};
-}
-function avatarUrl(id){ return `https://i.pravatar.cc/100?u=${encodeURIComponent(id)}`; }
-function brandImg(name){ return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0A66C2&color=fff&size=100&bold=true`; }
+/* ===== Seed Data (100 profiles) ===== */
+const seedPeople=["Cristiano Ronaldo","Lionel Messi","Kylian Mbappé","Erling Haaland","Neymar Jr","Elon Musk","Bill Gates","Mark Zuckerberg","Jeff Bezos","Tim Cook","Taylor Swift","Ariana Grande","Beyoncé","Ed Sheeran","Rihanna","Hakan Kocapüskül","Ada Yılmaz","Efe Demir","Zeynep Kaya","Mert Aydın","Ayşe Çelik","Can Yıldız","Deniz Aksoy","Emre Koç","Selin Arslan","Barış Yaman","Derya Kurt","Kerem Öz","Seda Şahin","Burak Tunç","Melis Korkmaz","Oğuzhan Kara","Gizem Yalçın","Cem Uçar","İrem Taş","Ahmet Kaya","Mehmet Can","Fatma Nur","Gamze Kır","Onur Ege"];
+const seedBrands=["Coca-Cola","Pepsi","Nike","Adidas","Apple","Samsung","Microsoft","Google","Amazon","Tesla","BMW","Mercedes-Benz","Audi","Ferrari","Puma","Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"];
+const bios=["Kısa ve net: skor konuşur.","Her gün biraz daha iyi.","Veri takıntılı, kahve bağımlısı.","Sade, hızlı, net.","Takım oyuncusu.","Minimalist, sonuç odaklı.","Bugün daha iyi.","Deney ve öğren.","Puanlarınla şekilleniyorum."];
+
+function makeId(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,16)||('id'+Math.random().toString(36).slice(2,8))}
+function mkAgg(n,mean,sd){const sumMicro=Math.round(n*mean*1e5);const ex2=sd*sd+mean*mean;const sumSqMicro=Math.round(n*ex2*1e10);return{ratingCount:n,ratingSumMicro:sumMicro,ratingSumSqMicro:sumSqMicro,avgMicroCache:Math.floor(sumMicro/n)}}
+function avatarUrl(id){return `https://i.pravatar.cc/100?u=${encodeURIComponent(id)}`}
+function brandImg(name){return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0A66C2&color=fff&size=100&bold=true`}
 
 const profiles=[];
 (function seed(){
-  // People
   seedPeople.forEach((name,i)=>{
-    const id = (name==="Hakan Kocapüskül")?"me":makeId(name)+(i%7);
-    const n  = randInt(12,1200);
-    const m  = randInt(50,95); // ortalama
-    const sd = randInt(6,18);  // standart sapma
-    const agg= mkAgg(n, m, sd);
-    profiles.push({
-      id, displayName:name, type:"person", tags:["general"],
-      photoURL: avatarUrl(id),
-      bio: bios[randInt(0,bios.length-1)],
-      ...agg
-    });
+    const id=(name==="Hakan Kocapüskül")?"me":makeId(name)+(i%7);
+    const n=randInt(12,1200), m=randInt(50,95), sd=randInt(6,18);
+    profiles.push({id,displayName:name,type:"person",tags:["general"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],...mkAgg(n,m,sd)});
   });
-  // Brands/Teams
   seedBrands.forEach((name,i)=>{
-    const id = makeId(name)+ (i%5);
-    const n  = randInt(20,2000);
-    const m  = randInt(45,92);
-    const sd = randInt(5,16);
-    const agg= mkAgg(n, m, sd);
-    profiles.push({
-      id, displayName:name, type: (["Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"].includes(name)?"team":"brand"),
-      tags: ["popular"],
-      photoURL: brandImg(name),
-      bio: `${name} için topluluk skoru.`,
-      ...agg
-    });
+    const id=makeId(name)+(i%5), n=randInt(20,2000), m=randInt(45,92), sd=randInt(5,16);
+    const t=(["Fenerbahçe","Galatasaray","Beşiktaş","Real Madrid","Barcelona"].includes(name)?"team":"brand");
+    profiles.push({id,displayName:name,type:t,tags:["popular"],photoURL:brandImg(name),bio:`${name} için topluluk skoru.`,...mkAgg(n,m,sd)});
   });
-  // Fill up to 100 with generic users
-  const baseN = profiles.length;
-  const need = 100 - baseN;
+  const need=100-profiles.length;
   for(let i=0;i<need;i++){
-    const name = `Kullanıcı ${i+1}`;
-    const id   = makeId(name)+i;
-    const n    = randInt(5,800);
-    const m    = randInt(40,90);
-    const sd   = randInt(6,20);
-    const agg  = mkAgg(n,m,sd);
-    profiles.push({
-      id, displayName:name, type:"person", tags:["demo"],
-      photoURL: avatarUrl(id),
-      bio: bios[randInt(0,bios.length-1)],
-      ...agg
-    });
+    const name=`Kullanıcı ${i+1}`, id=makeId(name)+i, n=randInt(5,800), m=randInt(40,90), sd=randInt(6,20);
+    profiles.push({id,displayName:name,type:"person",tags:["demo"],photoURL:avatarUrl(id),bio:bios[randInt(0,bios.length-1)],...mkAgg(n,m,sd)});
   }
 })();
-const ME = profiles.find(p=>p.id==="me") || profiles[0];
-$('#memberCount').textContent = 'Üye: ' + profiles.length;
+const ME = profiles.find(p=>p.id==="me")||profiles[0];
+$('#memberCount').textContent = 'Üye: '+profiles.length;
 
-/* ========= Router ========= */
-const views = ['#pageHome','#pageRanking','#pageProfile'];
-function showOnly(ids){ views.forEach(id=> $(id).style.display = ids.includes(id)?'block':'none'); }
+/* ===== Router ===== */
+const views=['main','#pageRanking','#pageProfile'];
+function showOnly(ids){views.forEach(id=>{const el=(id==='main')?document.querySelector('main'):$(id);if(el) el.style.display = ids.includes(id)?'block':'none';});}
 function route(){
   const h=location.hash||'#/';
   if(h.startsWith('#/ranking')){ showOnly(['#pageRanking']); loadRanking(); return; }
   if(h.startsWith('#/profile/')){ const uid=h.split('/')[2]; showOnly(['#pageProfile']); renderProfile(uid); return; }
-  showOnly(['#pageHome']); loadDiscover(); loadTop50();
+  showOnly(['main']); renderAllHome();
 }
 window.addEventListener('hashchange', route);
 route();
 
-/* ========= In-memory rating (demo) ========= */
+/* ===== Core helpers ===== */
+function rankArray(list=profiles){
+  const arr=list.filter(x=>x.ratingCount>0).map(x=>({id:x.id,name:x.displayName,count:x.ratingCount,score:lcb(x.ratingSumMicro,x.ratingSumSqMicro,x.ratingCount)}));
+  arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+  return arr;
+}
+function percentileOf(id){
+  const arr=rankArray(); const pos=arr.findIndex(x=>x.id===id); if(pos<0||arr.length===0) return {rank:'—',total:arr.length,p:0};
+  const rank=pos+1, total=arr.length, p = Math.round((1 - (rank-1)/total)*100);
+  return {rank,total,p};
+}
+
+/* ===== In-memory rating ===== */
 function rateInMemory(targetId, val){
-  // self-rate engel
   if(targetId===ME.id){ alert('Kendini puanlayamazsın (demo).'); return; }
-  const u=profiles.find(p=>p.id===targetId);
-  if(!u) return;
-  const micro = Math.round(val*1e5);
-  // sanki ilk kez oy veriyormuşuz gibi güncelle (demo)
-  const old = 0;
-  const deltaSum = micro - old;
-  const deltaCnt = 1; // yeni oy gibi
+  const u=profiles.find(p=>p.id===targetId); if(!u) return;
+  const micro=Math.round(val*1e5); const old=0; const deltaSum=micro-old; const deltaCnt=1;
   u.ratingSumMicro += deltaSum;
   u.ratingSumSqMicro += (micro*micro - old*old);
   u.ratingCount += deltaCnt;
   u.avgMicroCache = Math.floor(u.ratingSumMicro/u.ratingCount);
+  // aktivite günlüğü için kaydet
+  activityLog.push({t:Date.now(), id:targetId, v:val});
 }
 
-/* ========= HOME: Discover (3) ========= */
-function loadDiscover(){
-  const box=$('#discoverBox'); box.textContent='Yükleniyor…';
-  // 3 farklı kişi/marka, ME hariç
-  const candidates = profiles.filter(p=>p.id!==ME.id);
-  const pick3 = pick(candidates, 3);
-  const html = pick3.map(u=>{
-    const score=lcb(u.ratingSumMicro,u.ratingSumSqMicro,u.ratingCount);
+/* ===== Home render ===== */
+function renderAllHome(){ renderDuels(); loadDiscover(); loadTop50(); renderMeCard(); renderRising(); renderTicker(); }
+
+/* ===== DUEL ARENA ===== */
+const duelPairs = [
+  ['cristianoronaldo0','lionelmessi1'],
+  ['cocacola0','pepsi1'],
+  ['nike2','adidas3'],
+  ['apple4','samsung0'],
+  ['realmadrid3','barcelona4'],
+  ['elonmusk5','billgates6']
+].map(([a,b])=>{
+  // fallback by name contains
+  const findByPrefix=(pref)=>profiles.find(p=>p.id.startsWith(pref)) || profiles.find(p=>p.displayName.toLowerCase().includes(pref.replace(/[0-9]/g,'')));
+  return [findByPrefix(a)?.id || profiles[1].id, findByPrefix(b)?.id || profiles[2].id];
+});
+
+function renderDuels(){
+  const car = $('#duelCarousel');
+  const cards = duelPairs.map(([l,r])=>{
+    const L=profiles.find(p=>p.id===l), R=profiles.find(p=>p.id===r);
+    const lS=lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
+    const rS=lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
     return `
-    <div class="card" style="margin-bottom:12px">
-      <div class="bd">
-        <div class="disc-row">
-          <div class="disc-left">
-            <img class="avatar" src="${u.photoURL}">
-            <div style="flex:1">
-              <div class="name">${u.displayName}</div>
-              <div class="handle">@${u.id.slice(0,8)} • <span class="muted">${u.type}</span></div>
-              <div class="bio">${u.bio||''}</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-                <button class="btn q" data-id="${u.id}" data-v="70">70</button>
-                <button class="btn q" data-id="${u.id}" data-v="80">80</button>
-                <button class="btn q" data-id="${u.id}" data-v="90">90</button>
-                <button class="btn q" data-id="${u.id}" data-v="95">95</button>
-                <input class="score-input" data-id="${u.id}" type="text" placeholder="0–100 (örn: 88,75000)" style="max-width:200px">
-                <button class="btn primary save" data-id="${u.id}">Puanla</button>
-                <button class="btn skip">Atla</button>
-                <a href="#/profile/${u.id}" class="btn">Profili gör</a>
-              </div>
-            </div>
-          </div>
-          <div class="rightbox">
-            <div class="score">${to5(score)}</div>
-            <div class="sub">Oy: ${u.ratingCount}</div>
+      <div class="dc">
+        <div class="mini"><img src="${L.photoURL}"><span>${L.displayName}</span></div>
+        <div class="mini"><img src="${R.photoURL}"><span>${R.displayName}</span></div>
+        <div class="title">${to5(lS)} vs ${to5(rS)}</div>
+        <button class="btn primary pick-duel" data-l="${L.id}" data-r="${R.id}" style="width:100%">Karşılaştır</button>
+      </div>`;
+  }).join('');
+  car.innerHTML = cards;
+  car.querySelectorAll('.pick-duel').forEach(b=>{
+    b.onclick = ()=> renderDuelStage(b.dataset.l, b.dataset.r);
+  });
+  // default pick first
+  const [l0,r0]=duelPairs[0]; renderDuelStage(l0,r0);
+}
+function renderDuelStage(leftId,rightId){
+  const L=profiles.find(p=>p.id===leftId), R=profiles.find(p=>p.id===rightId);
+  const lS=lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
+  const rS=lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
+  $('#duelStage').innerHTML = `
+    <div class="row">
+      <div class="left">
+        <img class="avatar" src="${L.photoURL}">
+        <div style="flex:1">
+          <div class="name">${L.displayName}</div>
+          <div class="handle">@${L.id.slice(0,8)}</div>
+          <div class="bio">${L.bio||''}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="btn ql" data-id="${L.id}" data-v="70">70</button>
+            <button class="btn ql" data-id="${L.id}" data-v="80">80</button>
+            <button class="btn ql" data-id="${L.id}" data-v="90">90</button>
+            <button class="btn ql" data-id="${L.id}" data-v="95">95</button>
+            <input class="score-input" id="inL" type="text" placeholder="0–100 (örn: 92,50000)" style="max-width:200px">
+            <button class="btn primary svL" data-id="${L.id}">Puanla</button>
           </div>
         </div>
       </div>
-    </div>`;
-  }).join('');
-  box.innerHTML=html;
+      <div class="rightbox">
+        <div class="score" id="scL">${to5(lS)}</div>
+        <div class="sub">Oy: ${L.ratingCount}</div>
+      </div>
+    </div>
 
-  // wiring
+    <div style="display:flex;gap:8px;justify-content:center;margin:10px 0">
+      <button class="btn ghost choose" data-w="L">◀ Daha iyi (sol)</button>
+      <button class="btn ghost swap">Yer değiştir</button>
+      <button class="btn ghost choose" data-w="R">Daha iyi (sağ) ▶</button>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <div class="left">
+        <img class="avatar" src="${R.photoURL}">
+        <div style="flex:1">
+          <div class="name">${R.displayName}</div>
+          <div class="handle">@${R.id.slice(0,8)}</div>
+          <div class="bio">${R.bio||''}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="btn qr" data-id="${R.id}" data-v="70">70</button>
+            <button class="btn qr" data-id="${R.id}" data-v="80">80</button>
+            <button class="btn qr" data-id="${R.id}" data-v="90">90</button>
+            <button class="btn qr" data-id="${R.id}" data-v="95">95</button>
+            <input class="score-input" id="inR" type="text" placeholder="0–100 (örn: 87,00000)" style="max-width:200px">
+            <button class="btn primary svR" data-id="${R.id}">Puanla</button>
+          </div>
+        </div>
+      </div>
+      <div class="rightbox">
+        <div class="score" id="scR">${to5(rS)}</div>
+        <div class="sub">Oy: ${R.ratingCount}</div>
+      </div>
+    </div>
+  `;
+
+  // wires
+  $('#duelStage').querySelectorAll('.ql').forEach(b=> b.onclick=()=> $('#inL').value = b.dataset.v.replace('.',','));
+  $('#duelStage').querySelectorAll('.qr').forEach(b=> b.onclick=()=> $('#inR').value = b.dataset.v.replace('.',','));
+  $('#duelStage').querySelector('.svL').onclick = ()=>{
+    const v=Number(($('#inL').value||'').replace(',','.')); if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+    rateInMemory(leftId,v); postUpdate();
+  };
+  $('#duelStage').querySelector('.svR').onclick = ()=>{
+    const v=Number(($('#inR').value||'').replace(',','.')); if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+    rateInMemory(rightId,v); postUpdate();
+  };
+  $('#duelStage').querySelector('.swap').onclick = ()=> renderDuelStage(rightId,leftId);
+  $('#duelStage').querySelectorAll('.choose').forEach(b=>{
+    b.onclick=()=>{
+      // hızlı karşılaştırma: kazanana 92.50000, diğerine 75.00000 verelim
+      const hi=92.5, lo=75;
+      if(b.dataset.w==='L'){ rateInMemory(leftId,hi); rateInMemory(rightId,lo); }
+      else { rateInMemory(rightId,hi); rateInMemory(leftId,lo); }
+      postUpdate(true);
+    };
+  });
+
+  function postUpdate(confetti=false){
+    // küçük ödül: score alanını kısa highlight
+    if(confetti){
+      [$('#scL'),$('#scR')].forEach(el=>{ el.style.transition='transform .15s'; el.style.transform='scale(1.1)'; setTimeout(()=>el.style.transform='scale(1)',180); });
+    }
+    // sayfa genelini güncelle
+    renderDuelStage(leftId,rightId);
+    loadTop50(); renderMeCard(); renderRising(); renderTicker();
+  }
+}
+
+/* ===== DISCOVER (3) ===== */
+function loadDiscover(){
+  const box=$('#discoverBox'); box.textContent='Yükleniyor…';
+  const candidates = profiles.filter(p=>p.id!==ME.id);
+  const three = pick(candidates,3);
+  const html = three.map(u=>{
+    const s=lcb(u.ratingSumMicro,u.ratingSumSqMicro,u.ratingCount);
+    return `
+      <div class="card" style="margin-bottom:12px">
+        <div class="bd">
+          <div class="row">
+            <div class="left">
+              <img class="avatar" src="${u.photoURL}">
+              <div style="flex:1">
+                <div class="name">${u.displayName}</div>
+                <div class="handle">@${u.id.slice(0,8)} • <span class="muted">${u.type}</span></div>
+                <div class="bio">${u.bio||''}</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                  <button class="btn q" data-id="${u.id}" data-v="70">70</button>
+                  <button class="btn q" data-id="${u.id}" data-v="80">80</button>
+                  <button class="btn q" data-id="${u.id}" data-v="90">90</button>
+                  <button class="btn q" data-id="${u.id}" data-v="95">95</button>
+                  <input class="score-input" data-id="${u.id}" type="text" placeholder="0–100 (örn: 88,75000)" style="max-width:200px">
+                  <button class="btn primary save" data-id="${u.id}">Puanla</button>
+                  <button class="btn ghost skip">Atla</button>
+                  <a href="#/profile/${u.id}" class="btn">Profili gör</a>
+                </div>
+              </div>
+            </div>
+            <div class="rightbox">
+              <div class="score">${to5(s)}</div>
+              <div class="sub">Oy: ${u.ratingCount}</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+  box.innerHTML = html;
+
   box.querySelectorAll('.btn.q').forEach(b=>{
     b.onclick=()=>{
       const id=b.dataset.id, v=b.dataset.v;
@@ -320,82 +444,143 @@ function loadDiscover(){
     b.onclick=()=>{
       const uid=b.dataset.id;
       const inp=box.querySelector(`.score-input[data-id="${uid}"]`);
-      const v = Number((inp.value||'').trim().replace(',', '.'));
-      if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
-      rateInMemory(uid, v);
-      loadDiscover(); loadTop50(); // anında güncelle
+      const v=Number((inp.value||'').replace(',','.'));
+      if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+      rateInMemory(uid,v);
+      loadDiscover(); loadTop50(); renderMeCard(); renderRising(); renderTicker();
     };
   });
-  box.querySelectorAll('.btn.skip').forEach(b=>{
-    b.onclick=()=> loadDiscover();
-  });
+  box.querySelectorAll('.btn.skip').forEach(b=> b.onclick=()=> loadDiscover());
 }
 
-/* ========= HOME: Top 50 ========= */
+/* ===== TOP 50 ===== */
 function loadTop50(){
   const wrap=$('#top50Wrap'); wrap.textContent='Yükleniyor…';
-  const arr = profiles
-    .filter(p=>p.ratingCount>0)
-    .map(p=>({id:p.id, name:p.displayName, count:p.ratingCount,
-              score:lcb(p.ratingSumMicro,p.ratingSumSqMicro,p.ratingCount)}));
-  arr.sort((a,b)=> b.score - a.score || b.count - a.count);
-  const top=arr.slice(0,50);
-  if(!top.length){ wrap.textContent='Henüz veri yok.'; return; }
+  const arr = rankArray().slice(0,50);
+  if(!arr.length){ wrap.textContent='Henüz veri yok.'; return; }
   let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th></tr></thead><tbody>';
-  top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/profile/${u.id}">${u.name}</a></td><td>${to5(u.score)}</td><td>${u.count}</td></tr>`);
+  arr.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td><a href="#/profile/${u.id}">${u.name}</a></td><td>${to5(u.score)}</td><td>${u.count}</td></tr>`);
   html+='</tbody></table>';
   wrap.innerHTML=html;
 }
 
-/* ========= RANKING (Top 500 demo) ========= */
-const paging = { list:[], page:1, per:50 };
+/* ===== ME CARD ===== */
+function renderMeCard(){
+  const me = profiles.find(p=>p.id===ME.id);
+  const cnt=me.ratingCount, s=lcb(me.ratingSumMicro,me.ratingSumSqMicro,cnt);
+  const {rank,total,p} = percentileOf(me.id);
+  // bir üst hedef = ilk %PERCENT hedef; basitçe %80 -> %85 gibi
+  const nextP = Math.min(99, Math.ceil(p/5)*5 + 5);
+  const prog = Math.max(0, Math.min(100, (p/nextP)*100));
+  $('#meCard').innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center">
+      <img class="avatar" src="${me.photoURL}">
+      <div>
+        <div class="name">${me.displayName}</div>
+        <div class="muted">@${me.id.slice(0,8)}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <span class="pill">Puan: ${to5(s)}</span>
+      <span class="pill">Oy: ${cnt}</span>
+      <span class="pill">Sıra: ${rank} / ${total}</span>
+      <span class="pill">%${p} dilim</span>
+    </div>
+    <div style="margin-top:12px">
+      <div class="muted" style="margin-bottom:6px">Hedef: %${nextP} dilim</div>
+      <div style="height:10px;border:1px solid #d5e7ff;border-radius:999px;overflow:hidden;background:#f0f6ff">
+        <div style="height:100%;width:${prog}%;background:#0A66C2"></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ===== RISING (son saat simülasyonu) ===== */
+const activityLog=[]; // {t,id,v}
+function renderRising(){
+  // son "simüle 1 saat"te artışı tahmin: activityLog'a dayalı topla
+  const now=Date.now(); const oneH=3600e3;
+  const incMap=new Map();
+  activityLog.filter(a=> now-a.t<=oneH).forEach(a=>{
+    const prev = incMap.get(a.id)||0;
+    // kabaca LCB değişimi yerine puan katkısını simüle edelim
+    incMap.set(a.id, prev + (a.v-50)); // 50 üstü pozitif kabul
+  });
+  const list = Array.from(incMap.entries()).map(([id,delta])=>{
+    const p=profiles.find(x=>x.id===id);
+    return {id, name:p.displayName, photo:p.photoURL, up: Math.max(0, Math.round(delta*100)/100)};
+  }).sort((a,b)=> b.up - a.up).slice(0,6);
+
+  const wrap=$('#risingWrap');
+  if(list.length===0){
+    // Hiç aktivite yoksa genel skor artışı yüksek 6 kişiyi göster
+    const generic = shuffle(rankArray()).slice(0,6).map(u=>{
+      const p=profiles.find(x=>x.id===u.id);
+      return `<div class="rise"><img class="avatar" src="${p.photoURL}"><div><div>${p.displayName}</div><div class="muted">LCB: ${to5(u.score)} • Oy: ${u.count}</div></div></div>`;
+    }).join('');
+    wrap.innerHTML = generic; return;
+  }
+  wrap.innerHTML = list.map(x=>`
+    <div class="rise">
+      <img class="avatar" src="${x.photo}">
+      <div style="flex:1">
+        <div>${x.name} <span class="up">↑ ${x.up}</span></div>
+        <div class="muted">@${x.id.slice(0,8)}</div>
+      </div>
+      <a class="btn" href="#/profile/${x.id}">Gör</a>
+    </div>
+  `).join('');
+}
+
+/* ===== TICKER ===== */
+function renderTicker(){
+  const now=Date.now(), oneH=3600e3;
+  const lastHour = activityLog.filter(a=> now-a.t<=oneH).length;
+  // bir iki "gündem" kalemi üret
+  const arr=rankArray();
+  const hot = arr.slice(0,5);
+  const msg = [
+    `<span class="tick-b">Son 1 saatte <b>${lastHour}</b> puan</span>`,
+    hot[0] ? `<span class="tick-b">${hot[0].name} Top #1</span>` : ``,
+    hot[1] ? `<span class="tick-b">${hot[1].name} Top #2</span>` : ``,
+  ].filter(Boolean).join(' ');
+  $('#ticker').innerHTML = msg || '<span class="muted">Henüz aktivite yok.</span>';
+}
+// periyodik ufak “canlılık” (sahte)
+setInterval(()=>{
+  // küçük rastgele bir oy simüle edelim
+  const target = profiles[randInt(0,profiles.length-1)];
+  const val = randInt(60,95);
+  rateInMemory(target.id, val);
+  // canlılık güncelle
+  loadTop50(); renderMeCard(); renderRising(); renderTicker();
+}, 8000);
+
+/* ===== RANKING PAGE ===== */
+const paging={list:[],page:1,per:50};
 $('#btnPrev').onclick=()=>{ if(paging.page>1){ paging.page--; renderRankingPage(); } };
 $('#btnNext').onclick=()=>{ const max=Math.ceil(paging.list.length/paging.per)||1; if(paging.page<max){ paging.page++; renderRankingPage(); } };
-$('#fltType').onchange=()=> loadRanking();
-$('#fltMin').onchange =()=> loadRanking();
-
 function loadRanking(){
   const wrap=$('#rankWrap'); wrap.textContent='Yükleniyor…';
-  const type=$('#fltType').value; const min=Number($('#fltMin').value||1);
-  let arr = profiles.filter(p=>p.ratingCount>=min);
-  if(type) arr = arr.filter(p=>p.type===type);
-  const list = arr.map(p=>({
-    id:p.id, name:p.displayName, count:p.ratingCount,
-    score:lcb(p.ratingSumMicro,p.ratingSumSqMicro,p.ratingCount)
-  }));
-  list.sort((a,b)=> b.score - a.score || b.count - a.count);
-  paging.list = list.slice(0,500);
-  paging.page = 1;
-  renderRankingPage();
+  const list=rankArray().slice(0,500);
+  paging.list=list; paging.page=1; renderRankingPage();
 }
 function renderRankingPage(){
-  const wrap=$('#rankWrap');
-  const start=(paging.page-1)*paging.per, end=start+paging.per;
+  const wrap=$('#rankWrap'); const start=(paging.page-1)*paging.per, end=start+paging.per;
   const pageItems=paging.list.slice(start,end);
   if(!pageItems.length){ wrap.textContent='Kayıt yok.'; $('#pageInfo').textContent='—'; return; }
   let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
   pageItems.forEach((u,i)=> html+=`<tr><td>${start+i+1}</td><td>${u.name}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/profile/${u.id}">Gör</a></td></tr>`);
-  html+='</tbody></table>';
-  wrap.innerHTML=html;
-  const max=Math.ceil(paging.list.length/paging.per)||1;
-  $('#pageInfo').textContent=`Sayfa ${paging.page}/${max}`;
+  html+='</tbody></table>'; wrap.innerHTML=html;
+  const max=Math.ceil(paging.list.length/paging.per)||1; $('#pageInfo').textContent=`Sayfa ${paging.page}/${max}`;
 }
 
-/* ========= PROFILE ========= */
+/* ===== PROFILE PAGE ===== */
 function renderProfile(uid){
   const box=$('#profWrap'); box.textContent='Yükleniyor…';
-  const p = profiles.find(x=>x.id===uid) || profiles[0];
-  const cnt=p.ratingCount||0;
-  const s  =lcb(p.ratingSumMicro,p.ratingSumSqMicro,cnt);
-
-  // Rank hesapla
-  const arr = profiles
-    .filter(x=>x.ratingCount>0)
-    .map(x=>({id:x.id,score:lcb(x.ratingSumMicro,x.ratingSumSqMicro,x.ratingCount),count:x.ratingCount}));
-  arr.sort((a,b)=> b.score - a.score || b.count - a.count);
-  const rank = arr.findIndex(x=>x.id===p.id);
-  const total=arr.length;
-
+  const p=profiles.find(x=>x.id===uid)||profiles[0];
+  const cnt=p.ratingCount||0; const s=lcb(p.ratingSumMicro,p.ratingSumSqMicro,cnt);
+  const arr=rankArray(); const rank=arr.findIndex(x=>x.id===p.id)+1; const total=arr.length;
   box.innerHTML=`
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
       <img class="avatar" src="${p.photoURL}">
@@ -405,7 +590,7 @@ function renderProfile(uid){
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <span class="pill">Puan: ${to5(s)}</span>
           <span class="pill">Oy: ${cnt}</span>
-          <span class="pill">Sıra: ${rank>=0?(rank+1):'—'} / ${total}</span>
+          <span class="pill">Sıra: ${rank||'—'} / ${total}</span>
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px">
@@ -414,29 +599,19 @@ function renderProfile(uid){
       </div>
     </div>
     <div class="muted" style="margin:6px 0">${p.bio||''}</div>
-
-    ${ uid===ME.id ? `
-      <div class="muted" style="margin-top:8px">Bu demo sürümünde profil düzenleme kapalıdır.</div>
-    `:`
+    ${ uid===ME.id ? `<div class="muted" style="margin-top:8px">Bu demo sürümünde profil düzenleme kapalıdır.</div>`:`
       <div id="rateBox" style="margin-top:12px">
         <input id="rateInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px">
         <button class="btn primary" id="btnRate">Puanla / Güncelle</button>
-      </div>
-    `}
+      </div>`}
   `;
-
-  $('#btnShare').onclick=()=>{
-    const link = location.origin + location.pathname + '#/profile/' + p.id;
-    navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link));
-  };
+  $('#btnShare').onclick=()=>{ const link=location.origin+location.pathname+'#/profile/'+p.id; navigator.clipboard.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link)); };
   if(uid!==ME.id){
     $('#btnRateOpen') && ($('#btnRateOpen').onclick=()=> $('#rateInput').focus());
     $('#btnRate').onclick=()=>{
-      const s = ($('#rateInput').value||'').trim().replace(',', '.');
-      const v = Number(s);
-      if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
-      rateInMemory(uid, v);
-      renderProfile(uid); loadTop50();
+      const v=Number(($('#rateInput').value||'').replace(',','.'));
+      if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+      rateInMemory(uid,v); renderProfile(uid); loadTop50(); renderMeCard(); renderRising(); renderTicker();
     };
   }
 }
