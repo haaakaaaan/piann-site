@@ -18,7 +18,6 @@
   .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
-  .btn.ghost{background:#fff;border-color:var(--line)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
   .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
 
@@ -43,7 +42,7 @@
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
   @media (max-width:960px){.grid{grid-template-columns:1fr}}
 
-  /* ROWS */
+  /* DISCOVER ROW */
   .row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
   .left{display:flex;gap:14px}
   .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#eef2f7;border:1px solid var(--line)}
@@ -54,17 +53,12 @@
   .score{font-weight:900;font-size:28px;color:#0a3e78}
   .sub{color:var(--muted);font-size:12px}
 
-  /* TABLE */
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
-  th{color:#111827}
-
-  /* DUEL */
+  /* DUEL — single pair */
   .duel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:900px){.duel-grid{grid-template-columns:1fr}}
   .duel-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:12px;position:relative}
   .duel-head{display:flex;align-items:center;gap:12px}
-  .avatar64{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);object-fit:cover;background:#eef2f7}
+  .duel-head img{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);object-fit:cover;background:#eef2f7}
   .duel-title{font-weight:800}
   .rank-badge{position:absolute;top:12px;right:12px;background:#0a3e7833;color:#0a3e78;font-weight:800;border-radius:999px;padding:6px 10px;border:1px solid #cfe2ff}
   .bigscore{font-size:40px;font-weight:900;color:#0a3e78}
@@ -72,6 +66,11 @@
   .duel-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .duel-footer{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:4px}
   .hint{font-size:12px;color:#64748b;text-align:center;margin-top:4px}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+  th{color:#111827}
 
   footer{margin:32px 0;text-align:center;color:#64748b;font-size:12px}
 </style>
@@ -82,7 +81,7 @@
 <nav class="nav" id="nav">
   <div class="nav-inner">
     <a href="#/" class="brand">piann</a>
-    <a href="#/discover" class="btn">Keşfet</a>
+    <a href="#/discover" class="btn" id="lnkDiscover">Ana sayfa</a>
     <a href="#/board" class="btn">Leaderboard</a>
     <div class="spacer"></div>
     <span id="memberCount" class="count">Üye: —</span>
@@ -108,7 +107,7 @@
       <div class="bd">
         <button class="btn primary" id="btnGoogle" style="width:100%">Google ile giriş yap</button>
         <div class="muted" id="loginInfo" style="margin-top:8px"></div>
-        <div class="muted" style="margin-top:12px;font-size:12px">İpucu: Test için dosyayı <b>http://localhost</b> üstünden aç ve Firebase’de <b>Authorized domains</b>’e domainini ekle.</div>
+        <div class="muted" style="margin-top:12px;font-size:12px">İpucu: Test için bu dosyayı <b>http://localhost</b> üzerinden aç ve Firebase’de <b>Authorized domains</b>’e domainini ekle.</div>
       </div>
     </div>
   </div>
@@ -120,11 +119,11 @@
     <!-- LEFT -->
     <div>
       <!-- DUEL (tek çift) -->
-      <section class="card" id="pageDuel">
+      <section class="card" id="pageDuel" style="display:none">
         <div class="hd">Düello Arenası</div>
         <div class="bd" id="duelStage">Yükleniyor…</div>
         <div class="bd" style="border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;align-items:center">
-          <span class="muted">İpucu: Sağa kaydır → atla • Klavye: → atla, ← yer değiştir</span>
+          <span class="muted">İpucu: <b>Sağa kaydır</b> → atla • Klavye: <b>→</b> atla, <b>←</b> yer değiştir</span>
           <div style="display:flex;gap:8px">
             <button class="btn ghost" id="btnSkip">Atla →</button>
             <button class="btn" id="btnShuffle">Karıştır (Yeni Düello)</button>
@@ -133,7 +132,7 @@
       </section>
 
       <!-- DISCOVER -->
-      <section class="card" id="pageDiscover" style="margin-top:16px">
+      <section class="card" id="pageDiscover" style="display:none; margin-top:16px">
         <div class="hd">Keşfet</div>
         <div class="bd" id="discoverBox">Yükleniyor…</div>
       </section>
@@ -148,7 +147,7 @@
     <!-- RIGHT -->
     <aside>
       <!-- LEADERBOARD (Top 25) -->
-      <section class="card" id="pageBoard">
+      <section class="card" id="pageBoard" style="display:none">
         <div class="hd">Leaderboard (Top 25)</div>
         <div class="bd">
           <div class="muted" style="margin-bottom:10px">En az 1 oy alan profiller listelenir.</div>
@@ -167,7 +166,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-/* 🔐 Firebase config — kendi projenle aynı olmalı */
+/* 🔐 Firebase config — kendi konsolundakiyle birebir kontrol et! */
 const firebaseConfig = {
   apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
   authDomain: "piann-c58b8.firebaseapp.com",
@@ -184,12 +183,24 @@ const db   = firebase.firestore();
 const $ = (s)=>document.querySelector(s);
 const show = (ids=[])=>{
   const all=['#pageDuel','#pageDiscover','#pageBoard','#pageProfile'];
-  all.forEach(sel=> $(sel).style.display = 'none');
-  ids.forEach(sel=> $(sel).style.display = 'block');
+  all.forEach(sel=> $(sel).style.display = ids.includes(sel)?'block':'none');
 };
 const to5  = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
 const clip = (x)=> Math.max(0, Math.min(100, x));
 
+/* Yerel avatar fallback (harici yok) */
+function avatarDataURL(name){
+  const bg='#0A66C2', txt='#fff';
+  const ini=(name||'').trim().split(/\s+/).map(s=>s[0]||'').slice(0,2).join('').toUpperCase()||'P';
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'>
+    <rect width='100' height='100' rx='50' ry='50' fill='${bg}'/>
+    <text x='50%' y='56%' text-anchor='middle' dominant-baseline='middle'
+      font-size='44' font-family='Arial, Helvetica, sans-serif' fill='${txt}'>${ini}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+}
+
+/* LCB */
 function lcb(sumMicro, sumSqMicro, n){
   if(!n||n<=0) return 0;
   const mean = (sumMicro/n)/100000;
@@ -203,46 +214,32 @@ function lcb(sumMicro, sumSqMicro, n){
   return clip(mean - 1.96 * (sd/Math.sqrt(n)));
 }
 
-/* Yerel avatar (baş harf SVG) — harici servis yok */
-function initials(name){
-  const parts=(name||'').trim().split(/\s+/);
-  const a=(parts[0]||'').charAt(0), b=(parts[1]||'').charAt(0);
-  return (a+b).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,2) || 'U';
-}
-function avatarDataURL(name){
-  const bg='#0A66C2', txt='#ffffff', init=initials(name);
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'>
-    <rect width='100' height='100' rx='50' ry='50' fill='${bg}'/>
-    <text x='50%' y='56%' text-anchor='middle' dominant-baseline='middle'
-      font-size='44' font-family='Arial, Helvetica, sans-serif' fill='${txt}'>${init}</text></svg>`;
-  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
-}
-
 /* ===== STATE ===== */
 let me=null;
-let usersCache=[];     // {id, displayName, photoURL, ratingCount, ratingSumMicro, ratingSumSqMicro}
-let duelQueue=[];      // [[uidA, uidB], ...]
-let currentDuel=null;  // [uidA, uidB]
+let allUsersCache=[];     // {id, displayName, photoURL, ratingCount, ratingSumMicro, ratingSumSqMicro}
+let rankCache=[];         // [{id,name,score,count}]
+let currentDuel=null;     // [leftId,rightId]
 
 /* ===== Auth UI ===== */
 const nav = $('#nav'), loginHero=$('#loginHero'), appMain=$('#appMain');
 const btnGoogle = $('#btnGoogle'), btnOut=$('#btnOut'), btnMy=$('#btnMy');
 const memberCount=$('#memberCount');
 
-btnGoogle.onclick = async ()=>{
+btnGoogle && (btnGoogle.onclick = async ()=>{
   try{
     $('#loginInfo').textContent = 'Google açılıyor…';
     await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }catch(e){
     $('#loginInfo').textContent = 'Hata: '+ (e.message || e.code || e);
   }
-};
-btnOut.onclick = ()=> auth.signOut();
-btnMy.onclick = ()=> { location.hash = '#/u/'+me.uid; renderProfile(me.uid); show(['#pageProfile']); };
+});
+btnOut && (btnOut.onclick = ()=> auth.signOut());
+btnMy && (btnMy.onclick = ()=> { location.hash = '#/u/'+me.uid; renderProfile(me.uid); show(['#pageProfile']); });
 
 auth.onAuthStateChanged(async (u)=>{
   me=u||null;
   const loggedIn=!!me;
+  // Nav/Login toggle
   nav.style.display = loggedIn? 'block':'none';
   loginHero.style.display = loggedIn? 'none':'block';
   appMain.style.display = loggedIn? 'block':'none';
@@ -250,39 +247,23 @@ auth.onAuthStateChanged(async (u)=>{
   if(loggedIn){
     btnOut.style.display='inline-block'; btnMy.style.display='inline-block';
     await ensureUserDocs();
-    await refreshUsersCache();  // usersCache + memberCount
-    await loadBoard();
-    await loadDiscover();
-    prepareDuelQueue();
-    renderDuel();
-
-    // varsayılan görünüm: Düello + Keşfet + Board
-    show(['#pageDuel','#pageDiscover','#pageBoard']);
-
-    // ilk girişte profilini ziyaret etmek istersen:
-    // location.hash = '#/u/'+me.uid;
+    await refreshCounters();
+    // Varsayılan: Ana sayfa (Düello + Keşfet + Board)
+    if (!location.hash || location.hash==='#/' || location.hash==='#') {
+      location.hash = '#/discover';
+    }
+    await route();
   }else{
     btnOut.style.display='none'; btnMy.style.display='none';
   }
 });
 
-/* ===== Counters + Users Cache ===== */
-async function refreshUsersCache(){
-  const qs=await db.collection('users').get();
-  const arr=[];
-  qs.forEach(d=>{
-    const u=d.data()||{};
-    arr.push({
-      id:d.id,
-      displayName: u.displayName || '(Kullanıcı)',
-      photoURL: u.photoURL || '',
-      ratingCount: u.ratingCount||0,
-      ratingSumMicro: u.ratingSumMicro||0,
-      ratingSumSqMicro: u.ratingSumSqMicro||0
-    });
-  });
-  usersCache = arr;
-  memberCount.textContent='Üye: '+arr.length;
+/* ===== Counters ===== */
+async function refreshCounters(){
+  try{
+    const s = await db.collection('users').get();
+    memberCount.textContent = 'Üye: ' + s.size;
+  }catch{ memberCount.textContent = 'Üye: —'; }
 }
 
 /* ===== Ensure user docs ===== */
@@ -324,24 +305,271 @@ window.addEventListener('hashchange', route);
 async function route(){
   if(!me){ return; }
   const h=location.hash||'#/';
-  if(h.startsWith('#/discover')){ await loadDiscover(); show(['#pageDuel','#pageDiscover','#pageBoard']); return; }
+  if(h.startsWith('#/discover')){ await ensureCaches(); await renderDuel(); await loadDiscover(); await loadBoard(); show(['#pageDuel','#pageDiscover','#pageBoard']); return; }
   if(h.startsWith('#/board')){ await loadBoard(); show(['#pageBoard']); return; }
   if(h.startsWith('#/u/')){ const uid=h.split('/')[2]; await renderProfile(uid); show(['#pageProfile']); return; }
-  // default: Duel + Discover + Board
-  show(['#pageDuel','#pageDiscover','#pageBoard']);
+  // default → ana sayfa
+  await ensureCaches(); await renderDuel(); await loadDiscover(); await loadBoard(); show(['#pageDuel','#pageDiscover','#pageBoard']);
 }
 
-/* ===== Rank helpers ===== */
-function rankArray(){
-  const arr=usersCache
+/* ===== Cache (users + ranks) ===== */
+async function ensureCaches(){
+  const snap = await db.collection('users').get();
+  allUsersCache = [];
+  snap.forEach(d=>{
+    const u=d.data();
+    allUsersCache.push({
+      id:d.id,
+      displayName:u.displayName||'(Kullanıcı)',
+      photoURL:u.photoURL||'',
+      ratingCount:u.ratingCount||0,
+      ratingSumMicro:u.ratingSumMicro||0,
+      ratingSumSqMicro:u.ratingSumSqMicro||0
+    });
+  });
+  // rank cache
+  rankCache = allUsersCache
     .filter(x=>x.ratingCount>0)
-    .map(x=>({id:x.id,name:x.displayName,count:x.ratingCount,score:lcb(x.ratingSumMicro,x.ratingSumSqMicro,x.ratingCount)}));
-  arr.sort((a,b)=> b.score - a.score || b.count - a.count);
-  return arr;
+    .map(x=>({id:x.id,name:x.displayName,count:x.ratingCount,score:lcb(x.ratingSumMicro,x.ratingSumSqMicro,x.ratingCount)}))
+    .sort((a,b)=> b.score - a.score || b.count - a.count);
 }
+
+/* ===== Pair helpers ===== */
 function rankOf(uid){
-  const arr=rankArray(); const i=arr.findIndex(x=>x.id===uid);
+  const i=rankCache.findIndex(x=>x.id===uid);
   return i>=0 ? (i+1) : null;
+}
+function randomPair(){
+  const pool = allUsersCache.filter(x=> x.id!==me.uid);
+  if(pool.length<2) return null;
+  // ağırlıklı: oy sayısı yüksek olanlara biraz daha şans
+  const bag=[];
+  pool.forEach(p=>{ const w=Math.max(1, Math.round(Math.log10((p.ratingCount||1)+10))); for(let i=0;i<w;i++) bag.push(p); });
+  const pick = ()=> bag[Math.floor(Math.random()*bag.length)];
+  let a=pick(), b=pick();
+  let guard=0;
+  while(a.id===b.id && guard<10){ b=pick(); guard++; }
+  return [a.id,b.id];
+}
+
+/* ===== DUEL RENDER ===== */
+async function renderDuel(){
+  const stage=$('#duelStage');
+  if(allUsersCache.filter(u=>u.id!==me.uid).length<2){
+    stage.innerHTML = `<div class="muted">Düelloya başlamak için en az <b>2 farklı</b> kullanıcı gerekir. Şimdilik başka hesap yoksa Keşfet/Profil ile devam et.</div>`;
+    return;
+  }
+  if(!currentDuel){ currentDuel = randomPair(); }
+  const [leftId,rightId] = currentDuel;
+  const L = allUsersCache.find(x=>x.id===leftId);
+  const R = allUsersCache.find(x=>x.id===rightId);
+  // LCB & rank
+  const lS = lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
+  const rS = lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
+  const lRank = rankOf(L.id); const rRank = rankOf(R.id);
+
+  // fetch profiles meta
+  const [pL,pR] = await Promise.all([
+    db.collection('profiles').doc(L.id).get(),
+    db.collection('profiles').doc(R.id).get()
+  ]);
+  const metaL = pL.exists? pL.data() : {};
+  const metaR = pR.exists? pR.data() : {};
+  const lAvatar = (metaL.photoURL||L.photoURL) || avatarDataURL(metaL.displayName||L.displayName);
+  const rAvatar = (metaR.photoURL||R.photoURL) || avatarDataURL(metaR.displayName||R.displayName);
+  const lMeta = (metaL.location?('📍 '+metaL.location):'') + (metaL.website?(' • 🔗 '+metaL.website):'');
+  const rMeta = (metaR.location?('📍 '+metaR.location):'') + (metaR.website?(' • 🔗 '+metaR.website):'');
+
+  stage.innerHTML = `
+    <div class="duel-grid" id="duelGrid">
+      <div class="duel-card" id="duelLeft">
+        <div class="rank-badge">Rank #${lRank ?? '—'}</div>
+        <div class="duel-head">
+          <img src="${lAvatar}" alt="">
+          <div>
+            <div class="duel-title">${metaL.displayName||L.displayName}</div>
+            <div class="handle">@${L.id.slice(0,8)}</div>
+          </div>
+        </div>
+        <div class="statline">
+          <span class="bigscore" id="scL">${to5(lS)}</span>
+          <span class="pill">Oy: ${L.ratingCount}</span>
+        </div>
+        <div class="bio">${metaL.bio||''}</div>
+        <div class="muted" style="font-size:13px">${lMeta}</div>
+        <div class="duel-actions">
+          <button class="btn ql" data-v="70">70</button>
+          <button class="btn ql" data-v="80">80</button>
+          <button class="btn ql" data-v="90">90</button>
+          <button class="btn ql" data-v="95">95</button>
+          <input class="score-input" id="inL" type="text" placeholder="0–100 (örn: 92,50000)" style="max-width:200px">
+          <button class="btn primary" id="btnRateL">Puanla</button>
+        </div>
+      </div>
+
+      <div class="duel-card" id="duelRight">
+        <div class="rank-badge">Rank #${rRank ?? '—'}</div>
+        <div class="duel-head">
+          <img src="${rAvatar}" alt="">
+          <div>
+            <div class="duel-title">${metaR.displayName||R.displayName}</div>
+            <div class="handle">@${R.id.slice(0,8)}</div>
+          </div>
+        </div>
+        <div class="statline">
+          <span class="bigscore" id="scR">${to5(rS)}</span>
+          <span class="pill">Oy: ${R.ratingCount}</span>
+        </div>
+        <div class="bio">${metaR.bio||''}</div>
+        <div class="muted" style="font-size:13px">${rMeta}</div>
+        <div class="duel-actions">
+          <button class="btn qr" data-v="70">70</button>
+          <button class="btn qr" data-v="80">80</button>
+          <button class="btn qr" data-v="90">90</button>
+          <button class="btn qr" data-v="95">95</button>
+          <input class="score-input" id="inR" type="text" placeholder="0–100 (örn: 87,00000)" style="max-width:200px">
+          <button class="btn primary" id="btnRateR">Puanla</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="duel-footer">
+      <button class="btn ghost" id="chooseL">◀ Sol daha iyi</button>
+      <button class="btn ghost" id="btnSwap">Yer değiştir</button>
+      <button class="btn ghost" id="chooseR">Sağ daha iyi ▶</button>
+    </div>
+    <div class="hint">Sağa kaydır → düelloyu atla</div>
+  `;
+
+  // quick buttons
+  $('#duelLeft').querySelectorAll('.ql').forEach(b=> b.onclick=()=> $('#inL').value=b.dataset.v.replace('.',','));
+  $('#duelRight').querySelectorAll('.qr').forEach(b=> b.onclick=()=> $('#inR').value=b.dataset.v.replace('.',','));
+
+  // actions
+  $('#btnRateL').onclick=async ()=>{
+    const v=Number(($('#inL').value||'').replace(',','.'));
+    if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+    await rateUser(L.id,v); await afterScore();
+  };
+  $('#btnRateR').onclick=async ()=>{
+    const v=Number(($('#inR').value||'').replace(',','.'));
+    if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
+    await rateUser(R.id,v); await afterScore();
+  };
+  $('#chooseL').onclick=async ()=>{ await rateUser(L.id,92.5); await rateUser(R.id,75); await afterScore(true); };
+  $('#chooseR').onclick=async ()=>{ await rateUser(R.id,92.5); await rateUser(L.id,75); await afterScore(true); };
+  $('#btnSwap').onclick=()=>{ currentDuel=[rightId,leftId]; renderDuel(); };
+  $('#btnSkip').onclick=()=>{ currentDuel=randomPair(); renderDuel(); };
+  $('#btnShuffle').onclick=()=>{ currentDuel=randomPair(); renderDuel(); };
+
+  // keyboard shortcuts
+  document.onkeydown=(e)=>{ if(e.key==='ArrowRight'){ $('#btnSkip').click(); } else if(e.key==='ArrowLeft'){ $('#btnSwap').click(); } };
+
+  // swipe right to skip
+  const grid=$('#duelGrid'); let sx=null,sy=null;
+  grid.addEventListener('touchstart',(ev)=>{const t=ev.changedTouches[0]; sx=t.clientX; sy=t.clientY;},{passive:true});
+  grid.addEventListener('touchend',(ev)=>{
+    if(sx==null) return;
+    const t=ev.changedTouches[0]; const dx=t.clientX-sx; const dy=t.clientY-sy;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy) && dx>0){ $('#btnSkip').click(); }
+    sx=sy=null;
+  },{passive:true});
+
+  async function afterScore(){
+    await ensureCaches(); // ranks/oy sayıları güncellensin
+    currentDuel = randomPair();
+    renderDuel();
+    loadBoard(); // sağ paneli tazele
+  }
+}
+
+/* ===== Discover (3 profil) ===== */
+async function loadDiscover(){
+  const box=$('#discoverBox'); box.textContent='Yükleniyor…';
+  try{
+    const arr = allUsersCache.filter(d=> d.id!==me.uid);
+    if(arr.length===0){ box.innerHTML='<div class="muted">Şimdilik başka kullanıcı yok. Birkaç hesap giriş yapınca burada belirecek.</div>'; return; }
+    // karıştır ve 3 al
+    const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]}
+    const three=a.slice(0,3);
+
+    // bio meta
+    const bioMap={};
+    await Promise.all( three.map(async it=>{
+      try{ const p=await db.collection('profiles').doc(it.id).get(); if(p.exists) bioMap[it.id]=(p.data().bio||''); }catch{}
+    }) );
+
+    const html = three.map(u=>{
+      const score=lcb(u.ratingSumMicro||0, u.ratingSumSqMicro||0, u.ratingCount||0), cnt=u.ratingCount||0;
+      const avatar = u.photoURL || avatarDataURL(u.displayName||'Kullanıcı');
+      return `
+        <div class="card" style="margin-bottom:12px">
+          <div class="bd">
+            <div class="row">
+              <div class="left">
+                <img class="avatar" src="${avatar}">
+                <div style="flex:1">
+                  <div class="name">${u.displayName}</div>
+                  <div class="handle">@${u.id.slice(0,6)}</div>
+                  <div class="bio">${(bioMap[u.id]||'')}</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <button class="btn q" data-id="${u.id}" data-v="70">70</button>
+                    <button class="btn q" data-id="${u.id}" data-v="80">80</button>
+                    <button class="btn q" data-id="${u.id}" data-v="90">90</button>
+                    <button class="btn q" data-id="${u.id}" data-v="95">95</button>
+                    <input class="score-input" data-id="${u.id}" type="text" placeholder="0–100 (ör: 88,75000)" style="max-width:200px">
+                    <button class="btn primary save" data-id="${u.id}">Puanla</button>
+                    <a href="#/u/${u.id}" class="btn">Profili gör</a>
+                  </div>
+                </div>
+              </div>
+              <div class="rightbox">
+                <div class="score">${to5(score)}</div>
+                <div class="sub">Oy: ${cnt}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    box.innerHTML=html;
+
+    // wiring
+    box.querySelectorAll('.btn.q').forEach(b=>{
+      b.onclick=()=>{
+        const id=b.dataset.id, v=b.dataset.v;
+        const inp=box.querySelector(`.score-input[data-id="${id}"]`);
+        if(inp) inp.value=v.replace('.',',');
+      };
+    });
+    box.querySelectorAll('.btn.save').forEach(b=>{
+      b.onclick=async ()=>{
+        const uid=b.dataset.id;
+        const inp=box.querySelector(`.score-input[data-id="${uid}"]`);
+        const v=Number((inp.value||'').replace(',','.'));
+        if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
+        await rateUser(uid, v);
+        await ensureCaches();
+        loadDiscover(); loadBoard();
+      };
+    });
+
+  }catch(e){
+    box.textContent='Hata: '+(e.message||e);
+  }
+}
+
+/* ===== Leaderboard (Top 25) ===== */
+async function loadBoard(limitN=25){
+  const wrap=$('#boardWrap'); wrap.textContent='Yükleniyor…';
+  try{
+    if(rankCache.length===0) await ensureCaches();
+    const top = rankCache.slice(0,limitN);
+    if(!top.length){ wrap.textContent='Henüz veri yok.'; return; }
+    let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+    top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+    html+='</tbody></table>'; wrap.innerHTML=html;
+  }catch(e){ wrap.textContent='Hata: '+(e.message||e); }
 }
 
 /* ===== Rate (transaction) ===== */
@@ -374,263 +602,39 @@ async function rateUser(targetUid, val){
 
     tx.set(userRef, { ratingSumMicro:nSum, ratingCount:nCnt, ratingSumSqMicro:nSq, avgMicroCache:avg }, {merge:true});
   });
-
-  // cache’i tazeleyip sahneleri güncelle
-  await refreshUsersCache();
-  await loadBoard();
-}
-
-/* ===== DISCOVER (3) ===== */
-async function loadDiscover(){
-  const box=$('#discoverBox'); box.textContent='Yükleniyor…';
-  try{
-    const others = usersCache.filter(u=> u.id!==me.uid);
-    if(others.length===0){ box.innerHTML='<div class="muted">Şimdilik başka kullanıcı yok. Birkaç hesap giriş yapınca burada belirecek.</div>'; return; }
-    // shuffle & pick 3
-    const arr=[...others]; for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]}
-    const three=arr.slice(0,3);
-
-    const bioMap={};
-    await Promise.all( three.map(async it=>{
-      try{ const p=await db.collection('profiles').doc(it.id).get(); if(p.exists) bioMap[it.id]=(p.data().bio||''); }catch{}
-    }) );
-
-    const html = three.map(u=>{
-      const s=lcb(u.ratingSumMicro,u.ratingSumSqMicro,u.ratingCount);
-      const avatar = u.photoURL ? u.photoURL : avatarDataURL(u.displayName);
-      return `
-        <div class="card" style="margin-bottom:12px">
-          <div class="bd">
-            <div class="row">
-              <div class="left">
-                <img class="avatar" src="${avatar}">
-                <div style="flex:1">
-                  <div class="name">${u.displayName}</div>
-                  <div class="handle">@${u.id.slice(0,6)}</div>
-                  <div class="bio">${(bioMap[u.id]||'')}</div>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-                    <button class="btn q" data-id="${u.id}" data-v="70">70</button>
-                    <button class="btn q" data-id="${u.id}" data-v="80">80</button>
-                    <button class="btn q" data-id="${u.id}" data-v="90">90</button>
-                    <button class="btn q" data-id="${u.id}" data-v="95">95</button>
-                    <input class="score-input" data-id="${u.id}" type="text" placeholder="0–100 (ör: 88,75000)" style="max-width:200px">
-                    <button class="btn primary save" data-id="${u.id}">Puanla</button>
-                    <a href="#/u/${u.id}" class="btn">Profili gör</a>
-                  </div>
-                </div>
-              </div>
-              <div class="rightbox">
-                <div class="score">${to5(s)}</div>
-                <div class="sub">Oy: ${u.ratingCount}</div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-    }).join('');
-    box.innerHTML=html;
-
-    box.querySelectorAll('.btn.q').forEach(b=>{
-      b.onclick=()=>{
-        const id=b.dataset.id, v=b.dataset.v;
-        const inp=box.querySelector(`.score-input[data-id="${id}"]`);
-        if(inp) inp.value=v.replace('.',',');
-      };
-    });
-    box.querySelectorAll('.btn.save').forEach(b=>{
-      b.onclick=async ()=>{
-        const uid=b.dataset.id;
-        const inp=box.querySelector(`.score-input[data-id="${uid}"]`);
-        const v=Number((inp.value||'').replace(',','.'));
-        if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
-        await rateUser(uid,v);
-        await loadDiscover();
-      };
-    });
-
-  }catch(e){ box.textContent='Hata: '+(e.message||e); }
-}
-
-/* ===== Leaderboard (Top 25) ===== */
-async function loadBoard(limitN=25){
-  const wrap=$('#boardWrap'); wrap.textContent='Yükleniyor…';
-  try{
-    const arr = rankArray();
-    const top = arr.slice(0,limitN);
-    if(!top.length){ wrap.textContent='Henüz veri yok.'; return; }
-    let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
-    top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
-    html+='</tbody></table>'; wrap.innerHTML=html;
-  }catch(e){ wrap.textContent='Hata: '+(e.message||e); }
-}
-
-/* ===== Düello Kuyruğu ===== */
-function prepareDuelQueue(){
-  const others = usersCache.filter(u=> u.id!==me.uid);
-  duelQueue=[];
-  // çiftler oluştur
-  for(let i=0;i<others.length;i++){
-    for(let j=i+1;j<others.length;j++){
-      duelQueue.push([others[i].id, others[j].id]);
-    }
-  }
-  // karıştır
-  for(let k=duelQueue.length-1;k>0;k--){ const r=Math.floor(Math.random()*(k+1)); [duelQueue[k],duelQueue[r]]=[duelQueue[r],duelQueue[k]]; }
-  currentDuel = duelQueue.shift() || null;
-}
-
-/* ===== Düello Render ===== */
-function userById(uid){ return usersCache.find(u=>u.id===uid); }
-
-function renderDuel(){
-  const stage=$('#duelStage');
-  const others = usersCache.filter(u=> u.id!==me.uid);
-  if(others.length<2){
-    stage.innerHTML = `<div class="muted">Düello için en az 2 farklı kullanıcı gerekir. Başka hesaplarla giriş yapılınca burada görünecek.</div>`;
-    return;
-  }
-  if(!currentDuel){ currentDuel = duelQueue.shift(); }
-  if(!currentDuel){ prepareDuelQueue(); }
-
-  const [Lid,Rid] = currentDuel;
-  const L=userById(Lid), R=userById(Rid);
-  const lS=lcb(L.ratingSumMicro,L.ratingSumSqMicro,L.ratingCount);
-  const rS=lcb(R.ratingSumMicro,R.ratingSumSqMicro,R.ratingCount);
-  const lRank=rankOf(L.id), rRank=rankOf(R.id);
-
-  const Lavatar = L.photoURL ? L.photoURL : avatarDataURL(L.displayName);
-  const Ravatar = R.photoURL ? R.photoURL : avatarDataURL(R.displayName);
-
-  stage.innerHTML = `
-    <div class="duel-grid" id="duelGrid">
-      <!-- LEFT -->
-      <div class="duel-card" id="duelLeft">
-        <div class="rank-badge">Rank #${lRank ?? '—'}</div>
-        <div class="duel-head">
-          <img class="avatar64" src="${Lavatar}" alt="">
-          <div>
-            <div class="duel-title">${L.displayName}</div>
-            <div class="handle">@${L.id.slice(0,8)}</div>
-          </div>
-        </div>
-        <div class="statline">
-          <span class="bigscore" id="scL">${to5(lS)}</span>
-          <span class="pill">Oy: ${L.ratingCount}</span>
-        </div>
-        <div class="duel-actions">
-          <button class="btn ql" data-v="70">70</button>
-          <button class="btn ql" data-v="80">80</button>
-          <button class="btn ql" data-v="90">90</button>
-          <button class="btn ql" data-v="95">95</button>
-          <input class="score-input" id="inL" type="text" placeholder="0–100 (örn: 92,50000)" style="max-width:200px">
-          <button class="btn primary" id="btnRateL">Puanla</button>
-        </div>
-      </div>
-
-      <!-- RIGHT -->
-      <div class="duel-card" id="duelRight">
-        <div class="rank-badge">Rank #${rRank ?? '—'}</div>
-        <div class="duel-head">
-          <img class="avatar64" src="${Ravatar}" alt="">
-          <div>
-            <div class="duel-title">${R.displayName}</div>
-            <div class="handle">@${R.id.slice(0,8)}</div>
-          </div>
-        </div>
-        <div class="statline">
-          <span class="bigscore" id="scR">${to5(rS)}</span>
-          <span class="pill">Oy: ${R.ratingCount}</span>
-        </div>
-        <div class="duel-actions">
-          <button class="btn qr" data-v="70">70</button>
-          <button class="btn qr" data-v="80">80</button>
-          <button class="btn qr" data-v="90">90</button>
-          <button class="btn qr" data-v="95">95</button>
-          <input class="score-input" id="inR" type="text" placeholder="0–100 (örn: 87,00000)" style="max-width:200px">
-          <button class="btn primary" id="btnRateR">Puanla</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="duel-footer">
-      <button class="btn ghost" id="chooseL">◀ Sol daha iyi</button>
-      <button class="btn ghost" id="btnSwap">Yer değiştir</button>
-      <button class="btn ghost" id="chooseR">Sağ daha iyi ▶</button>
-    </div>
-    <div class="hint">Sağa kaydır → Düelloyu atla</div>
-  `;
-
-  // quick fill
-  $('#duelLeft').querySelectorAll('.ql').forEach(b=> b.onclick=()=> $('#inL').value=b.dataset.v.replace('.',','));
-  $('#duelRight').querySelectorAll('.qr').forEach(b=> b.onclick=()=> $('#inR').value=b.dataset.v.replace('.',','));
-
-  // actions
-  $('#btnRateL').onclick=async ()=>{
-    const v=Number(($('#inL').value||'').replace(',','.'));
-    if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
-    await rateUser(L.id,v);
-    await refreshUsersCache();
-    renderDuel(); loadDiscover();
-  };
-  $('#btnRateR').onclick=async ()=>{
-    const v=Number(($('#inR').value||'').replace(',','.'));
-    if(!isFinite(v)||v<=0||v>100){alert('0<puan≤100');return;}
-    await rateUser(R.id,v);
-    await refreshUsersCache();
-    renderDuel(); loadDiscover();
-  };
-  $('#chooseL').onclick=async ()=>{ await rateUser(L.id,92.5); await rateUser(R.id,75); await refreshUsersCache(); renderDuel(); loadDiscover(); };
-  $('#chooseR').onclick=async ()=>{ await rateUser(R.id,92.5); await rateUser(L.id,75); await refreshUsersCache(); renderDuel(); loadDiscover(); };
-
-  $('#btnSwap').onclick=()=>{ currentDuel=[Rid,Lid]; renderDuel(); };
-  $('#btnSkip').onclick=()=>{ currentDuel = duelQueue.shift() || null; if(!currentDuel){ prepareDuelQueue(); } renderDuel(); };
-  $('#btnShuffle').onclick=()=>{ prepareDuelQueue(); renderDuel(); };
-
-  // keyboard shortcuts
-  document.onkeydown=(e)=>{
-    if(e.key==='ArrowRight'){ $('#btnSkip').click(); }
-    else if(e.key==='ArrowLeft'){ $('#btnSwap').click(); }
-  };
-
-  // swipe to skip (right swipe)
-  const grid = $('#duelGrid');
-  let sx=null, sy=null;
-  grid.addEventListener('touchstart', (ev)=>{ const t=ev.changedTouches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
-  grid.addEventListener('touchend', (ev)=>{
-    if(sx==null) return;
-    const t=ev.changedTouches[0]; const dx=t.clientX - sx; const dy=t.clientY - sy;
-    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy) && dx>0){ $('#btnSkip').click(); }
-    sx=sy=null;
-  }, {passive:true});
 }
 
 /* ===== Profile ===== */
 async function renderProfile(uid){
   const box=$('#profWrap'); box.textContent='Yükleniyor…';
   try{
-    const u = usersCache.find(x=>x.id===uid) || null;
-    const uDoc = u ? null : await db.collection('users').doc(uid).get();
-    const base = u || (uDoc && uDoc.exists ? { id: uid, ...uDoc.data() } : null);
-    if(!base){ box.textContent='Kullanıcı bulunamadı.'; return; }
-
+    const uDoc=await db.collection('users').doc(uid).get();
+    if(!uDoc.exists){ box.textContent='Kullanıcı bulunamadı.'; return; }
+    const u=uDoc.data();
     const pDoc=await db.collection('profiles').doc(uid).get();
     const p=pDoc.exists?pDoc.data():{};
-    const cnt=base.ratingCount||0, s=lcb(base.ratingSumMicro||0, base.ratingSumSqMicro||0, cnt);
-    const arr=rankArray(); const rank=arr.findIndex(x=>x.id===uid)+1; const total=arr.length;
+    const cnt=u.ratingCount||0, s=lcb(u.ratingSumMicro||0, u.ratingSumSqMicro||0, cnt);
+
+    // genel sıra
+    await ensureCaches();
+    const rank = rankOf(uid);
+    const total = rankCache.length;
+
     const own = me && me.uid===uid;
-    const avatar = (p.photoURL||base.photoURL) ? (p.photoURL||base.photoURL) : avatarDataURL(p.displayName||base.displayName);
+    const avatar = (p.photoURL||u.photoURL)||avatarDataURL(p.displayName||u.displayName||'Kullanıcı');
 
     box.innerHTML = `
       <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
         <img class="avatar" src="${avatar}">
         <div style="flex:1">
-          <div class="name">${p.displayName||base.displayName||'(Kullanıcı)'}</div>
+          <div class="name">${p.displayName||u.displayName||'(Kullanıcı)'}</div>
           <div class="handle">@${(p.handle||uid.slice(0,6))}</div>
           <div class="bio" style="margin-top:6px">${p.bio||''}</div>
           <div class="muted" style="font-size:14px">${p.location?('📍 '+p.location):''} ${p.website?(' • 🔗 '+p.website):''}</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0">
             <span class="pill">Puan: ${to5(s)}</span>
             <span class="pill">Oy: ${cnt}</span>
-            <span class="pill">Sıra: ${rank>0?rank:'—'} / ${total}</span>
+            <span class="pill">Sıra: ${rank ? rank : '—'} / ${total}</span>
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:start">
@@ -643,7 +647,7 @@ async function renderProfile(uid){
       <form id="editForm" class="card" style="padding:12px;border:1px dashed var(--line)">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <label>Ad Soyad
-            <input id="fName" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.displayName||base.displayName||'')}">
+            <input id="fName" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.displayName||u.displayName||'')}">
           </label>
           <label>Handle
             <input id="fHandle" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.handle||'')}">
@@ -688,12 +692,15 @@ async function renderProfile(uid){
         try{
           await db.collection('profiles').doc(uid).set({
             displayName, displayNameLower: displayName.toLowerCase(),
-            handle, handleLower:handle, bio, website, location
+            handle, handleLower:handle, bio, website, location,
+            photoURL: p.photoURL || u.photoURL || ''
           }, {merge:true});
-          await db.collection('users').doc(uid).set({ displayName }, {merge:true});
+          await db.collection('users').doc(uid).set({ displayName, photoURL: p.photoURL || u.photoURL || '' }, {merge:true});
           $('#saveMsg').textContent='Kaydedildi.';
-          setTimeout(async ()=>{ await refreshUsersCache(); renderProfile(uid); }, 500);
-        }catch(err){ $('#saveMsg').textContent='Hata: '+(err.message||err); }
+          setTimeout(()=> renderProfile(uid), 600);
+        }catch(err){
+          $('#saveMsg').textContent='Hata: '+(err.message||err);
+        }
       };
     }else{
       $('#btnRateOpen') && ($('#btnRateOpen').onclick=()=> $('#rateInput').focus());
@@ -701,8 +708,8 @@ async function renderProfile(uid){
         const s = ($('#rateInput').value||'').trim().replace(',', '.');
         const v = Number(s); if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
         await rateUser(uid, v);
-        await refreshUsersCache();
-        renderProfile(uid); loadBoard(); renderDuel();
+        await ensureCaches();
+        renderProfile(uid); loadBoard();
       };
     }
 
