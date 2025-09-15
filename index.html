@@ -4,13 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>piann — Gerçek değerini keşfet; skorun senin imzan</title>
-<meta name="description" content="Yorum yok, gürültü yok; sadece puan ve sıralama. Gerçek değerini keşfet; skorun senin imzan.">
 <style>
   :root{
     --bg:#f7f8fb; --ink:#0f172a; --muted:#64748b;
     --card:#ffffff; --line:#e6e9ef;
     --accent:#0A66C2; --accent-600:#0857A6;
-    --container:max(320px, min(1200px, 92vw));
+    --container:max(320px, min(1100px, 92vw));
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -19,51 +18,42 @@
   .btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover{background:var(--accent-600);border-color:var(--accent-600)}
-  .btn.ghost{background:#fff;border-color:var(--line)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
   .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
 
-  .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+  /* NAV */
+  .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);display:none}
   .nav-inner{max-width:var(--container);margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .brand{font-weight:800;color:var(--accent)}
   .spacer{flex:1}
   .count{color:var(--muted);font-size:14px}
 
-  .ribbon{background:#eef5ff;border-bottom:1px solid #d5e7ff}
-  .ribbon .inner{max-width:var(--container);margin:0 auto;padding:8px 16px;color:#0a3e78;font-weight:600}
+  /* LOGIN HERO */
+  .hero-wrap{max-width:var(--container);margin:48px auto;padding:0 16px;display:grid;grid-template-columns:1.2fr 1fr;gap:22px}
+  @media (max-width:900px){.hero-wrap{grid-template-columns:1fr}}
+  .hero-left h1{font-size:44px;line-height:1.12;margin:0 0 10px;color:#0a3e78}
+  .hero-left p{color:var(--muted);font-size:18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
+  .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
+  .bd{padding:16px}
 
+  /* PAGES */
   .wrap{max-width:var(--container);margin:24px auto 64px;padding:0 16px}
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
   @media (max-width:960px){.grid{grid-template-columns:1fr}}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.04)}
-  .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700}
-  .bd{padding:16px}
-  .muted{color:var(--muted)}
-
-  /* Düello tek çift görünüm */
-  .duel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media (max-width:900px){.duel-grid{grid-template-columns:1fr}}
-  .duel-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:12px;position:relative;min-height:220px}
-  .duel-head{display:flex;align-items:center;gap:12px}
-  .avatar{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);background:#e8eef7;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a3e78}
-  .duel-title{font-weight:800}
-  .rank-badge{position:absolute;top:12px;right:12px;background:#0a3e7833;color:#0a3e78;font-weight:800;border-radius:999px;padding:6px 10px;border:1px solid #cfe2ff}
-  .bigscore{font-size:40px;font-weight:900;color:#0a3e78}
-  .statline{display:flex;gap:10px;flex-wrap:wrap}
-  .duel-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .duel-footer{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:4px}
-  .hint{font-size:12px;color:#64748b;text-align:center;margin-top:4px}
-
-  /* Discover satırı */
+  /* DISCOVER ROW */
   .row{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center}
   .left{display:flex;gap:14px}
-  .avatar-sm{width:56px;height:56px;border-radius:50%;border:1px solid var(--line);background:#e8eef7;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a3e78}
+  .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#eef2f7;border:1px solid var(--line)}
+  .name{font-weight:800}
+  .handle{color:var(--muted);font-size:14px}
+  .bio{color:#1f2937;margin:8px 0 10px;font-size:15px;line-height:1.4}
   .rightbox{background:#eef5ff;border:1px solid #d5e7ff;border-radius:12px;padding:20px;text-align:center}
   .score{font-weight:900;font-size:28px;color:#0a3e78}
-  .sub{color:#64748b;font-size:12px}
+  .sub{color:var(--muted);font-size:12px}
 
-  /* Tablo */
+  /* TABLE */
   table{width:100%;border-collapse:collapse}
   th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
   th{color:#111827}
@@ -73,194 +63,454 @@
 </head>
 <body>
 
-<nav class="nav">
+<!-- NAV (girişten sonra görünür) -->
+<nav class="nav" id="nav">
   <div class="nav-inner">
     <a href="#/" class="brand">piann</a>
-    <a href="#/" class="btn">Ana sayfa</a>
-    <a href="#/ranking" class="btn">Leaderboard</a>
+    <a href="#/discover" class="btn">Keşfet</a>
+    <a href="#/board" class="btn">Leaderboard</a>
     <div class="spacer"></div>
-    <a href="#/profile/me" class="btn">Profil</a>
-    <span id="memberCount" class="count">Üye: 0</span>
+    <span id="memberCount" class="count">Üye: —</span>
+    <button id="btnMy" class="btn" style="display:none">Profilim</button>
+    <button id="btnOut" class="btn" style="display:none">Çıkış</button>
   </div>
 </nav>
 
-<div class="ribbon"><div class="inner">Gerçek değerini keşfet; skorun senin imzan.</div></div>
-
-<main class="wrap">
-  <div class="grid">
-    <!-- Sol kolon -->
-    <div>
-      <section class="card">
-        <div class="hd">Düello Arenası</div>
-        <div class="bd" id="duelStage">
-          <!-- Tek çift düello (boş durum) -->
-          <div class="duel-grid">
-            <div class="duel-card">
-              <div class="rank-badge">Rank —</div>
-              <div class="duel-head">
-                <div class="avatar">—</div>
-                <div>
-                  <div class="duel-title">Henüz profil yok</div>
-                  <div class="muted">@—— • person/brand</div>
-                </div>
-              </div>
-              <div class="statline">
-                <span class="bigscore">—,—</span>
-                <span class="pill">Oy: —</span>
-              </div>
-              <div class="muted">Profil açıklaması burada görünecek.</div>
-              <div class="duel-actions">
-                <button class="btn" disabled>70</button>
-                <button class="btn" disabled>80</button>
-                <button class="btn" disabled>90</button>
-                <button class="btn" disabled>95</button>
-                <input class="score-input" type="text" placeholder="0–100" style="max-width:200px" disabled>
-                <button class="btn primary" disabled>Puanla</button>
-              </div>
-            </div>
-            <div class="duel-card">
-              <div class="rank-badge">Rank —</div>
-              <div class="duel-head">
-                <div class="avatar">—</div>
-                <div>
-                  <div class="duel-title">Henüz profil yok</div>
-                  <div class="muted">@—— • person/brand</div>
-                </div>
-              </div>
-              <div class="statline">
-                <span class="bigscore">—,—</span>
-                <span class="pill">Oy: —</span>
-              </div>
-              <div class="muted">Profil açıklaması burada görünecek.</div>
-              <div class="duel-actions">
-                <button class="btn" disabled>70</button>
-                <button class="btn" disabled>80</button>
-                <button class="btn" disabled>90</button>
-                <button class="btn" disabled>95</button>
-                <input class="score-input" type="text" placeholder="0–100" style="max-width:200px" disabled>
-                <button class="btn primary" disabled>Puanla</button>
-              </div>
-            </div>
-          </div>
-          <div class="duel-footer" style="margin-top:12px">
-            <button class="btn ghost" id="chooseL" disabled>◀ Sol daha iyi</button>
-            <button class="btn ghost" id="btnSwap" disabled>Yer değiştir</button>
-            <button class="btn ghost" id="chooseR" disabled>Sağ daha iyi ▶</button>
-          </div>
-          <div class="hint">Sağa kaydır → düelloyu atla • Klavye: → atla, ← yer değiştir</div>
-        </div>
-        <div class="bd" style="border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;align-items:center">
-          <span class="muted">Düello için en az 2 profil gerekir.</span>
-          <div style="display:flex;gap:8px">
-            <button class="btn ghost" id="btnSkip" disabled>Atla →</button>
-            <button class="btn" id="btnShuffle" disabled>Karıştır (Yeni Düello)</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="card" style="margin-top:16px">
-        <div class="hd">Keşfet</div>
-        <div class="bd" id="discoverBox">
-          <div class="muted">Şimdilik keşfetlenecek profil yok. Bir sonraki adımda eklenecek.</div>
-        </div>
-      </section>
+<!-- LOGIN HERO (giriş yoksa görünür) -->
+<section id="loginHero" style="display:none">
+  <div class="hero-wrap">
+    <div class="hero-left">
+      <h1>Gerçek değerini keşfet; skorun senin imzan.</h1>
+      <p>Beğeni/yorum yok—sadece puan ve sıralama. Herkes aynı zeminde yarışsın.</p>
+      <ul style="color:#475569;line-height:1.6">
+        <li>Anonim oy: dürüst puanlama</li>
+        <li>Genel & arkadaş sıralamaları</li>
+        <li>Markalar, takımlar ve kişiler bir arada</li>
+      </ul>
     </div>
-
-    <!-- Sağ kolon -->
-    <aside>
-      <section class="card">
-        <div class="hd">Benim Sıram</div>
-        <div class="bd" id="meCard">
-          <div class="muted">Demo mod: giriş/profil daha sonra eklenecek.</div>
-        </div>
-      </section>
-
-      <section class="card" style="margin-top:16px">
-        <div class="hd">Top 50</div>
-        <div class="bd" id="top50Wrap">
-          <div class="muted">Henüz veri yok.</div>
-        </div>
-      </section>
-
-      <section class="card" style="margin-top:16px">
-        <div class="hd">Canlı Aktivite</div>
-        <div class="bd"><div class="muted" id="ticker">Henüz aktivite yok.</div></div>
-      </section>
-    </aside>
-  </div>
-</main>
-
-<!-- Leaderboard sayfası -->
-<section id="pageRanking" class="wrap" style="display:none">
-  <div class="card">
-    <div class="hd">Leaderboard – İlk 500</div>
-    <div class="bd">
-      <div id="rankWrap"><div class="muted">Henüz veri yok.</div></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-        <button class="btn" id="btnPrev" disabled>Önceki</button>
-        <span class="muted" id="pageInfo">Sayfa 0/0</span>
-        <button class="btn" id="btnNext" disabled>Sonraki</button>
+    <div class="card">
+      <div class="hd">Giriş yap</div>
+      <div class="bd">
+        <button class="btn primary" id="btnGoogle" style="width:100%">Google ile giriş yap</button>
+        <div class="muted" id="loginInfo" style="margin-top:8px"></div>
+        <div class="muted" style="margin-top:12px;font-size:12px">İpucu: Test için bu dosyayı <b>http://localhost</b> üzerinden aç ve Firebase’de <b>Authorized domains</b>’e domainini ekle.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Profil sayfası -->
-<section id="pageProfile" class="wrap" style="display:none">
-  <div class="card">
-    <div class="hd">Profil</div>
-    <div class="bd" id="profWrap"><div class="muted">Profil bulunamadı.</div></div>
-  </div>
-</section>
+<!-- APP (giriş sonrası) -->
+<main class="wrap" id="appMain" style="display:none">
+  <div class="grid">
+    <!-- LEFT -->
+    <div>
+      <!-- DISCOVER -->
+      <section class="card" id="pageDiscover" style="display:none">
+        <div class="hd">Keşfet</div>
+        <div class="bd" id="discoverBox">Yükleniyor…</div>
+      </section>
 
-<footer>© piann.com — Adım 1 (iskelet / profilsiz)</footer>
+      <!-- PROFILE -->
+      <section class="card" id="pageProfile" style="display:none;margin-top:16px">
+        <div class="hd">Profil</div>
+        <div class="bd" id="profWrap">—</div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <aside>
+      <!-- LEADERBOARD (Top 25) -->
+      <section class="card" id="pageBoard" style="display:none">
+        <div class="hd">Leaderboard (Top 25)</div>
+        <div class="bd">
+          <div class="muted" style="margin-bottom:10px">En az 1 oy alan profiller listelenir.</div>
+          <div id="boardWrap">Yükleniyor…</div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<footer>© piann.com</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-/* === Utilities === */
-const $=(s)=>document.querySelector(s);
-const views=['main','#pageRanking','#pageProfile'];
-function showOnly(ids){views.forEach(id=>{const el=(id==='main')?document.querySelector('main'):$(id);if(el) el.style.display = ids.includes(id)?'block':'none';});}
-function route(){
-  const h=location.hash||'#/';
-  if(h.startsWith('#/ranking')){ showOnly(['#pageRanking']); return; }
-  if(h.startsWith('#/profile/')){ showOnly(['#pageProfile']); return; }
-  showOnly(['main']);
-}
-window.addEventListener('hashchange', route);
+/* 🔐 Firebase config — kendi konsolundakiyle birebir kontrol et! */
+const firebaseConfig = {
+  apiKey: "AIzaSyCB71Ffsvv3y5QArsgauAC91lhjFiE5K8Q",
+  authDomain: "piann-c58b8.firebaseapp.com",
+  projectId: "piann-c58b8",
+  storageBucket: "piann-c58b8.appspot.com",
+  messagingSenderId: "1086334896697",
+  appId: "1:1086334896697:web:7770adc7f9438be4a49be8"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
-/* === LCB (ilerisi için hazır) === */
-function lcb(sumMicro,sumSqMicro,n){
+/* ===== Helpers ===== */
+const $ = (s)=>document.querySelector(s);
+const show = (id)=>{ ['#pageDiscover','#pageBoard','#pageProfile'].forEach(sel=>$(sel).style.display='none'); if(id) $(id).style.display='block'; };
+const to5  = (n)=> Number.isFinite(n)? n.toFixed(5).replace('.', ',') : '—';
+const clip = (x)=> Math.max(0, Math.min(100, x));
+
+/* LCB */
+function lcb(sumMicro, sumSqMicro, n){
   if(!n||n<=0) return 0;
-  const mean=(sumMicro/n)/1e5;
-  let sd=25;
+  const mean = (sumMicro/n)/100000;
+  let sd = 25;
   if(n>1){
-    const ex2=(sumSqMicro/n)/1e10;
-    const ex=(sumMicro/n)/1e5;
-    sd=Math.sqrt(Math.max(0,ex2-ex*ex));
+    const ex2 = (sumSqMicro/n)/1e10;
+    const ex  = (sumMicro/n)/1e5;
+    const variance = Math.max(0, ex2 - ex*ex);
+    sd = Math.sqrt(variance);
   }
-  const v = mean - 1.96*(sd/Math.sqrt(n));
-  return Math.max(0,Math.min(100,v));
+  return clip(mean - 1.96 * (sd/Math.sqrt(n)));
 }
 
-/* === Boş veri seti (bilinçli) === */
-const profiles=[];       // Adım 2'de dolduracağız
-const activityLog=[];    // Adım 2'de kullanılacak
-$('#memberCount').textContent='Üye: '+profiles.length;
+/* ===== STATE ===== */
+let me=null;
 
-/* === Düello butonları (şimdilik disabled) — event wiring hazır === */
-['chooseL','chooseR','btnSwap','btnSkip','btnShuffle','btnPrev','btnNext'].forEach(id=>{
-  const el = $('#'+id);
-  if(el) el.addEventListener('click', (e)=> {
-    e.preventDefault();
-    alert('Bu adımda profilsiz çalışıyoruz. Bir sonraki adımda düellolar aktif olacak.');
-  });
+/* ===== Auth UI ===== */
+const nav = $('#nav'), loginHero=$('#loginHero'), appMain=$('#appMain');
+const btnGoogle = $('#btnGoogle'), btnOut=$('#btnOut'), btnMy=$('#btnMy');
+const memberCount=$('#memberCount');
+
+btnGoogle.onclick = async ()=>{
+  try{
+    $('#loginInfo').textContent = 'Google açılıyor…';
+    await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  }catch(e){
+    $('#loginInfo').textContent = 'Hata: '+ (e.message || e.code || e);
+  }
+};
+btnOut.onclick = ()=> auth.signOut();
+btnMy.onclick = ()=> { location.hash = '#/u/'+me.uid; renderProfile(me.uid); show('#pageProfile'); };
+
+auth.onAuthStateChanged(async (u)=>{
+  me=u||null;
+  const loggedIn=!!me;
+  // Nav/Login toggle
+  nav.style.display = loggedIn? 'block':'none';
+  loginHero.style.display = loggedIn? 'none':'block';
+  appMain.style.display = loggedIn? 'block':'none';
+
+  if(loggedIn){
+    btnOut.style.display='inline-block'; btnMy.style.display='inline-block';
+    await ensureUserDocs();
+    await refreshCounters();
+
+    // İlk girişte profilime yönlendir
+    if (!location.hash || location.hash==='#/' || location.hash==='#') {
+      location.hash = '#/u/'+me.uid;
+    }
+    route();
+  }else{
+    btnOut.style.display='none'; btnMy.style.display='none';
+  }
 });
 
-/* === Keşfet/Top50/Profil/Ranking boş durumları gösterildi === */
+/* ===== Counters ===== */
+async function refreshCounters(){
+  try{
+    const s = await db.collection('users').get();
+    memberCount.textContent = 'Üye: ' + s.size;
+  }catch{ memberCount.textContent = 'Üye: —'; }
+}
 
-/* === Boot === */
-function boot(){ route(); }
-document.addEventListener('DOMContentLoaded', boot);
+/* ===== Ensure user docs ===== */
+async function ensureUserDocs(){
+  if(!me) return;
+  const uRef = db.collection('users').doc(me.uid);
+  const uSnap= await uRef.get();
+  if(!uSnap.exists){
+    await uRef.set({
+      displayName: me.displayName || me.email || 'Kullanıcı',
+      photoURL: me.photoURL || '',
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      ratingCount:0, ratingSumMicro:0, ratingSumSqMicro:0, avgMicroCache:0
+    }, {merge:true});
+  }else{
+    await uRef.set({
+      displayName: me.displayName || uSnap.data().displayName || 'Kullanıcı',
+      photoURL: me.photoURL || uSnap.data().photoURL || ''
+    }, {merge:true});
+  }
+
+  const pRef = db.collection('profiles').doc(me.uid);
+  const pSnap= await pRef.get();
+  if(!pSnap.exists){
+    const base = (me.displayName||'').split(' ')[0] || (me.email||'user').split('@')[0];
+    const handle = (base||'user').toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/_+/g,'_').slice(0,15) || 'user';
+    await pRef.set({
+      displayName: me.displayName || (me.email||'Kullanıcı'),
+      displayNameLower: (me.displayName||'kullanıcı').toLowerCase(),
+      handle, handleLower:handle,
+      bio:'', website:'', location:'', photoURL: me.photoURL || '', coverURL:'',
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+}
+
+/* ===== Router ===== */
+window.addEventListener('hashchange', route);
+async function route(){
+  if(!me){ return; }
+  const h=location.hash||'#/';
+  if(h.startsWith('#/discover')){ await loadDiscover(); show('#pageDiscover'); return; }
+  if(h.startsWith('#/board')){ await loadBoard(); show('#pageBoard'); return; }
+  if(h.startsWith('#/u/')){ const uid=h.split('/')[2]; await renderProfile(uid); show('#pageProfile'); return; }
+  // default
+  await renderProfile(me.uid); show('#pageProfile');
+}
+
+/* ===== Discover (3 profil) ===== */
+async function loadDiscover(){
+  const box=$('#discoverBox'); box.textContent='Yükleniyor…';
+  try{
+    const all = await db.collection('users').get();
+    const arr=[];
+    all.forEach(d=>{
+      if(!me || d.id===me.uid) return;
+      const u=d.data();
+      const c=u.ratingCount||0;
+      const sum=u.ratingSumMicro||0, sq=u.ratingSumSqMicro||0;
+      arr.push({id:d.id, name:u.displayName||'(Kullanıcı)', photo:u.photoURL||'', c, sum, sq});
+    });
+    if(arr.length===0){ box.innerHTML='<div class="muted">Şimdilik başka kullanıcı yok. Birkaç hesap giriş yapınca burada belirecek.</div>'; return; }
+    // 3 rastgele
+    for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]}
+    const three=arr.slice(0,3);
+
+    // bio’lar
+    const bioMap={};
+    await Promise.all( three.map(async it=>{
+      try{ const p=await db.collection('profiles').doc(it.id).get(); if(p.exists) bioMap[it.id]=(p.data().bio||''); }catch{}
+    }) );
+
+    const html = three.map(u=>{
+      const score=lcb(u.sum, u.sq, u.c), cnt=u.c;
+      const avatar = u.photo || 'https://ui-avatars.com/api/?background=0A66C2&color=fff&name='+encodeURIComponent(u.name);
+      return `
+        <div class="card" style="margin-bottom:12px">
+          <div class="bd">
+            <div class="row">
+              <div class="left">
+                <img class="avatar" src="${avatar}">
+                <div style="flex:1">
+                  <div class="name">${u.name}</div>
+                  <div class="handle">@${u.id.slice(0,6)}</div>
+                  <div class="bio">${(bioMap[u.id]||'')}</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <button class="btn q" data-v="70">70</button>
+                    <button class="btn q" data-v="80">80</button>
+                    <button class="btn q" data-v="90">90</button>
+                    <button class="btn q" data-v="95">95</button>
+                    <input class="score-input" data-id="${u.id}" type="text" placeholder="0–100 (ör: 88,75000)" style="max-width:200px">
+                    <button class="btn primary save" data-id="${u.id}">Puanla</button>
+                    <a href="#/u/${u.id}" class="btn">Profili gör</a>
+                  </div>
+                </div>
+              </div>
+              <div class="rightbox">
+                <div class="score">${to5(score)}</div>
+                <div class="sub">Oy: ${cnt}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    box.innerHTML=html;
+
+    // wiring
+    box.querySelectorAll('.btn.q').forEach(b=>{
+      b.onclick=()=>{
+        const row=b.closest('.row'); const inp=row.querySelector('.score-input'); inp.value=b.dataset.v.replace('.',',');
+      };
+    });
+    box.querySelectorAll('.btn.save').forEach(b=>{
+      b.onclick=async ()=>{
+        const uid=b.dataset.id;
+        const row=b.closest('.row'); const s=(row.querySelector('.score-input').value||'').trim().replace(',','.');
+        const v=Number(s);
+        if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
+        await rateUser(uid, v);
+        loadDiscover(); loadBoard();
+      };
+    });
+
+  }catch(e){
+    box.textContent='Hata: '+(e.message||e);
+  }
+}
+
+/* ===== Leaderboard (Top 25) ===== */
+async function loadBoard(limitN=25){
+  const wrap=$('#boardWrap'); wrap.textContent='Yükleniyor…';
+  try{
+    const qs=await db.collection('users').get();
+    const arr=[];
+    qs.forEach(d=>{
+      const u=d.data(); const c=u.ratingCount||0; if(c<=0) return;
+      const s=lcb(u.ratingSumMicro||0, u.ratingSumSqMicro||0, c);
+      arr.push({id:d.id,name:u.displayName||'(Kullanıcı)',score:s, count:c});
+    });
+    arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+    const top = arr.slice(0,limitN);
+    if(!top.length){ wrap.textContent='Henüz veri yok.'; return; }
+    let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
+    top.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
+    html+='</tbody></table>'; wrap.innerHTML=html;
+  }catch(e){ wrap.textContent='Hata: '+(e.message||e); }
+}
+
+/* ===== Rate (transaction) ===== */
+async function rateUser(targetUid, val){
+  if(!me) throw new Error('Giriş gerekli');
+  if(targetUid===me.uid){ alert('Kendini puanlayamazsın.'); return; }
+  const micro=Math.round(val*100000);
+
+  await db.runTransaction(async tx=>{
+    const userRef = db.collection('users').doc(targetUid);
+    const rateRef = userRef.collection('ratings').doc(me.uid);
+    const uSnap = await tx.get(userRef);
+    if(!uSnap.exists) throw new Error('Kullanıcı yok.');
+    const rSnap = await tx.get(rateRef);
+
+    const old = rSnap.exists ? (rSnap.data().micro||0) : 0;
+    const deltaSum = micro - old;
+    const deltaCnt = rSnap.exists ? 0 : 1;
+
+    tx.set(rateRef, {
+      micro, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: rSnap.exists ? rSnap.data().createdAt : firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+
+    const d=uSnap.data();
+    const nSum=(d.ratingSumMicro||0)+deltaSum;
+    const nCnt=(d.ratingCount||0)+deltaCnt;
+    const nSq =(d.ratingSumSqMicro||0)+ (micro*micro - old*old);
+    const avg = nCnt>0 ? Math.floor(nSum/nCnt) : 0;
+
+    tx.set(userRef, { ratingSumMicro:nSum, ratingCount:nCnt, ratingSumSqMicro:nSq, avgMicroCache:avg }, {merge:true});
+  });
+}
+
+/* ===== Profile ===== */
+async function renderProfile(uid){
+  const box=$('#profWrap'); box.textContent='Yükleniyor…';
+  try{
+    const uDoc=await db.collection('users').doc(uid).get();
+    if(!uDoc.exists){ box.textContent='Kullanıcı bulunamadı.'; return; }
+    const u=uDoc.data();
+    const pDoc=await db.collection('profiles').doc(uid).get();
+    const p=pDoc.exists?pDoc.data():{};
+    const cnt=u.ratingCount||0, s=lcb(u.ratingSumMicro||0, u.ratingSumSqMicro||0, cnt);
+
+    // genel sıra
+    const all=await db.collection('users').get();
+    const arr=[]; all.forEach(d=>{ const x=d.data(); const c=x.ratingCount||0; if(c<=0) return; arr.push({id:d.id,score:lcb(x.ratingSumMicro||0,x.ratingSumSqMicro||0,c),count:c}); });
+    arr.sort((a,b)=> b.score - a.score || b.count - a.count);
+    const rank = arr.findIndex(x=>x.id===uid); const total = arr.length;
+
+    const own = me && me.uid===uid;
+
+    box.innerHTML = `
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
+        <img class="avatar" src="${(p.photoURL||u.photoURL||'https://ui-avatars.com/api/?background=0A66C2&color=fff&name='+encodeURIComponent(p.displayName||u.displayName||'Kullanıcı'))}">
+        <div style="flex:1">
+          <div class="name">${p.displayName||u.displayName||'(Kullanıcı)'}</div>
+          <div class="handle">@${(p.handle||uid.slice(0,6))}</div>
+          <div class="bio" style="margin-top:6px">${p.bio||''}</div>
+          <div class="muted" style="font-size:14px">${p.location?('📍 '+p.location):''} ${p.website?(' • 🔗 '+p.website):''}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0">
+            <span class="pill">Puan: ${to5(s)}</span>
+            <span class="pill">Oy: ${cnt}</span>
+            <span class="pill">Sıra: ${rank>=0?(rank+1):'—'} / ${total}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:start">
+          ${ own ? `<button class="btn" id="btnEdit">Profili düzenle</button>` : `<button class="btn primary" id="btnRateOpen">Puan ver</button>` }
+          <button class="btn" id="btnShare">Paylaş</button>
+        </div>
+      </div>
+
+      ${ own ? `
+      <form id="editForm" class="card" style="padding:12px;border:1px dashed var(--line)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label>Ad Soyad
+            <input id="fName" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.displayName||u.displayName||'')}">
+          </label>
+          <label>Handle
+            <input id="fHandle" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.handle||'')}">
+          </label>
+          <label style="grid-column:1/-1">Bio
+            <textarea id="fBio" rows="3" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px">${(p.bio||'')}</textarea>
+          </label>
+          <label>Website
+            <input id="fWeb" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.website||'')}">
+          </label>
+          <label>Konum
+            <input id="fLoc" type="text" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px" value="${(p.location||'')}">
+          </label>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+          <span id="saveMsg" class="muted" style="align-self:center"></span>
+          <button class="btn" type="button" id="btnCancel">İptal</button>
+          <button class="btn primary" type="submit">Kaydet</button>
+        </div>
+      </form>` : `
+      <div id="rateBox" style="margin-top:8px">
+        <input id="rateInput" type="text" placeholder="0–100, 5 ondalık (örn: 89,12345)" style="max-width:220px;padding:10px;border:1px solid var(--line);border-radius:10px">
+        <button class="btn primary" id="btnRate">Puanla / Güncelle</button>
+      </div>`}
+    `;
+
+    $('#btnShare').onclick=()=>{
+      const link = location.origin + location.pathname + '#/u/' + uid;
+      navigator.clipboard?.writeText(link).then(()=> alert('Bağlantı kopyalandı: '+link)).catch(()=> alert(link));
+    };
+
+    if(own){
+      $('#btnEdit').onclick=()=> $('#fName').focus();
+      $('#btnCancel').onclick=()=> route();
+      $('#editForm').onsubmit = async (e)=>{
+        e.preventDefault();
+        const dis= (v)=> (v||'').toString().trim();
+        const displayName=dis($('#fName').value);
+        let handle=(dis($('#fHandle').value)||displayName.split(' ')[0]||'user').toLowerCase()
+          .replace(/[^a-z0-9_]+/g,'_').replace(/_+/g,'_').slice(0,15);
+        const bio=dis($('#fBio').value), website=dis($('#fWeb').value), location=dis($('#fLoc').value);
+        try{
+          await db.collection('profiles').doc(uid).set({
+            displayName, displayNameLower: displayName.toLowerCase(),
+            handle, handleLower:handle, bio, website, location,
+            photoURL: p.photoURL || u.photoURL || ''
+          }, {merge:true});
+          await db.collection('users').doc(uid).set({ displayName, photoURL: p.photoURL || u.photoURL || '' }, {merge:true});
+          $('#saveMsg').textContent='Kaydedildi.';
+          setTimeout(()=> renderProfile(uid), 600);
+        }catch(err){
+          $('#saveMsg').textContent='Hata: '+(err.message||err);
+        }
+      };
+    }else{
+      $('#btnRateOpen') && ($('#btnRateOpen').onclick=()=> $('#rateInput').focus());
+      $('#btnRate').onclick=async ()=>{
+        const s = ($('#rateInput').value||'').trim().replace(',', '.');
+        const v = Number(s); if(!isFinite(v)||v<=0||v>100){ alert('0<puan≤100 olmalı.'); return; }
+        await rateUser(uid, v);
+        renderProfile(uid); loadBoard();
+      };
+    }
+
+  }catch(e){ box.textContent='Hata: '+(e.message||e); }
+}
 </script>
 </body>
 </html>
