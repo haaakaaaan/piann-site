@@ -97,7 +97,7 @@
       <p>Beğeni/yorum yok—sadece puan ve sıralama. Herkes aynı zeminde yarışsın.</p>
       <ul style="color:#475569;line-height:1.6">
         <li>Anonim oy: dürüst puanlama</li>
-        <li>Genel & arkadaş sıralamaları</li>
+        <li>Genel & ağ sıralamaları</li>
         <li>Markalar, takımlar ve kişiler bir arada</li>
       </ul>
     </div>
@@ -532,7 +532,6 @@ async function loadNetwork(){
     wrap.innerHTML = `<div class="muted">Henüz kimseyi takip etmiyorsun. Keşfet veya Top 500’den profillere girip <b>“Takip et”</b> butonuyla ağını oluştur.</div>`;
     return;
   }
-  // yeniden sırala (zaten LCB’ye göre)
   let html='<table><thead><tr><th>#</th><th>Ad</th><th>Puan</th><th>Oy</th><th>Profil</th></tr></thead><tbody>';
   subset.forEach((u,i)=> html+=`<tr><td>${i+1}</td><td>${u.name}${u.id===me.uid?' (sen)':''}</td><td>${to5(u.score)}</td><td>${u.count}</td><td><a href="#/u/${u.id}">Gör</a></td></tr>`);
   html+='</tbody></table>'; wrap.innerHTML=html;
@@ -561,7 +560,7 @@ async function rateUser(targetUid,val){
   });
 }
 
-/* ===== Profile (takip et/çıkar dahil) ===== */
+/* ===== Profile (takip et/çıkar + düzenle + puan) ===== */
 async function renderProfile(uid){
   const box=$('#profWrap'); box.textContent='Yükleniyor…';
   try{
