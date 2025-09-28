@@ -1,53 +1,73 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PİANN</title>
+  <meta name="robots" content="noindex" />
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #f7f8fb;
-      color: #0f172a;
-      text-align: center;
+    /* Tam beyaz full ekran zemin */
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      background:#fff; /* gri yok, tamamen beyaz */
+      color:#0f172a;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
     }
-    img {
-      width: 250px; /* Logo boyutu */
-      margin-bottom: 30px;
+
+    /* İçeriği tam ortaya yerleştir */
+    .page{
+      min-height: 100svh;                 /* mobil çentikler için güvenli yükseklik */
+      display: grid;
+      place-items: center;                 /* dikey + yatay merkez */
+      padding: 24px;
+      box-sizing: border-box;
     }
-    h1 {
-      font-size: 26px;
-      margin: 0;
+
+    .stack{
+      text-align:center;
+      max-width: 720px;
     }
-    p {
-      margin-top: 12px;
-      font-size: 18px;
-      color: #555;
+
+    /* Logo büyük ve responsive */
+    .logo{
+      width: clamp(220px, 26vw, 380px);    /* ekrana göre 220–380px arası */
+      display:block;
+      margin: 0 auto 28px;
+      height:auto;
     }
-    footer {
-      position: absolute;
-      bottom: 20px;
-      font-size: 14px;
-      color: #999;
+
+    h1{
+      margin:0;
+      font-size: clamp(22px, 2.2vw + 10px, 34px);
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    p{
+      margin: 12px 0 0;
+      font-size: clamp(14px, 1vw + 10px, 18px);
+      color:#4b5563;
+    }
+
+    footer{
+      position: fixed;
+      left:0; right:0; bottom:18px;
+      text-align:center;
+      font-size: 12px;
+      color:#9ca3af;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <!-- Logo -->
-  <img src="top_banner.png" alt="PİANN Logo">
-
-  <!-- Mesaj -->
-  <h1>Site geçici olarak kapalıdır</h1>
-  <p>Proje geliştirme aşamasındadır.</p>
-
-  <!-- Footer -->
+  <main class="page">
+    <div class="stack">
+      <!-- Logonu aynı klasöre top_banner.png adıyla koymuştun -->
+      <img class="logo" src="top_banner.png" alt="PİANN logo">
+      <h1>Site geçici olarak kapalıdır</h1>
+      <p>Proje geliştirme aşamasındadır.</p>
+    </div>
+  </main>
   <footer>© 2025 PİANN</footer>
 </body>
 </html>
