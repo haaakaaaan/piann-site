@@ -3,316 +3,74 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PİANN · 1–4. Sınıflar · Etkinlik & Oyun</title>
-<meta name="description" content="İlkokul 1–4. sınıflar için basit etkinlikler, mini oyunlar ve çalışma sayfaları.">
+<title>PİANN · Site Güncelleniyor</title>
+<meta name="description" content="PİANN sitesi kısa süreli bakım nedeniyle geçici olarak kapalıdır.">
 <link rel="icon" href="data:,">
 <style>
-:root{--bg:#f7f9fc;--ink:#0f172a;--muted:#6b7280;--card:#fff;--accent:#2563eb}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-header{background:#fff;border-bottom:1px solid #e5e7eb}
-.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
-.banner{display:block;max-width:100%;height:auto;margin:10px auto}
-h1{font-size:20px;margin:10px 0 0}
-nav a{color:#111;text-decoration:none;margin-left:12px;font-weight:600}
-.hero{background:#eaf2ff;padding:14px;border-radius:10px;margin:14px 0}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.tab{padding:8px 12px;border-radius:999px;background:#e6efff;cursor:pointer;font-weight:600}
-.tab.active{background:#111;color:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.btn{display:inline-block;padding:8px 10px;border-radius:8px;background:#111;color:#fff;text-decoration:none;cursor:pointer}
-small.m{color:var(--muted)}
-.adbox{background:#fff;border:1px dashed #cbd5e1;border-radius:10px;padding:8px;text-align:center}
-footer{color:var(--muted);font-size:14px;text-align:center;padding:30px 0}
-ul.clean{margin:8px 0 0;padding-left:18px}
-kbd{background:#eef;padding:2px 6px;border-radius:4px}
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.5);
-  display:none;align-items:center;justify-content:center;padding:16px
+:root {
+  --bg: #f8fafc;
+  --ink: #0f172a;
+  --accent: #2563eb;
+  --muted: #64748b;
+  --card: #ffffff;
 }
-.modal .box{max-width:800px;background:#fff;border-radius:10px;padding:16px}
-.modal.show{display:flex}
-.closebtn{float:right;background:#111;color:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
-.hr{height:1px;background:#e5e7eb;margin:14px 0}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 24px;
+}
+img.logo {
+  max-width: 420px;
+  width: 80%;
+  height: auto;
+  margin-bottom: 40px;
+}
+.card {
+  background: var(--card);
+  padding: 34px;
+  border-radius: 13px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  max-width: 600px;
+  width: 100%;
+}
+h1 {
+  font-size: clamp(20px, 3vw, 28px);
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+p {
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--muted);
+  line-height: 1.6;
+}
+footer {
+  margin-top: 40px;
+  font-size: 14px;
+  color: var(--muted);
+}
 </style>
-
-<!-- AdSense (onay sonrası aç ve ID/slot ekle) (Enable after approval)
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXX" crossorigin="anonymous"></script>
--->
 </head>
 <body>
-<header>
-  <div class="wrap" style="display:flex;align-items:center;gap:16px;justify-content:space-between">
-    <div style="display:flex;align-items:center;gap:16px">
-      <img src="/top_banner.png" alt="PİANN" class="banner" style="max-height:56px">
-      <div>
-        <h1>PİANN · İlkokul</h1>
-        <div class="small">1–4. sınıflar için basit etkinlik & mini oyunlar (Simple activities & mini games for grades 1–4)</div>
-      </div>
-    </div>
-    <nav>
-      <a href="#" onclick="openPrivacy();return false;">Gizlilik (Privacy)</a>
-      <a href="#" onclick="openContact();return false;">İletişim (Contact)</a>
-    </nav>
-  </div>
-</header>
 
-<main class="wrap">
-  <!-- ÜST REKLAM ALANI (TOP AD SLOT) -->
-  <section class="adbox" aria-label="Reklam (Ad)">
-    <!--
-    <ins class="adsbygoogle" style="display:block"
-         data-ad-client="ca-pub-XXXXXXXX"
-         data-ad-slot="YYYYYYYYYY"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-    -->
-    <div><small class="m">Reklam alanı (onay sonrası aktif) · (Ad slot – active after approval)</small></div>
-  </section>
+<!-- Logo -->
+<img src="top_banner.png" alt="PİANN Logo" class="logo">
 
-  <section class="hero">
-    <strong>Hoş geldin 👋</strong> · Sınıfı seç, etkinlik kartından **Oyunu Aç**’a tıkla. (Welcome 👋 · Pick a grade, click **Start Game**.)
-  </section>
-
-  <!-- SEKME BAŞLIKLARI (TABS) -->
-  <div class="tabs" role="tablist">
-    <div class="tab active" data-grade="g1">1. Sınıf (Grade 1)</div>
-    <div class="tab" data-grade="g2">2. Sınıf (Grade 2)</div>
-    <div class="tab" data-grade="g3">3. Sınıf (Grade 3)</div>
-    <div class="tab" data-grade="g4">4. Sınıf (Grade 4)</div>
-  </div>
-
-  <!-- 1. Sınıf -->
-  <section id="g1" class="grade">
-    <div class="grid">
-      <div class="card">
-        <h3>Türkçe · Ses/Hece (Letters/Syllables)</h3>
-        <p>Harf–hece eşleştirme mini oyunu. (Mini matching game.)</p>
-        <button class="btn" onclick="gameLetters()">Oyunu Aç (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Matematik · 0–20 (Math 0–20)</h3>
-        <p>Toplama/çıkarma hızlı alıştırma. (Quick add/sub.)</p>
-        <button class="btn" onclick="gameAdd()">Oyunu Aç (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Hayat Bilgisi (Life Studies)</h3>
-        <p>Günlük güvenlik ve sınıf kuralları. (Safety & rules.)</p>
-        <button class="btn" onclick="gameHB()">Mini Quiz</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. Sınıf -->
-  <section id="g2" class="grade" hidden>
-    <div class="grid">
-      <div class="card">
-        <h3>Türkçe · Okuduğunu Anlama (Reading)</h3>
-        <p>Kısa metin, bir soru. (Short text, one question.)</p>
-        <button class="btn" onclick="gameRead()">Başlat (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Matematik · Zihinden (Mental)</h3>
-        <p>Kolay dört işlem. (Easy four ops.)</p>
-        <button class="btn" onclick="gameAdd(50)">Başlat (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Hayat Bilgisi (Life Studies)</h3>
-        <p>Çevre ve tasarruf. (Environment & saving.)</p>
-        <button class="btn" onclick="gameHB()">Başlat (Start)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. Sınıf -->
-  <section id="g3" class="grade" hidden>
-    <div class="grid">
-      <div class="card">
-        <h3>Türkçe · Eş/Zıt Anlam (Synonyms/Antonyms)</h3>
-        <p>Kısa eşleştirme. (Quick match.)</p>
-        <button class="btn" onclick="gameWords()">Başlat (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Matematik · Birimler (Units)</h3>
-        <p>Saat & uzunluk. (Time & length.)</p>
-        <button class="btn" onclick="gameUnits()">Başlat (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Fen Bilimleri (Science)</h3>
-        <p>Canlılar – doğru/yanlış. (Living things – T/F.)</p>
-        <button class="btn" onclick="gameSci()">Başlat (Start)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. Sınıf -->
-  <section id="g4" class="grade" hidden>
-    <div class="grid">
-      <div class="card">
-        <h3>Türkçe · Paragraf (Paragraph)</h3>
-        <p>Ana/yardımcı fikir. (Main/supporting idea.)</p>
-        <button class="btn" onclick="gameRead(true)">Başlat (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Matematik · Kesirler (Fractions)</h3>
-        <p>Büyüktür/küçüktür. (Compare fractions.)</p>
-        <button class="btn" onclick="gameFrac()">Başlat (Start)</button>
-      </div>
-      <div class="card">
-        <h3>Sosyal Bilgiler (Social Studies)</h3>
-        <p>Başkent sorusu. (Capital city quiz.)</p>
-        <button class="btn" onclick="gameSoc()">Başlat (Start)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ORTA REKLAM (MID AD) -->
-  <section class="adbox" style="margin-top:22px" aria-label="Reklam (Ad)">
-    <!--
-    <ins class="adsbygoogle" style="display:block"
-         data-ad-client="ca-pub-XXXXXXXX"
-         data-ad-slot="ZZZZZZZZZZ"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-    -->
-    <div><small class="m">Reklam alanı (onay sonrası aktif) · (Ad slot – active after approval)</small></div>
-  </section>
-
-  <!-- BASİT DÖKÜMAN / LİNK BÖLÜMÜ (Docs/Links) -->
-  <section style="margin:22px 0">
-    <h3>PDF / Bağlantılar (PDF / Links)</h3>
-    <ul class="clean">
-      <li><a href="#" onclick="alert('Buraya PDF linki ekleyeceğiz. (We will add PDF link here.)');return false;">1. Sınıf Çalışma Sayfası (Worksheet)</a></li>
-      <li><a href="#" onclick="alert('Buraya PDF linki ekleyeceğiz.');return false;">2. Sınıf Çalışma Sayfası</a></li>
-      <li><a href="#" onclick="alert('Buraya PDF linki ekleyeceğiz.');return false;">3. Sınıf Çalışma Sayfası</a></li>
-      <li><a href="#" onclick="alert('Buraya PDF linki ekleyeceğiz.');return false;">4. Sınıf Çalışma Sayfası</a></li>
-    </ul>
-  </section>
-
-  <div class="hr"></div>
-  <section style="margin:12px 0">
-    <small class="m">Not: Bu site basit demo amaçlıdır; müfredata uygun küçük pratikler sunar. (Note: Simple demo with small practices.)</small>
-  </section>
-</main>
-
-<footer>© 2025 PİANN · Basit eğitim sitesi (Simple education site)</footer>
-
-<!-- GİZLİLİK & İLETİŞİM MODALLARI (PRIVACY & CONTACT MODALS) -->
-<div id="privacyModal" class="modal" aria-hidden="true">
-  <div class="box">
-    <button class="closebtn" onclick="closePrivacy()">Kapat (Close)</button>
-    <h2>Gizlilik Politikası (Privacy Policy)</h2>
-    <p>Bu sitede çerezler yalnızca performans ve olası reklam ölçümü için kullanılabilir. (Cookies for performance/ads measurement.)</p>
-    <p>AdSense kullanılırsa Google politikaları geçerlidir. (If AdSense used, Google policies apply.)</p>
-    <p>İletişim: <a href="#" onclick="openContact();return false;">iletişim formu</a> veya e-posta. (Contact form or email.)</p>
-  </div>
+<!-- Duyuru Kutusu -->
+<div class="card">
+  <h1>Geçici Süreyle Kapalıyız</h1>
+  <p>Sitemiz şu anda güncellenmektedir.<br>
+  Daha iyi bir deneyim için kısa bir süre sonra yeniden hizmetinizde olacağız.</p>
 </div>
 
-<div id="contactModal" class="modal" aria-hidden="true">
-  <div class="box">
-    <button class="closebtn" onclick="closeContact()">Kapat (Close)</button>
-    <h2>İletişim (Contact)</h2>
-    <p>E-posta: <a href="mailto:you@domain.com">you@domain.com</a></p>
-    <p>Statik sitede form için Formspree/Netlify Forms kullanılabilir. (For static forms use Formspree/Netlify Forms.)</p>
-  </div>
-</div>
+<footer>© 2025 PİANN · Göcü Yönlendir</footer>
 
-<script>
-// SEKME GEÇİŞİ (TABS)
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    const g=t.dataset.grade;
-    document.querySelectorAll('.grade').forEach(s=>s.hidden = (s.id!==g));
-    // basit odak: en üstteki karta kaydır
-    document.getElementById(g).scrollIntoView({behavior:"smooth",block:"start"});
-  });
-});
-
-// MODAL YARDIMCILAR (MODALS)
-const privacy = document.getElementById('privacyModal');
-const contact = document.getElementById('contactModal');
-function openPrivacy(){privacy.classList.add('show');privacy.setAttribute('aria-hidden','false')}
-function closePrivacy(){privacy.classList.remove('show');privacy.setAttribute('aria-hidden','true')}
-function openContact(){contact.classList.add('show');contact.setAttribute('aria-hidden','false')}
-function closeContact(){contact.classList.remove('show');contact.setAttribute('aria-hidden','true')}
-
-// YARDIMCI (HELPERS)
-function r(a,b){return Math.floor(Math.random()*(b-a+1))+a}
-
-// 1) Harf-Hece (Letters/Syllables)
-function gameLetters(){
-  const heceler=["ba","be","bi","bo","bu","la","le","li","lo","lu"];
-  const h=heceler[r(0,heceler.length-1)];
-  const diger=h[0]+["a","e","i","o","u"][r(0,4)];
-  const ops=[h,diger].sort(()=>Math.random()-0.5);
-  const y=prompt(`Hangi hece doğru?\nA) ${ops[0]}  B) ${ops[1]}\nA/B? (Which is correct?)`);
-  alert((y||"").toUpperCase()===(ops[0]===h?"A":"B") ? "Doğru! (Correct!)" : "Tekrar dene! (Try again!)");
-}
-
-// 2) Toplama/Çıkarma (Add/Sub)
-function gameAdd(max=20){
-  const a=r(2,Math.floor(max/2)), b=r(1,Math.floor(max/2));
-  const islem=Math.random()<0.5?"+":"-";
-  const dogru=islem==="+"?a+b:a-b;
-  const y=prompt(`${a} ${islem} ${b} = ?`);
-  alert(Number(y)===dogru?"Doğru! (Correct!)":`Doğru cevap: ${dogru} (Answer)`);
-}
-
-// 3) Hayat Bilgisi (Life Studies)
-function gameHB(){
-  const q=[
-    {s:"Karşıdan karşıya geçerken önce ne yaparız?",a:"Sağa sola bakarız (Look both ways)"},
-    {s:"Sınıfta söz almak için ne yaparız?",a:"Parmak kaldırırız (Raise hand)"}
-  ];
-  const i=r(0,q.length-1), y=prompt(q[i].s);
-  alert(y?"Aferin! Örnek: "+q[i].a:"Bir cevap yaz. (Type an answer.)");
-}
-
-// 4) Okuduğunu Anlama (Reading)
-function gameRead(paragraf=false){
-  const t=paragraf?"Ali her sabah erken uyanır, kahvaltı yapar ve okula yürür.":"Ayşe kitap okumayı sever.";
-  const s=paragraf?"Ali okula nasıl gider?":"Ayşe neyi sever?";
-  const y=prompt(`${t}\n\nSoru: ${s}`);
-  alert(y?"Güzel! (Nice!)":"Bir cevap yaz. (Type an answer.)");
-}
-
-// 5) Sözcük Anlamı (Words)
-function gameWords(){
-  const pairs=[["mutlu","sevinçli"],["hızlı","çabuk"],["büyük","iri"]];
-  const p=pairs[r(0,pairs.length-1)];
-  const y=prompt(`"${p[0]}" sözcüğünün eş anlamı nedir? (Synonym?)`);
-  alert(y&&y.trim()===p[1]?"Doğru! (Correct!)":`Örnek: ${p[1]} (Example)`);
-}
-
-// 6) Birimler (Units)
-function gameUnits(){
-  const y=prompt("1 metre kaç santimetredir? (How many cm in 1 m?)");
-  alert(Number(y)===100?"Doğru! (Correct!)":"Doğru: 100 (Answer)");
-}
-
-// 7) Fen (Science)
-function gameSci(){
-  const y=prompt("Bitkiler fotosentez yapar mı? (E/H) (Do plants photosynthesize? Y/N)");
-  alert((y||"").toUpperCase()==="E"?"Doğru! (Correct!)":"Yanlış, yaparlar. (Wrong, they do.)");
-}
-
-// 8) Kesirler (Fractions)
-function gameFrac(){
-  const a=r(1,5), b=r(2,6), c=r(1,5), d=r(2,6);
-  const y=prompt(`${a}/${b} mi, ${c}/${d} mi daha büyüktür? (1/2 veya 'eşit' yaz) (Which is larger?)`);
-  const v1=a/b, v2=c/d, dgr=v1===v2?"eşit":(v1>v2?"1":"2");
-  alert(y===dgr||(dgr==="eşit"&&y==="eşit")?"Doğru! (Correct!)":`Doğru: ${dgr} (Answer)`);
-}
-
-// 9) Sosyal Bilgiler (Social)
-function gameSoc(){
-  const y=prompt("Türkiye’nin başkenti neresidir? (Capital of Türkiye?)");
-  alert(y&&y.toLowerCase().includes("ankara")?"Doğru! (Correct!)":"Doğru: Ankara (Answer)");
-}
-</script>
 </body>
 </html>
