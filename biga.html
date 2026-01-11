@@ -75,7 +75,9 @@ button{
     </div>
 
     <div class="price">₺120</div>
-    <button onclick="goCheckout(this,'Karışık Köy Turşusu')">Satın Al</button>
+    <button onclick="addProduct(this,'Karışık Köy Turşusu')">
+      Sepete Ekle
+    </button>
   </div>
 
 </section>
@@ -89,11 +91,28 @@ function updatePrice(select){
   p.querySelector(".price").innerText = "₺" + total;
 }
 
-function goCheckout(btn, name){
+/* ===== SEPET MOTORU ===== */
+function getCart(){
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+function saveCart(cart){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+function addProduct(btn, name){
   const p = btn.closest(".product");
-  const qty = p.querySelector("select").value;
-  const total = p.querySelector(".price").innerText.replace("₺","");
-  location.href = `checkout.html?urun=${encodeURIComponent(name)}&adet=${qty}&tutar=${total}`;
+  const qty = Number(p.querySelector("select").value);
+  const unit = Number(p.dataset.price);
+  const cart = getCart();
+
+  const found = cart.find(i => i.name === name);
+  if(found){
+    found.qty += qty;
+    found.total += qty * unit;
+  }else{
+    cart.push({ name:name, qty:qty, unit:unit, total:qty*unit });
+  }
+  saveCart(cart);
+  alert("Ürün sepete eklendi");
 }
 </script>
 
