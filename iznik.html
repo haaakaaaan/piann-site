@@ -13,216 +13,195 @@ body{
   color:#0f172a;
 }
 
-/* === ÜST BAR === */
+/* ÜST BAR */
 .topbar{
-  position:fixed;
-  top:0; left:0; right:0;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px 28px;
-  z-index:100;
-  background:#F6F8F4;
+  position:fixed; inset:0 0 auto 0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:18px 28px; background:#F6F8F4; z-index:100;
 }
-
-.nav-left{
-  display:flex;
-  gap:18px;
-  font-size:14px;
-}
-
-.nav-left span{
-  cursor:pointer;
-  opacity:0.75;
-}
-
+.nav-left{display:flex; gap:18px; font-size:14px;}
+.nav-left span{cursor:pointer; opacity:.75;}
 .nav-left span:hover{opacity:1;}
-
-.cart-btn{
-  position:relative;
-  font-size:20px;
-  cursor:pointer;
-}
-
+.cart-btn{position:relative; cursor:pointer;}
 .cart-count{
-  position:absolute;
-  top:-6px;
-  right:-10px;
-  background:#0f172a;
-  color:#fff;
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:50%;
+  position:absolute; top:-6px; right:-10px;
+  background:#0f172a; color:#fff;
+  font-size:11px; padding:2px 6px; border-radius:50%;
 }
 
-/* === SAYFA === */
+/* BAŞLIK */
 .header{
-  max-width:1100px;
-  margin:0 auto;
-  padding:110px clamp(34px,5vw,89px) 21px;
+  max-width:1200px; margin:0 auto;
+  padding:110px 34px 34px;
 }
-
 .header small{
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  font-size:13px;
-  opacity:0.6;
+  letter-spacing:.18em; font-size:13px; opacity:.6;
 }
-
 .header h1{
-  font-size: clamp(34px,5vw,52px);
-  margin:13px 0 0;
+  font-size:clamp(34px,5vw,52px);
+  margin-top:13px;
 }
 
-.products{
-  max-width:1100px;
-  margin:0 auto;
-  padding:21px clamp(34px,5vw,89px) 55px;
+/* ÜRÜN ALANI */
+.product-wrap{
+  max-width:1200px; margin:0 auto;
+  padding:0 34px 55px;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:34px;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap:55px;
 }
 
-.product{
-  background:#fff;
-  border-radius:13px;
-  padding:34px;
-  box-shadow:0 8px 34px rgba(0,0,0,0.04);
+/* GÖRSEL */
+.product-image{
+  background:#e5e7eb;
+  border-radius:18px;
+  aspect-ratio: 4 / 5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  opacity:.5;
+}
+
+/* BİLGİ */
+.product-info{
   display:flex;
   flex-direction:column;
-  gap:13px;
+  gap:18px;
 }
 
-.product strong{
-  font-size:18px;
-  letter-spacing:-0.01em;
+.product-info h2{
+  font-size:24px;
 }
 
 .tagline{
   font-size:13px;
-  opacity:0.72;
+  opacity:.7;
   font-style:italic;
 }
 
 .desc{
   font-size:14px;
-  line-height:1.618;
-  opacity:0.86;
+  line-height:1.7;
+  opacity:.85;
+}
+
+/* SATIN ALMA (İNCE) */
+.buy{
+  margin-top:8px;
+  display:flex;
+  flex-direction:column;
+  gap:13px;
 }
 
 select{
-  padding:13px;
+  padding:11px;
   border-radius:8px;
   border:1px solid #e5e7eb;
-  font-size:15px;
+  font-size:14px;
+  max-width:200px;
 }
 
 .price{
-  font-size:17px;
+  font-size:18px;
   font-weight:600;
 }
 
 button{
-  padding:13px;
+  align-self:flex-start;
+  padding:11px 34px;
   border:none;
-  border-radius:8px;
+  border-radius:999px;
   background:#AFC8A0;
-  font-size:15px;
+  font-size:14px;
   cursor:pointer;
 }
+button:hover{opacity:.9;}
 
-button:hover{opacity:0.92;}
-
-/* === HİKÂYE BLOKU (SAYFA ALTI) === */
+/* HİKÂYE */
 .story{
-  max-width:1100px;
+  max-width:1200px;
   margin:0 auto;
-  padding:0 clamp(34px,5vw,89px) 89px;
+  padding:55px 34px 89px;
 }
-
 .story-box{
-  background:#ffffff;
+  background:#fff;
   border-radius:18px;
   padding:34px;
-  box-shadow:0 13px 55px rgba(0,0,0,0.05);
+  box-shadow:0 13px 55px rgba(0,0,0,.05);
 }
-
-.story-box h2{
-  font-size:18px;
-  margin-bottom:13px;
-}
-
+.story-box h3{margin-bottom:13px;}
 .story-box p{
   font-size:14px;
-  line-height:1.618;
-  opacity:0.86;
+  line-height:1.7;
+  opacity:.85;
 }
 
 .footer{
   text-align:center;
   font-size:11px;
-  letter-spacing:0.18em;
-  opacity:0.5;
-  padding:34px 0 34px;
+  letter-spacing:.18em;
+  opacity:.5;
+  padding:34px 0;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ÜST BAR -->
 <div class="topbar">
   <div class="nav-left">
     <span onclick="history.back()">← Geri</span>
     <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
   </div>
-
   <div class="cart-btn" onclick="location.href='sepet.html'">
     🛒 <span class="cart-count" id="cartCount">0</span>
   </div>
 </div>
 
-<!-- BAŞLIK -->
 <section class="header">
   <small>Bursa · İznik</small>
   <h1>Zeytin & Zeytinyağı</h1>
 </section>
 
-<!-- ÜRÜNLER -->
-<section class="products">
+<section class="product-wrap" data-price="320">
 
-  <div class="product" data-price="320">
-    <strong>Soğuk Sıkım Zeytinyağı</strong>
+  <!-- GÖRSEL -->
+  <div class="product-image">
+    Ürün görseli eklenecek
+  </div>
 
-    <!-- 1) ÜRÜN KARTI KISA SATIR -->
+  <!-- BİLGİ -->
+  <div class="product-info">
+    <h2>Soğuk Sıkım Zeytinyağı</h2>
+
     <div class="tagline">🌳 150 yılı aşkın zeytin ağaçlarından</div>
 
-    <!-- 2) ÜRÜN AÇIKLAMASINDA ORTA METİN -->
     <div class="desc">
       Zeytinlerimiz, İznik’te bulunan <b>150 yılı aşkın</b> zeytin ağaçlarından elde edilir.
-      Bu yaş, ağacın köklerinin toprağın derin katmanlarına ulaşmasını sağlar ve
-      ürüne daha dengeli, oturmuş bir aroma kazandırır.
+      Derin kök yapısı sayesinde ürüne daha dengeli ve oturmuş bir aroma kazandırır.
       <br><br>
       Verimi düşük ancak karakteri yüksek bu ağaçlardan elde edilen ürünler
       sınırlı miktarda hazırlanır.
     </div>
 
-    <select onchange="updatePrice(this)">
-      <option value="1">1 Litre</option>
-      <option value="2">2 Litre</option>
-    </select>
+    <div class="buy">
+      <select onchange="updatePrice(this)">
+        <option value="1">1 Litre</option>
+        <option value="2">2 Litre</option>
+      </select>
 
-    <div class="price">₺320</div>
+      <div class="price">₺320</div>
 
-    <button onclick="addProduct(this,'Soğuk Sıkım Zeytinyağı')">Sepete Ekle</button>
+      <button onclick="addProduct()">Sepete Ekle</button>
+    </div>
   </div>
 
 </section>
 
-<!-- 3) SAYFA ALTINDA HİKÂYE -->
 <section class="story">
   <div class="story-box">
-    <h2>🌿 Ağaçlarımız Hakkında</h2>
+    <h3>🌿 Ağaçlarımız Hakkında</h3>
     <p>
       İznik’te bulunan zeytin ağaçlarımızın yaşı <b>150 yılın üzerindedir</b>.
       Bu ağaçlar nesiller boyunca aynı toprakta yetişmiş,
@@ -231,9 +210,6 @@ button:hover{opacity:0.92;}
       Yaşlı zeytin ağaçları yüksek verim sunmaz;
       ancak verdikleri ürün daha dengeli aroma,
       daha stabil kalite ve gerçek zeytin karakteri taşır.
-      <br><br>
-      Bu nedenle bu ürünler endüstriyel üretime uygun değildir
-      ve sınırlı miktarda hazırlanır.
     </p>
   </div>
 </section>
@@ -248,17 +224,16 @@ function updateCartCount(){
     getCart().reduce((s,i)=>s+i.qty,0);
 }
 function updatePrice(s){
-  const p=s.closest(".product");
-  p.querySelector(".price").innerText="₺"+(p.dataset.price*s.value);
+  const price=320*s.value;
+  document.querySelector(".price").innerText="₺"+price;
 }
-function addProduct(btn,name){
-  const p=btn.closest(".product");
-  const qty=Number(p.querySelector("select").value);
-  const unit=Number(p.dataset.price);
+function addProduct(){
+  const qty=document.querySelector("select").value;
+  const unit=320;
   const cart=getCart();
-  const f=cart.find(i=>i.name===name);
-  if(f){f.qty+=qty;f.total+=qty*unit;}
-  else{cart.push({name,qty,unit,total:qty*unit});}
+  const f=cart.find(i=>i.name==="Soğuk Sıkım Zeytinyağı");
+  if(f){f.qty+=Number(qty);f.total+=unit*qty;}
+  else{cart.push({name:"Soğuk Sıkım Zeytinyağı",qty:Number(qty),unit,total:unit*qty});}
   saveCart(cart);
   updateCartCount();
   alert("Ürün sepete eklendi");
