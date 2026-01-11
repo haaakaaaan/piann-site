@@ -39,7 +39,7 @@ body{
 
 /* === SAYFA === */
 .container{
-  max-width:520px;
+  max-width:620px;
   margin:0 auto;
   padding:110px 21px 55px;
 }
@@ -49,8 +49,8 @@ h1{
   margin-bottom:21px;
 }
 
-/* === SEPET ÖZETİ === */
-.summary{
+/* === KUTULAR === */
+.box{
   background:#fff;
   border-radius:13px;
   padding:21px;
@@ -58,15 +58,17 @@ h1{
   margin-bottom:21px;
 }
 
+.box h2{
+  font-size:17px;
+  margin-bottom:13px;
+}
+
+/* === SEPET ÖZETİ === */
 .summary-item{
   display:flex;
   justify-content:space-between;
   font-size:14px;
   margin-bottom:8px;
-}
-
-.summary-item span{
-  opacity:0.85;
 }
 
 .summary-total{
@@ -79,25 +81,25 @@ h1{
   font-weight:600;
 }
 
-/* === ÖDEME KARTI === */
-.card{
-  background:#fff;
-  border-radius:13px;
-  padding:34px;
-  box-shadow:0 13px 55px rgba(0,0,0,0.06);
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-input{
+/* === FORM === */
+input, textarea{
+  width:100%;
   padding:13px;
   border-radius:8px;
   border:1px solid #e5e7eb;
+  margin-bottom:13px;
+  font-size:14px;
 }
 
+textarea{
+  resize:none;
+  min-height:80px;
+}
+
+/* === BUTON === */
 button{
-  margin-top:13px;
+  margin-top:8px;
+  width:100%;
   padding:15px;
   border:none;
   border-radius:8px;
@@ -107,6 +109,7 @@ button{
   cursor:pointer;
 }
 
+/* === ALT === */
 .notice{
   margin-top:21px;
   font-size:12px;
@@ -137,24 +140,37 @@ button{
 <div class="container">
   <h1>Ödeme</h1>
 
-  <!-- SEPET ÖZETİ -->
-  <div class="summary" id="summary"></div>
+  <!-- 🧾 SEPET ÖZETİ -->
+  <div class="box" id="summaryBox">
+    <h2>Sepet Özeti</h2>
+    <div id="summary"></div>
+  </div>
 
-  <!-- ÖDEME -->
-  <div class="card">
+  <!-- 🚚 TESLİMAT -->
+  <div class="box">
+    <h2>Teslimat Bilgileri</h2>
+    <input placeholder="Ad Soyad">
+    <input placeholder="Telefon">
+    <textarea placeholder="Adres"></textarea>
+    <input placeholder="İl">
+    <input placeholder="İlçe">
+  </div>
+
+  <!-- 💳 ÖDEME -->
+  <div class="box">
+    <h2>Kredi Kartı</h2>
     <input placeholder="Kart Üzerindeki İsim">
     <input placeholder="Kart Numarası">
     <input placeholder="AA / YY">
     <input placeholder="CVC">
-
     <button onclick="alert('Ödeme altyapısı aktif edildiğinde kullanılacaktır.')">
       Ödemeyi Tamamla
     </button>
   </div>
 
   <div class="notice">
-    Kredi kartı ödemeleri iyzico / PayTR entegrasyonu
-    aktif edildiğinde güvenli şekilde alınacaktır.
+    Kargo 1–3 iş günü içinde hazırlanır.  
+    Ödemeler iyzico / PayTR altyapısı ile alınacaktır.
   </div>
 
   <div class="footer">a piann</div>
