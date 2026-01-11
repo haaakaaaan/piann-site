@@ -35,13 +35,11 @@ body{
   cursor:pointer;
   opacity:0.75;
 }
-
 .nav-left span:hover{opacity:1;}
 
 .cart-btn{
   position:relative;
   font-size:20px;
-  cursor:pointer;
 }
 
 .cart-count{
@@ -57,7 +55,7 @@ body{
 
 /* === SAYFA === */
 .container{
-  max-width:720px;
+  max-width:760px;
   margin:0 auto;
   padding:110px 21px 55px;
 }
@@ -81,21 +79,43 @@ h1{
 .cart-info{
   display:flex;
   flex-direction:column;
-  gap:5px;
+  gap:6px;
 }
 
 .cart-info strong{font-size:16px;}
-.cart-info span{font-size:14px;opacity:0.75;}
 
-.cart-price{font-weight:600;}
+.qty-control{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.qty-control button{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:6px;
+  background:#e5e7eb;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.qty-control span{
+  min-width:20px;
+  text-align:center;
+}
+
+.cart-price{
+  font-weight:600;
+}
 
 .remove{
   background:none;
   border:none;
   color:#dc2626;
-  font-size:14px;
+  font-size:13px;
   cursor:pointer;
-  margin-left:13px;
+  margin-top:6px;
 }
 
 .total-box{
@@ -184,35 +204,61 @@ function updateCartCount(){
 /* SEPETİ ÇİZ */
 function renderCart(){
   const cart = getCart();
-  const cartDiv = document.getElementById("cart");
-  const totalSpan = document.getElementById("total");
+  const box = document.getElementById("cart");
+  const totalEl = document.getElementById("total");
 
-  cartDiv.innerHTML = "";
+  box.innerHTML = "";
   let total = 0;
 
   if(cart.length === 0){
-    cartDiv.innerHTML = "<div class='empty'>Sepetiniz boş</div>";
-    totalSpan.innerText = "0";
+    box.innerHTML = "<div class='empty'>Sepetiniz boş</div>";
+    totalEl.innerText = "0";
+    updateCartCount();
     return;
   }
 
-  cart.forEach((item, index) => {
+  cart.forEach((item, i)=>{
     total += item.total;
-    cartDiv.innerHTML += `
+
+    box.innerHTML += `
       <div class="cart-item">
         <div class="cart-info">
           <strong>${item.name}</strong>
-          <span>Miktar: ${item.qty}</span>
+
+          <div class="qty-control">
+            <button onclick="changeQty(${i}, -1)">−</button>
+            <span>${item.qty}</span>
+            <button onclick="changeQty(${i}, 1)">+</button>
+          </div>
+
+          <button class="remove" onclick="removeItem(${i})">
+            Ürünü Sil
+          </button>
         </div>
-        <div>
-          <span class="cart-price">₺${item.total}</span>
-          <button class="remove" onclick="removeItem(${index})">Sil</button>
+
+        <div class="cart-price">
+          ₺${item.total}
         </div>
       </div>
     `;
   });
 
-  totalSpan.innerText = total;
+  totalEl.innerText = total;
+  updateCartCount();
+}
+
+/* ADET ART / AZALT */
+function changeQty(index, delta){
+  const cart = getCart();
+  const item = cart[index];
+
+  if(item.qty + delta < 1) return;
+
+  item.qty += delta;
+  item.total = item.qty * item.unit;
+
+  saveCart(cart);
+  renderCart();
 }
 
 /* ÜRÜN SİL */
@@ -221,7 +267,6 @@ function removeItem(index){
   cart.splice(index,1);
   saveCart(cart);
   renderCart();
-  updateCartCount();
 }
 
 /* CHECKOUT */
@@ -230,10 +275,9 @@ function goCheckout(){
     alert("Sepetiniz boş");
     return;
   }
-  location.href = "checkout.html?toplam=" + document.getElementById("total").innerText;
+  location.href = "checkout.html";
 }
 
-updateCartCount();
 renderCart();
 </script>
 
