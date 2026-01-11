@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sepet · PİANN</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background:#F7F8F6;
+  color:#0f172a;
+}
+
+.container{
+  max-width:720px;
+  margin:0 auto;
+  padding:55px 21px;
+}
+
+h1{
+  font-size:32px;
+  margin-bottom:34px;
+}
+
+.cart-item{
+  background:#fff;
+  border-radius:13px;
+  padding:21px;
+  box-shadow:0 8px 34px rgba(0,0,0,0.05);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:21px;
+}
+
+.cart-info{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.cart-info strong{
+  font-size:16px;
+}
+
+.cart-info span{
+  font-size:14px;
+  opacity:0.75;
+}
+
+.cart-price{
+  font-weight:600;
+  font-size:16px;
+}
+
+.remove{
+  background:none;
+  border:none;
+  color:#dc2626;
+  font-size:14px;
+  cursor:pointer;
+  margin-left:13px;
+}
+
+.total-box{
+  margin-top:34px;
+  padding-top:21px;
+  border-top:1px solid #e5e7eb;
+  display:flex;
+  justify-content:space-between;
+  font-size:18px;
+  font-weight:600;
+}
+
+.checkout{
+  margin-top:34px;
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:8px;
+  background:#0f172a;
+  color:#fff;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.empty{
+  opacity:0.6;
+  text-align:center;
+  margin-top:55px;
+}
+
+.footer{
+  margin-top:55px;
+  text-align:center;
+  font-size:11px;
+  letter-spacing:0.18em;
+  opacity:0.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Sepetiniz</h1>
+
+  <div id="cart"></div>
+
+  <div class="total-box">
+    <span>Toplam</span>
+    <span>₺<span id="total">0</span></span>
+  </div>
+
+  <button class="checkout" onclick="goCheckout()">
+    Ödemeye Geç
+  </button>
+
+  <div class="footer">a piann</div>
+</div>
+
+<script>
+/* ===== SEPET MOTORU ===== */
+function getCart(){
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+/* ===== SEPETİ ÇİZ ===== */
+function renderCart(){
+  const cart = getCart();
+  const cartDiv = document.getElementById("cart");
+  const totalSpan = document.getElementById("total");
+
+  cartDiv.innerHTML = "";
+  let total = 0;
+
+  if(cart.length === 0){
+    cartDiv.innerHTML = "<div class='empty'>Sepetiniz boş</div>";
+    totalSpan.innerText = "0";
+    return;
+  }
+
+  cart.forEach((item, index) => {
+    total += item.total;
+
+    cartDiv.innerHTML += `
+      <div class="cart-item">
+        <div class="cart-info">
+          <strong>${item.name}</strong>
+          <span>Miktar: ${item.qty}</span>
+        </div>
+        <div>
+          <span class="cart-price">₺${item.total}</span>
+          <button class="remove" onclick="removeItem(${index})">
+            Sil
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  totalSpan.innerText = total;
+}
+
+/* ===== ÜRÜN SİL ===== */
+function removeItem(index){
+  const cart = getCart();
+  cart.splice(index,1);
+  saveCart(cart);
+  renderCart();
+}
+
+/* ===== CHECKOUT ===== */
+function goCheckout(){
+  if(getCart().length === 0){
+    alert("Sepetiniz boş");
+    return;
+  }
+  location.href = "checkout.html";
+}
+
+/* SAYFA YÜKLENİNCE */
+renderCart();
+</script>
+
+</body>
+</html>
