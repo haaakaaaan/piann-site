@@ -295,4 +295,238 @@ select{
 .btn.ghost{
   background:transparent;
   border:1px solid rgba(15,23,42,.16);
-  color:rgba(15,23,42,.8)
+  color:rgba(15,23,42,.8);
+}
+.btn.ghost:hover{background:rgba(15,23,42,.04)}
+
+/* alt bilgi satırı */
+.meta{
+  display:flex;
+  gap:21px;
+  flex-wrap:wrap;
+  font-size:12px;
+  color:rgba(15,23,42,.60);
+  margin-top:8px;
+}
+
+/* =========================
+   HİKÂYE / BÖLÜM
+========================= */
+.section{
+  margin-top: var(--s55);
+  background:var(--card);
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:18px;
+  padding: var(--s34);
+  box-shadow:0 13px 55px rgba(0,0,0,.04);
+}
+
+.section h2{
+  font-size:18px;
+  margin-bottom: var(--s13);
+}
+
+.section p{
+  font-size:14px;
+  line-height:1.72;
+  color:rgba(15,23,42,.84);
+  max-width: 85ch;
+}
+
+/* footer */
+.footer{
+  margin-top: var(--s55);
+  text-align:center;
+  font-size:11px;
+  letter-spacing:.18em;
+  opacity:.5;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 980px){
+  .grid{grid-template-columns:1fr; gap: var(--s34);}
+  .page{padding: calc(64px + var(--s21)) var(--s21) var(--s55);}
+  .title{font-size:30px;}
+  .main-shot{aspect-ratio: 4/3;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="nav-left">
+    <a href="index.html">🏠 Ana Sayfa</a>
+    <a href="javascript:history.back()">← Geri</a>
+  </div>
+
+  <div class="brand">Bursa · İznik</div>
+
+  <div class="cart" onclick="location.href='sepet.html'">
+    <span class="icon">🛒</span>
+    <span class="count" id="cartCount">0</span>
+  </div>
+</div>
+
+<main class="page">
+
+  <div class="crumb">
+    <span>PİANN</span>  /  <span>İznik</span>  /  <b>Soğuk Sıkım Zeytinyağı</b>
+  </div>
+
+  <section class="grid">
+
+    <!-- SOL: GÖRSELLER -->
+    <div class="media">
+      <div class="main-shot">
+        <!-- FOTOĞRAFLARINIZI BURAYA KOYUN:
+             assets/iznik/yag-1.jpg
+             assets/iznik/yag-2.jpg
+             assets/iznik/yag-3.jpg
+        -->
+        <img id="mainImg" src="assets/iznik/yag-1.jpg" alt="Soğuk Sıkım Zeytinyağı"
+             onerror="this.remove(); document.getElementById('ph').style.display='block';">
+        <div id="ph" class="placeholder" style="display:none;">Ürün görseli eklenecek</div>
+      </div>
+
+      <div class="thumbs">
+        <div class="thumb" onclick="swap('assets/iznik/yag-1.jpg')">
+          <img src="assets/iznik/yag-1.jpg" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="thumb" onclick="swap('assets/iznik/yag-2.jpg')">
+          <img src="assets/iznik/yag-2.jpg" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="thumb" onclick="swap('assets/iznik/yag-3.jpg')">
+          <img src="assets/iznik/yag-3.jpg" alt="" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+
+    <!-- SAĞ: BİLGİ + SATIN AL -->
+    <div class="info">
+      <div class="subline">Ürün Kodu: IZ-YAG-001</div>
+      <h1 class="title">Soğuk Sıkım Zeytinyağı</h1>
+
+      <div class="badge">🌳 150 yılı aşkın zeytin ağaçlarından</div>
+
+      <div class="price" id="priceText">₺320</div>
+
+      <p class="note">
+        Zeytinlerimiz, İznik’te bulunan <b>150 yılı aşkın</b> zeytin ağaçlarından elde edilir.
+        Derin kök yapısı sayesinde ürüne daha dengeli ve oturmuş bir aroma kazandırır.
+        Verimi düşük ancak karakteri yüksek bu ağaçlardan elde edilen ürünler sınırlı miktarda hazırlanır.
+      </p>
+
+      <div class="buy">
+        <div class="buy-row">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <label>Seçim</label>
+            <select id="variant" onchange="recalc()">
+              <option value="1" data-label="1 Litre" data-unit="320">1 Litre</option>
+              <option value="2" data-label="2 Litre" data-unit="620">2 Litre</option>
+              <option value="5" data-label="5 Litre" data-unit="1450">5 Litre</option>
+            </select>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <label>Adet</label>
+            <div class="qty">
+              <button onclick="qty(-1)">−</button>
+              <span id="qtyText">1</span>
+              <button onclick="qty(1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta">
+          <button class="btn primary" onclick="addToCart()">Sepete Ekle</button>
+          <button class="btn ghost" onclick="location.href='sepet.html'">Sepeti Gör</button>
+        </div>
+
+        <div class="meta">
+          <span>📦 Özenli paketleme</span>
+          <span>🚚 1–3 iş günü</span>
+          <span>🌿 Katkısız</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>🌿 Ağaçlarımız Hakkında</h2>
+    <p>
+      İznik’te bulunan zeytin ağaçlarımızın yaşı <b>150 yılın üzerindedir</b>.
+      Bu ağaçlar nesiller boyunca aynı toprakta yetişmiş, köklerini toprağın derin katmanlarına salmıştır.
+      Yaşlı zeytin ağaçları yüksek verim sunmaz; ancak verdikleri ürün daha dengeli aroma,
+      daha stabil kalite ve gerçek zeytin karakteri taşır. Bu nedenle ürünler sınırlı miktarda hazırlanır.
+    </p>
+  </section>
+
+  <div class="footer">a piann</div>
+</main>
+
+<script>
+/* ======= SEPET MOTORU (sayfaya gömülü) ======= */
+function getCart(){ return JSON.parse(localStorage.getItem("cart")) || []; }
+function saveCart(cart){ localStorage.setItem("cart", JSON.stringify(cart)); }
+function updateCartCount(){
+  document.getElementById("cartCount").innerText =
+    getCart().reduce((s,i)=>s+i.qty,0);
+}
+
+/* ======= GALERİ ======= */
+function swap(src){
+  const img = document.getElementById("mainImg");
+  if(!img) return;
+  img.src = src;
+}
+
+/* ======= VARYANT + ADET ======= */
+let QTY = 1;
+function qty(d){
+  QTY = Math.max(1, QTY + d);
+  document.getElementById("qtyText").innerText = QTY;
+  recalc();
+}
+
+function recalc(){
+  const opt = document.querySelector("#variant option:checked");
+  const unit = Number(opt.dataset.unit || 0);
+  const total = unit * QTY;
+  document.getElementById("priceText").innerText = "₺" + total;
+}
+
+/* ======= SEPETE EKLE ======= */
+function addToCart(){
+  const opt = document.querySelector("#variant option:checked");
+  const label = opt.dataset.label;
+  const unit = Number(opt.dataset.unit || 0);
+
+  const name = `Soğuk Sıkım Zeytinyağı · ${label}`;
+  const cart = getCart();
+  const found = cart.find(i => i.name === name);
+
+  if(found){
+    found.qty += QTY;
+    found.total = found.qty * unit;
+    found.unit = unit;
+  } else {
+    cart.push({ name, qty: QTY, unit, total: QTY * unit });
+  }
+
+  saveCart(cart);
+  updateCartCount();
+  alert("Ürün sepete eklendi");
+}
+
+/* init */
+updateCartCount();
+recalc();
+</script>
+
+</body>
+</html>
