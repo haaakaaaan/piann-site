@@ -13,14 +13,25 @@ body{
   color:#0f172a;
 }
 
-/* === ÜST BAR / SEPET === */
+/* === ÜST BAR === */
 .topbar{
   position:fixed;
-  top:0;
-  right:0;
-  padding:21px 34px;
+  top:0; left:0; right:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 28px;
   z-index:100;
 }
+
+.nav-left{
+  display:flex;
+  gap:18px;
+  font-size:14px;
+}
+
+.nav-left span{cursor:pointer;opacity:0.75;}
+.nav-left span:hover{opacity:1;}
 
 .cart-btn{
   position:relative;
@@ -39,39 +50,16 @@ body{
   border-radius:50%;
 }
 
-/* === SAYFA === */
 .header{
   max-width:1100px;
   margin:0 auto;
   padding:110px clamp(34px,5vw,89px) 55px;
 }
 
-.header small{
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  font-size:13px;
-  opacity:0.6;
-}
-
-.header h1{
-  font-size: clamp(42px,6vw,68px);
-  margin:21px 0 13px;
-}
-
-.header p{
-  max-width:480px;
-  font-size:16px;
-  line-height:1.618;
-  opacity:0.85;
-}
-
 .products{
   max-width:1100px;
   margin:0 auto;
   padding:0 clamp(34px,5vw,89px) 89px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:34px;
 }
 
 .product{
@@ -81,144 +69,67 @@ body{
   box-shadow:0 8px 34px rgba(0,0,0,0.04);
   display:flex;
   flex-direction:column;
-  gap:21px;
+  gap:18px;
 }
 
-.product strong{
-  font-size:18px;
-}
-
-.product p{
-  font-size:15px;
-  line-height:1.618;
-  opacity:0.8;
-}
-
-select{
-  padding:13px;
-  border-radius:8px;
-  border:1px solid #e5e7eb;
-  font-size:15px;
-}
-
-.price{
-  font-size:17px;
-  font-weight:600;
-}
-
-button{
-  padding:13px;
-  border:none;
-  border-radius:8px;
-  background:#A9D3EA;
-  font-size:15px;
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:0.9;
-}
-
-.footer{
-  text-align:center;
-  font-size:11px;
-  letter-spacing:0.18em;
-  opacity:0.5;
-  padding-bottom:34px;
-}
+.price{font-weight:600;}
+button{padding:13px;border:none;border-radius:8px;background:#A9D3EA;cursor:pointer;}
+.footer{text-align:center;font-size:11px;opacity:0.5;padding-bottom:34px;}
 </style>
 </head>
 
 <body>
 
-<!-- 🛒 SEPET -->
 <div class="topbar">
+  <div class="nav-left">
+    <span onclick="history.back()">← Geri</span>
+    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
+  </div>
+
   <div class="cart-btn" onclick="location.href='sepet.html'">
-    🛒
-    <span class="cart-count" id="cartCount">0</span>
+    🛒 <span class="cart-count" id="cartCount">0</span>
   </div>
 </div>
 
 <section class="header">
-  <small>Çanakkale · Biga</small>
-  <h1>Ev Yapımı Turşular</h1>
-  <p>Mevsiminden, evinden.</p>
+  <h1>Biga · Ev Yapımı Turşular</h1>
 </section>
 
 <section class="products">
-
-  <!-- KARIŞIK TURŞU -->
   <div class="product" data-price="120">
     <strong>Karışık Köy Turşusu</strong>
-    <p>Doğal fermantasyon, ev yapımı.</p>
-
     <select onchange="updatePrice(this)">
       <option value="1">1 kg</option>
       <option value="2">2 kg</option>
-      <option value="5">5 kg</option>
     </select>
-
     <div class="price">₺120</div>
-
-    <button onclick="addProduct(this,'Karışık Köy Turşusu')">
-      Sepete Ekle
-    </button>
+    <button onclick="addProduct(this,'Karışık Köy Turşusu')">Sepete Ekle</button>
   </div>
-
 </section>
 
 <div class="footer">a piann</div>
 
 <script>
-/* ===== SEPET MOTORU ===== */
-function getCart(){
-  return JSON.parse(localStorage.getItem("cart")) || [];
-}
-
-function saveCart(cart){
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-/* ===== SEPET SAYISI ===== */
+function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
+function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
 function updateCartCount(){
-  const cart = getCart();
   document.getElementById("cartCount").innerText =
-    cart.reduce((sum, item) => sum + item.qty, 0);
+    getCart().reduce((s,i)=>s+i.qty,0);
 }
-
-/* ===== FİYAT ===== */
-function updatePrice(select){
-  const p = select.closest(".product");
-  const total = Number(p.dataset.price) * Number(select.value);
-  p.querySelector(".price").innerText = "₺" + total;
+function updatePrice(s){
+  const p=s.closest(".product");
+  p.querySelector(".price").innerText="₺"+(p.dataset.price*s.value);
 }
-
-/* ===== SEPETE EKLE ===== */
-function addProduct(btn, name){
-  const p = btn.closest(".product");
-  const qty = Number(p.querySelector("select").value);
-  const unit = Number(p.dataset.price);
-  const cart = getCart();
-
-  const found = cart.find(i => i.name === name);
-  if(found){
-    found.qty += qty;
-    found.total += qty * unit;
-  } else {
-    cart.push({
-      name: name,
-      qty: qty,
-      unit: unit,
-      total: qty * unit
-    });
-  }
-
-  saveCart(cart);
-  updateCartCount();
-  alert("Ürün sepete eklendi");
+function addProduct(btn,name){
+  const p=btn.closest(".product");
+  const qty=Number(p.querySelector("select").value);
+  const unit=Number(p.dataset.price);
+  const cart=getCart();
+  const f=cart.find(i=>i.name===name);
+  if(f){f.qty+=qty;f.total+=qty*unit;}
+  else{cart.push({name,qty,unit,total:qty*unit});}
+  saveCart(cart); updateCartCount();
 }
-
-/* SAYFA AÇILINCA */
 updateCartCount();
 </script>
 
