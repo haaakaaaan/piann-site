@@ -30,11 +30,7 @@ body{
   gap:18px;
   font-size:14px;
 }
-
-.nav-left span{
-  cursor:pointer;
-  opacity:0.75;
-}
+.nav-left span{cursor:pointer;opacity:0.75;}
 .nav-left span:hover{opacity:1;}
 
 /* === SAYFA === */
@@ -44,12 +40,8 @@ body{
   padding:110px 21px 55px;
 }
 
-h1{
-  font-size:32px;
-  margin-bottom:21px;
-}
+h1{font-size:32px;margin-bottom:21px;}
 
-/* === KUTULAR === */
 .box{
   background:#fff;
   border-radius:13px;
@@ -58,26 +50,22 @@ h1{
   margin-bottom:21px;
 }
 
-.box h2{
-  font-size:17px;
-  margin-bottom:13px;
-}
+.box h2{font-size:17px;margin-bottom:13px;}
 
-/* === SEPET ÖZETİ === */
-.summary-item{
+/* === ÖZET === */
+.row{
   display:flex;
   justify-content:space-between;
   font-size:14px;
   margin-bottom:8px;
 }
-
-.summary-total{
+.total{
   margin-top:13px;
   padding-top:13px;
   border-top:1px solid #e5e7eb;
   display:flex;
   justify-content:space-between;
-  font-size:17px;
+  font-size:18px;
   font-weight:600;
 }
 
@@ -90,15 +78,9 @@ input, textarea{
   margin-bottom:13px;
   font-size:14px;
 }
+textarea{resize:none;min-height:80px;}
 
-textarea{
-  resize:none;
-  min-height:80px;
-}
-
-/* === BUTON === */
 button{
-  margin-top:8px;
   width:100%;
   padding:15px;
   border:none;
@@ -109,14 +91,12 @@ button{
   cursor:pointer;
 }
 
-/* === ALT === */
 .notice{
   margin-top:21px;
   font-size:12px;
   opacity:0.6;
   text-align:center;
 }
-
 .footer{
   margin-top:34px;
   text-align:center;
@@ -141,9 +121,14 @@ button{
   <h1>Ödeme</h1>
 
   <!-- 🧾 SEPET ÖZETİ -->
-  <div class="box" id="summaryBox">
-    <h2>Sepet Özeti</h2>
+  <div class="box">
+    <h2>Sipariş Özeti</h2>
     <div id="summary"></div>
+    <div class="row"><span>Kargo</span><span>₺<span id="shipping">79</span></span></div>
+    <div class="total">
+      <span>Genel Toplam</span>
+      <span>₺<span id="grandTotal">0</span></span>
+    </div>
   </div>
 
   <!-- 🚚 TESLİMAT -->
@@ -163,13 +148,11 @@ button{
     <input placeholder="Kart Numarası">
     <input placeholder="AA / YY">
     <input placeholder="CVC">
-    <button onclick="alert('Ödeme altyapısı aktif edildiğinde kullanılacaktır.')">
-      Ödemeyi Tamamla
-    </button>
+    <button onclick="completeOrder()">Ödemeyi Tamamla</button>
   </div>
 
   <div class="notice">
-    Kargo 1–3 iş günü içinde hazırlanır.  
+    Kargo 1–3 iş günü içinde hazırlanır.<br>
     Ödemeler iyzico / PayTR altyapısı ile alınacaktır.
   </div>
 
@@ -177,6 +160,8 @@ button{
 </div>
 
 <script>
+const SHIPPING_FEE = 79;
+
 function getCart(){
   return JSON.parse(localStorage.getItem("cart")) || [];
 }
@@ -184,30 +169,30 @@ function getCart(){
 function renderSummary(){
   const cart = getCart();
   const box = document.getElementById("summary");
-  let total = 0;
-
-  if(cart.length === 0){
-    box.innerHTML = "Sepetiniz boş";
-    return;
-  }
+  let subtotal = 0;
 
   box.innerHTML = "";
   cart.forEach(item=>{
-    total += item.total;
+    subtotal += item.total;
     box.innerHTML += `
-      <div class="summary-item">
+      <div class="row">
         <span>${item.name} (${item.qty})</span>
         <span>₺${item.total}</span>
       </div>
     `;
   });
 
-  box.innerHTML += `
-    <div class="summary-total">
-      <span>Toplam</span>
-      <span>₺${total}</span>
-    </div>
-  `;
+  const grand = subtotal + SHIPPING_FEE;
+  document.getElementById("grandTotal").innerText = grand;
+}
+
+function completeOrder(){
+  if(getCart().length === 0){
+    alert("Sepetiniz boş");
+    return;
+  }
+  localStorage.removeItem("cart");
+  location.href = "tesekkur.html";
 }
 
 renderSummary();
