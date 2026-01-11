@@ -12,15 +12,61 @@ body{
   background:#F7F8F6;
   color:#0f172a;
 }
+
+/* === ÜST BAR === */
+.topbar{
+  position:fixed;
+  top:0; left:0; right:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 28px;
+  z-index:100;
+  background:#F7F8F6;
+}
+
+.nav-left{
+  display:flex;
+  gap:18px;
+  font-size:14px;
+}
+
+.nav-left span{
+  cursor:pointer;
+  opacity:0.75;
+}
+
+.nav-left span:hover{opacity:1;}
+
+.cart-btn{
+  position:relative;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.cart-count{
+  position:absolute;
+  top:-6px;
+  right:-10px;
+  background:#0f172a;
+  color:#fff;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:50%;
+}
+
+/* === SAYFA === */
 .container{
   max-width:720px;
   margin:0 auto;
-  padding:55px 21px;
+  padding:110px 21px 55px;
 }
+
 h1{
   font-size:32px;
   margin-bottom:34px;
 }
+
 .cart-item{
   background:#fff;
   border-radius:13px;
@@ -31,14 +77,18 @@ h1{
   align-items:center;
   margin-bottom:21px;
 }
+
 .cart-info{
   display:flex;
   flex-direction:column;
   gap:5px;
 }
+
 .cart-info strong{font-size:16px;}
 .cart-info span{font-size:14px;opacity:0.75;}
-.cart-price{font-weight:600;font-size:16px;}
+
+.cart-price{font-weight:600;}
+
 .remove{
   background:none;
   border:none;
@@ -47,6 +97,7 @@ h1{
   cursor:pointer;
   margin-left:13px;
 }
+
 .total-box{
   margin-top:34px;
   padding-top:21px;
@@ -56,6 +107,7 @@ h1{
   font-size:18px;
   font-weight:600;
 }
+
 .checkout{
   margin-top:34px;
   width:100%;
@@ -67,11 +119,13 @@ h1{
   font-size:15px;
   cursor:pointer;
 }
+
 .empty{
   opacity:0.6;
   text-align:center;
   margin-top:55px;
 }
+
 .footer{
   margin-top:55px;
   text-align:center;
@@ -83,6 +137,18 @@ h1{
 </head>
 
 <body>
+
+<!-- ÜST BAR -->
+<div class="topbar">
+  <div class="nav-left">
+    <span onclick="history.back()">← Geri</span>
+    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
+  </div>
+
+  <div class="cart-btn">
+    🛒 <span class="cart-count" id="cartCount">0</span>
+  </div>
+</div>
 
 <div class="container">
   <h1>Sepetiniz</h1>
@@ -109,6 +175,13 @@ function saveCart(cart){
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
+/* SEPET SAYISI */
+function updateCartCount(){
+  document.getElementById("cartCount").innerText =
+    getCart().reduce((s,i)=>s+i.qty,0);
+}
+
+/* SEPETİ ÇİZ */
 function renderCart(){
   const cart = getCart();
   const cartDiv = document.getElementById("cart");
@@ -142,22 +215,25 @@ function renderCart(){
   totalSpan.innerText = total;
 }
 
+/* ÜRÜN SİL */
 function removeItem(index){
   const cart = getCart();
   cart.splice(index,1);
   saveCart(cart);
   renderCart();
+  updateCartCount();
 }
 
+/* CHECKOUT */
 function goCheckout(){
-  const total = document.getElementById("total").innerText;
-  if(total === "0"){
+  if(getCart().length === 0){
     alert("Sepetiniz boş");
     return;
   }
-  location.href = `checkout.html?toplam=${total}`;
+  location.href = "checkout.html?toplam=" + document.getElementById("total").innerText;
 }
 
+updateCartCount();
 renderCart();
 </script>
 
