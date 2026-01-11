@@ -137,4 +137,134 @@ button:hover{opacity:0.92;}
 .story{
   max-width:1100px;
   margin:0 auto;
-  padding:0 clamp(34px,5
+  padding:0 clamp(34px,5vw,89px) 89px;
+}
+
+.story-box{
+  background:#ffffff;
+  border-radius:18px;
+  padding:34px;
+  box-shadow:0 13px 55px rgba(0,0,0,0.05);
+}
+
+.story-box h2{
+  font-size:18px;
+  margin-bottom:13px;
+}
+
+.story-box p{
+  font-size:14px;
+  line-height:1.618;
+  opacity:0.86;
+}
+
+.footer{
+  text-align:center;
+  font-size:11px;
+  letter-spacing:0.18em;
+  opacity:0.5;
+  padding:34px 0 34px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ÜST BAR -->
+<div class="topbar">
+  <div class="nav-left">
+    <span onclick="history.back()">← Geri</span>
+    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
+  </div>
+
+  <div class="cart-btn" onclick="location.href='sepet.html'">
+    🛒 <span class="cart-count" id="cartCount">0</span>
+  </div>
+</div>
+
+<!-- BAŞLIK -->
+<section class="header">
+  <small>Bursa · İznik</small>
+  <h1>Zeytin & Zeytinyağı</h1>
+</section>
+
+<!-- ÜRÜNLER -->
+<section class="products">
+
+  <div class="product" data-price="320">
+    <strong>Soğuk Sıkım Zeytinyağı</strong>
+
+    <!-- 1) ÜRÜN KARTI KISA SATIR -->
+    <div class="tagline">🌳 150 yılı aşkın zeytin ağaçlarından</div>
+
+    <!-- 2) ÜRÜN AÇIKLAMASINDA ORTA METİN -->
+    <div class="desc">
+      Zeytinlerimiz, İznik’te bulunan <b>150 yılı aşkın</b> zeytin ağaçlarından elde edilir.
+      Bu yaş, ağacın köklerinin toprağın derin katmanlarına ulaşmasını sağlar ve
+      ürüne daha dengeli, oturmuş bir aroma kazandırır.
+      <br><br>
+      Verimi düşük ancak karakteri yüksek bu ağaçlardan elde edilen ürünler
+      sınırlı miktarda hazırlanır.
+    </div>
+
+    <select onchange="updatePrice(this)">
+      <option value="1">1 Litre</option>
+      <option value="2">2 Litre</option>
+    </select>
+
+    <div class="price">₺320</div>
+
+    <button onclick="addProduct(this,'Soğuk Sıkım Zeytinyağı')">Sepete Ekle</button>
+  </div>
+
+</section>
+
+<!-- 3) SAYFA ALTINDA HİKÂYE -->
+<section class="story">
+  <div class="story-box">
+    <h2>🌿 Ağaçlarımız Hakkında</h2>
+    <p>
+      İznik’te bulunan zeytin ağaçlarımızın yaşı <b>150 yılın üzerindedir</b>.
+      Bu ağaçlar nesiller boyunca aynı toprakta yetişmiş,
+      köklerini toprağın derin katmanlarına salmıştır.
+      <br><br>
+      Yaşlı zeytin ağaçları yüksek verim sunmaz;
+      ancak verdikleri ürün daha dengeli aroma,
+      daha stabil kalite ve gerçek zeytin karakteri taşır.
+      <br><br>
+      Bu nedenle bu ürünler endüstriyel üretime uygun değildir
+      ve sınırlı miktarda hazırlanır.
+    </p>
+  </div>
+</section>
+
+<div class="footer">a piann</div>
+
+<script>
+function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
+function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
+function updateCartCount(){
+  document.getElementById("cartCount").innerText =
+    getCart().reduce((s,i)=>s+i.qty,0);
+}
+function updatePrice(s){
+  const p=s.closest(".product");
+  p.querySelector(".price").innerText="₺"+(p.dataset.price*s.value);
+}
+function addProduct(btn,name){
+  const p=btn.closest(".product");
+  const qty=Number(p.querySelector("select").value);
+  const unit=Number(p.dataset.price);
+  const cart=getCart();
+  const f=cart.find(i=>i.name===name);
+  if(f){f.qty+=qty;f.total+=qty*unit;}
+  else{cart.push({name,qty,unit,total:qty*unit});}
+  saveCart(cart);
+  updateCartCount();
+  alert("Ürün sepete eklendi");
+}
+updateCartCount();
+</script>
+
+</body>
+</html>
