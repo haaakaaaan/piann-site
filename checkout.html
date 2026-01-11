@@ -30,7 +30,10 @@ body{
   gap:18px;
   font-size:14px;
 }
-.nav-left span{cursor:pointer;opacity:0.75;}
+.nav-left span{
+  cursor:pointer;
+  opacity:0.75;
+}
 .nav-left span:hover{opacity:1;}
 
 /* === SAYFA === */
@@ -40,8 +43,12 @@ body{
   padding:110px 21px 55px;
 }
 
-h1{font-size:32px;margin-bottom:21px;}
+h1{
+  font-size:32px;
+  margin-bottom:21px;
+}
 
+/* === KUTU === */
 .box{
   background:#fff;
   border-radius:13px;
@@ -50,7 +57,10 @@ h1{font-size:32px;margin-bottom:21px;}
   margin-bottom:21px;
 }
 
-.box h2{font-size:17px;margin-bottom:13px;}
+.box h2{
+  font-size:17px;
+  margin-bottom:13px;
+}
 
 /* === ÖZET === */
 .row{
@@ -59,6 +69,12 @@ h1{font-size:32px;margin-bottom:21px;}
   font-size:14px;
   margin-bottom:8px;
 }
+
+.free{
+  color:#16a34a;
+  font-weight:600;
+}
+
 .total{
   margin-top:13px;
   padding-top:13px;
@@ -78,8 +94,12 @@ input, textarea{
   margin-bottom:13px;
   font-size:14px;
 }
-textarea{resize:none;min-height:80px;}
+textarea{
+  resize:none;
+  min-height:80px;
+}
 
+/* === BUTON === */
 button{
   width:100%;
   padding:15px;
@@ -92,11 +112,12 @@ button{
 }
 
 .notice{
-  margin-top:21px;
+  margin-top:13px;
   font-size:12px;
   opacity:0.6;
   text-align:center;
 }
+
 .footer{
   margin-top:34px;
   text-align:center;
@@ -120,15 +141,22 @@ button{
 <div class="container">
   <h1>Ödeme</h1>
 
-  <!-- 🧾 SEPET ÖZETİ -->
+  <!-- 🧾 SİPARİŞ ÖZETİ -->
   <div class="box">
     <h2>Sipariş Özeti</h2>
     <div id="summary"></div>
-    <div class="row"><span>Kargo</span><span>₺<span id="shipping">79</span></span></div>
+
+    <div class="row">
+      <span>Kargo</span>
+      <span id="shippingText">₺79</span>
+    </div>
+
     <div class="total">
       <span>Genel Toplam</span>
       <span>₺<span id="grandTotal">0</span></span>
     </div>
+
+    <div class="notice" id="shippingNote"></div>
   </div>
 
   <!-- 🚚 TESLİMAT -->
@@ -152,8 +180,7 @@ button{
   </div>
 
   <div class="notice">
-    Kargo 1–3 iş günü içinde hazırlanır.<br>
-    Ödemeler iyzico / PayTR altyapısı ile alınacaktır.
+    Ödemeler iyzico / PayTR altyapısı ile güvenli şekilde alınacaktır.
   </div>
 
   <div class="footer">a piann</div>
@@ -161,6 +188,7 @@ button{
 
 <script>
 const SHIPPING_FEE = 79;
+const FREE_SHIPPING_LIMIT = 1000;
 
 function getCart(){
   return JSON.parse(localStorage.getItem("cart")) || [];
@@ -168,13 +196,17 @@ function getCart(){
 
 function renderSummary(){
   const cart = getCart();
-  const box = document.getElementById("summary");
-  let subtotal = 0;
+  const summary = document.getElementById("summary");
+  const shippingText = document.getElementById("shippingText");
+  const shippingNote = document.getElementById("shippingNote");
+  const grandTotalEl = document.getElementById("grandTotal");
 
-  box.innerHTML = "";
+  let subtotal = 0;
+  summary.innerHTML = "";
+
   cart.forEach(item=>{
     subtotal += item.total;
-    box.innerHTML += `
+    summary.innerHTML += `
       <div class="row">
         <span>${item.name} (${item.qty})</span>
         <span>₺${item.total}</span>
@@ -182,21 +214,9 @@ function renderSummary(){
     `;
   });
 
-  const grand = subtotal + SHIPPING_FEE;
-  document.getElementById("grandTotal").innerText = grand;
-}
+  let shipping = SHIPPING_FEE;
 
-function completeOrder(){
-  if(getCart().length === 0){
-    alert("Sepetiniz boş");
-    return;
-  }
-  localStorage.removeItem("cart");
-  location.href = "tesekkur.html";
-}
-
-renderSummary();
-</script>
-
-</body>
-</html>
+  if(subtotal >= FREE_SHIPPING_LIMIT){
+    shipping = 0;
+    shippingText.innerHTML = "<span class='free'>Ücretsiz</span>";
+    shippi
