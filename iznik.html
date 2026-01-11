@@ -1,245 +1,298 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>İznik · PİANN</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>İznik · Soğuk Sıkım Zeytinyağı | PİANN</title>
 
 <style>
+/* =========================
+   TEMEL / BUTİK SİSTEM
+========================= */
+:root{
+  --bg:#F6F8F4;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:rgba(15,23,42,.66);
+  --line:rgba(15,23,42,.10);
+
+  /* İznik yeşili (sakin) */
+  --iznik:#AFC8A0;
+  --iznik-2:#CFE0C6;
+
+  /* Altın oran boşluk hissi */
+  --s8:8px;
+  --s13:13px;
+  --s21:21px;
+  --s34:34px;
+  --s55:55px;
+}
+
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-  background:#F6F8F4;
-  color:#0f172a;
+  background:var(--bg);
+  color:var(--text);
 }
 
-/* ÜST BAR */
+/* =========================
+   ÜST BAR
+========================= */
 .topbar{
   position:fixed; inset:0 0 auto 0;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:18px 28px; background:#F6F8F4; z-index:100;
-}
-.nav-left{display:flex; gap:18px; font-size:14px;}
-.nav-left span{cursor:pointer; opacity:.75;}
-.nav-left span:hover{opacity:1;}
-.cart-btn{position:relative; cursor:pointer;}
-.cart-count{
-  position:absolute; top:-6px; right:-10px;
-  background:#0f172a; color:#fff;
-  font-size:11px; padding:2px 6px; border-radius:50%;
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  background:rgba(246,248,244,.92);
+  backdrop-filter: blur(10px);
+  z-index:99;
+  border-bottom:1px solid rgba(15,23,42,.06);
 }
 
-/* BAŞLIK */
-.header{
-  max-width:1200px; margin:0 auto;
-  padding:110px 34px 34px;
+.nav-left{
+  display:flex;
+  gap:18px;
+  font-size:14px;
 }
-.header small{
-  letter-spacing:.18em; font-size:13px; opacity:.6;
+.nav-left a{
+  text-decoration:none;
+  color:var(--text);
+  opacity:.72;
 }
-.header h1{
-  font-size:clamp(34px,5vw,52px);
-  margin-top:13px;
+.nav-left a:hover{opacity:1;}
+
+.brand{
+  font-size:12px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  opacity:.55;
 }
 
-/* ÜRÜN ALANI */
-.product-wrap{
-  max-width:1200px; margin:0 auto;
-  padding:0 34px 55px;
+.cart{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  user-select:none;
+}
+.cart .icon{font-size:20px;}
+.cart .count{
+  position:absolute;
+  top:-7px;
+  right:-10px;
+  background:var(--text);
+  color:#fff;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:999px;
+}
+
+/* =========================
+   SAYFA WRAP
+========================= */
+.page{
+  max-width:1180px;
+  margin:0 auto;
+  padding: calc(64px + var(--s34)) var(--s34) var(--s55);
+}
+
+/* breadcrumb */
+.crumb{
+  font-size:12px;
+  color:var(--muted);
+  letter-spacing:.08em;
+  margin-bottom: var(--s21);
+}
+.crumb span{opacity:.75}
+
+/* =========================
+   ÜRÜN GRID
+========================= */
+.grid{
   display:grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap:55px;
+  grid-template-columns: 1.05fr .95fr;
+  gap: var(--s55);
+  align-items:start;
 }
 
-/* GÖRSEL */
-.product-image{
-  background:#e5e7eb;
+/* SOL: görsel alanı */
+.media{
+  background:var(--card);
+  border:1px solid rgba(15,23,42,.08);
   border-radius:18px;
-  aspect-ratio: 4 / 5;
+  padding: var(--s21);
+}
+
+.main-shot{
+  width:100%;
+  aspect-ratio: 1 / 1;
+  border-radius:16px;
+  background:#E9EEE4;
+  overflow:hidden;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:14px;
-  opacity:.5;
+  position:relative;
 }
 
-/* BİLGİ */
-.product-info{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
+.main-shot img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
 
-.product-info h2{
-  font-size:24px;
-}
-
-.tagline{
+.placeholder{
   font-size:13px;
-  opacity:.7;
-  font-style:italic;
+  color:rgba(15,23,42,.45);
 }
 
-.desc{
-  font-size:14px;
-  line-height:1.7;
-  opacity:.85;
+/* küçük galeri */
+.thumbs{
+  display:flex;
+  gap: var(--s13);
+  margin-top: var(--s21);
 }
 
-/* SATIN ALMA (İNCE) */
-.buy{
-  margin-top:8px;
+.thumb{
+  width:76px;
+  height:76px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  overflow:hidden;
+  background:#E9EEE4;
+  cursor:pointer;
+  opacity:.9;
+  transition:transform .12s ease, opacity .12s ease;
+}
+.thumb:hover{transform:translateY(-2px);opacity:1;}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* SAĞ: ürün bilgi */
+.info{
   display:flex;
   flex-direction:column;
-  gap:13px;
+  gap: var(--s13);
 }
 
-select{
-  padding:11px;
-  border-radius:8px;
-  border:1px solid #e5e7eb;
-  font-size:14px;
-  max-width:200px;
+.title{
+  font-size:34px;
+  letter-spacing:-.02em;
+  line-height:1.08;
+}
+
+.subline{
+  font-size:13px;
+  color:var(--muted);
+  letter-spacing:.08em;
 }
 
 .price{
-  font-size:18px;
+  font-size:28px;
+  font-weight:700;
+  color:#1F2937;
+  margin-top: var(--s8);
+}
+
+.note{
+  font-size:13px;
+  line-height:1.62;
+  color:rgba(15,23,42,.70);
+  max-width: 52ch;
+}
+
+/* mini “150 yıl” vurgusu */
+.badge{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 13px;
+  border-radius:999px;
+  background:rgba(175,200,160,.35);
+  border:1px solid rgba(175,200,160,.65);
+  width:fit-content;
+  font-size:13px;
+  color:rgba(15,23,42,.85);
+}
+
+/* satın alma paneli (ince, kibar) */
+.buy{
+  margin-top: var(--s13);
+  background:var(--card);
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:18px;
+  padding: var(--s21);
+  display:flex;
+  flex-direction:column;
+  gap: var(--s13);
+}
+
+.buy-row{
+  display:flex;
+  gap: var(--s13);
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+label{
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(15,23,42,.55);
+}
+
+select{
+  padding:11px 13px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.14);
+  background:#fff;
+  font-size:14px;
+  min-width: 210px;
+}
+
+.qty{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid rgba(15,23,42,.14);
+  border-radius:12px;
+  padding:8px;
+}
+.qty button{
+  width:34px;height:34px;
+  border:none;border-radius:10px;
+  background:rgba(15,23,42,.06);
+  cursor:pointer;
+  font-weight:700;
+}
+.qty span{
+  width:34px;
+  text-align:center;
   font-weight:600;
 }
 
-button{
-  align-self:flex-start;
-  padding:11px 34px;
+/* butonlar */
+.cta{
+  display:flex;
+  gap: var(--s13);
+  flex-wrap:wrap;
+}
+.btn{
   border:none;
   border-radius:999px;
-  background:#AFC8A0;
-  font-size:14px;
+  padding:12px 21px;
   cursor:pointer;
-}
-button:hover{opacity:.9;}
-
-/* HİKÂYE */
-.story{
-  max-width:1200px;
-  margin:0 auto;
-  padding:55px 34px 89px;
-}
-.story-box{
-  background:#fff;
-  border-radius:18px;
-  padding:34px;
-  box-shadow:0 13px 55px rgba(0,0,0,.05);
-}
-.story-box h3{margin-bottom:13px;}
-.story-box p{
   font-size:14px;
-  line-height:1.7;
-  opacity:.85;
 }
-
-.footer{
-  text-align:center;
-  font-size:11px;
-  letter-spacing:.18em;
-  opacity:.5;
-  padding:34px 0;
+.btn.primary{
+  background:var(--iznik);
+  color:#0f172a;
 }
-</style>
-</head>
-
-<body>
-
-<div class="topbar">
-  <div class="nav-left">
-    <span onclick="history.back()">← Geri</span>
-    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
-  </div>
-  <div class="cart-btn" onclick="location.href='sepet.html'">
-    🛒 <span class="cart-count" id="cartCount">0</span>
-  </div>
-</div>
-
-<section class="header">
-  <small>Bursa · İznik</small>
-  <h1>Zeytin & Zeytinyağı</h1>
-</section>
-
-<section class="product-wrap" data-price="320">
-
-  <!-- GÖRSEL -->
-  <div class="product-image">
-    Ürün görseli eklenecek
-  </div>
-
-  <!-- BİLGİ -->
-  <div class="product-info">
-    <h2>Soğuk Sıkım Zeytinyağı</h2>
-
-    <div class="tagline">🌳 150 yılı aşkın zeytin ağaçlarından</div>
-
-    <div class="desc">
-      Zeytinlerimiz, İznik’te bulunan <b>150 yılı aşkın</b> zeytin ağaçlarından elde edilir.
-      Derin kök yapısı sayesinde ürüne daha dengeli ve oturmuş bir aroma kazandırır.
-      <br><br>
-      Verimi düşük ancak karakteri yüksek bu ağaçlardan elde edilen ürünler
-      sınırlı miktarda hazırlanır.
-    </div>
-
-    <div class="buy">
-      <select onchange="updatePrice(this)">
-        <option value="1">1 Litre</option>
-        <option value="2">2 Litre</option>
-      </select>
-
-      <div class="price">₺320</div>
-
-      <button onclick="addProduct()">Sepete Ekle</button>
-    </div>
-  </div>
-
-</section>
-
-<section class="story">
-  <div class="story-box">
-    <h3>🌿 Ağaçlarımız Hakkında</h3>
-    <p>
-      İznik’te bulunan zeytin ağaçlarımızın yaşı <b>150 yılın üzerindedir</b>.
-      Bu ağaçlar nesiller boyunca aynı toprakta yetişmiş,
-      köklerini toprağın derin katmanlarına salmıştır.
-      <br><br>
-      Yaşlı zeytin ağaçları yüksek verim sunmaz;
-      ancak verdikleri ürün daha dengeli aroma,
-      daha stabil kalite ve gerçek zeytin karakteri taşır.
-    </p>
-  </div>
-</section>
-
-<div class="footer">a piann</div>
-
-<script>
-function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
-function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
-function updateCartCount(){
-  document.getElementById("cartCount").innerText =
-    getCart().reduce((s,i)=>s+i.qty,0);
-}
-function updatePrice(s){
-  const price=320*s.value;
-  document.querySelector(".price").innerText="₺"+price;
-}
-function addProduct(){
-  const qty=document.querySelector("select").value;
-  const unit=320;
-  const cart=getCart();
-  const f=cart.find(i=>i.name==="Soğuk Sıkım Zeytinyağı");
-  if(f){f.qty+=Number(qty);f.total+=unit*qty;}
-  else{cart.push({name:"Soğuk Sıkım Zeytinyağı",qty:Number(qty),unit,total:unit*qty});}
-  saveCart(cart);
-  updateCartCount();
-  alert("Ürün sepete eklendi");
-}
-updateCartCount();
-</script>
-
-</body>
-</html>
+.btn.primary:hover{opacity:.92}
+.btn.ghost{
+  background:transparent;
+  border:1px solid rgba(15,23,42,.16);
+  color:rgba(15,23,42,.8)
