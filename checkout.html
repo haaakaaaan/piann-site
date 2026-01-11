@@ -35,16 +35,51 @@ body{
   cursor:pointer;
   opacity:0.75;
 }
-
 .nav-left span:hover{opacity:1;}
 
 /* === SAYFA === */
 .container{
-  max-width:420px;
+  max-width:520px;
   margin:0 auto;
   padding:110px 21px 55px;
 }
 
+h1{
+  font-size:32px;
+  margin-bottom:21px;
+}
+
+/* === SEPET ÖZETİ === */
+.summary{
+  background:#fff;
+  border-radius:13px;
+  padding:21px;
+  box-shadow:0 8px 34px rgba(0,0,0,0.05);
+  margin-bottom:21px;
+}
+
+.summary-item{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+.summary-item span{
+  opacity:0.85;
+}
+
+.summary-total{
+  margin-top:13px;
+  padding-top:13px;
+  border-top:1px solid #e5e7eb;
+  display:flex;
+  justify-content:space-between;
+  font-size:17px;
+  font-weight:600;
+}
+
+/* === ÖDEME KARTI === */
 .card{
   background:#fff;
   border-radius:13px;
@@ -52,16 +87,7 @@ body{
   box-shadow:0 13px 55px rgba(0,0,0,0.06);
   display:flex;
   flex-direction:column;
-  gap:21px;
-}
-
-h1{font-size:32px;}
-
-.total{
-  display:flex;
-  justify-content:space-between;
-  font-size:18px;
-  font-weight:600;
+  gap:18px;
 }
 
 input{
@@ -71,6 +97,7 @@ input{
 }
 
 button{
+  margin-top:13px;
   padding:15px;
   border:none;
   border-radius:8px;
@@ -110,12 +137,11 @@ button{
 <div class="container">
   <h1>Ödeme</h1>
 
-  <div class="card">
-    <div class="total">
-      <span>Toplam</span>
-      <span>₺<span id="toplam">0</span></span>
-    </div>
+  <!-- SEPET ÖZETİ -->
+  <div class="summary" id="summary"></div>
 
+  <!-- ÖDEME -->
+  <div class="card">
     <input placeholder="Kart Üzerindeki İsim">
     <input placeholder="Kart Numarası">
     <input placeholder="AA / YY">
@@ -127,15 +153,48 @@ button{
   </div>
 
   <div class="notice">
-    Kredi kartı ödemeleri iyzico / PayTR entegrasyonu aktif edildiğinde alınacaktır.
+    Kredi kartı ödemeleri iyzico / PayTR entegrasyonu
+    aktif edildiğinde güvenli şekilde alınacaktır.
   </div>
 
   <div class="footer">a piann</div>
 </div>
 
 <script>
-const p = new URLSearchParams(location.search);
-document.getElementById("toplam").innerText = p.get("toplam") || "0";
+function getCart(){
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function renderSummary(){
+  const cart = getCart();
+  const box = document.getElementById("summary");
+  let total = 0;
+
+  if(cart.length === 0){
+    box.innerHTML = "Sepetiniz boş";
+    return;
+  }
+
+  box.innerHTML = "";
+  cart.forEach(item=>{
+    total += item.total;
+    box.innerHTML += `
+      <div class="summary-item">
+        <span>${item.name} (${item.qty})</span>
+        <span>₺${item.total}</span>
+      </div>
+    `;
+  });
+
+  box.innerHTML += `
+    <div class="summary-total">
+      <span>Toplam</span>
+      <span>₺${total}</span>
+    </div>
+  `;
+}
+
+renderSummary();
 </script>
 
 </body>
