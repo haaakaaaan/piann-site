@@ -16,11 +16,26 @@ body{
 /* === ÜST BAR === */
 .topbar{
   position:fixed;
-  top:0;
-  right:0;
-  padding:21px 34px;
+  top:0; left:0; right:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 28px;
   z-index:100;
 }
+
+.nav-left{
+  display:flex;
+  gap:18px;
+  font-size:14px;
+}
+
+.nav-left span{
+  cursor:pointer;
+  opacity:0.75;
+}
+
+.nav-left span:hover{opacity:1;}
 
 .cart-btn{
   position:relative;
@@ -43,19 +58,7 @@ body{
 .header{
   max-width:1100px;
   margin:0 auto;
-  padding: 110px clamp(34px,5vw,89px) 55px;
-}
-
-.header small{
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  font-size:13px;
-  opacity:0.6;
-}
-
-.header h1{
-  font-size: clamp(42px,6vw,68px);
-  margin:21px 0 13px;
+  padding:110px clamp(34px,5vw,89px) 55px;
 }
 
 .products{
@@ -74,22 +77,11 @@ body{
   box-shadow:0 8px 34px rgba(0,0,0,0.04);
   display:flex;
   flex-direction:column;
-  gap:21px;
-}
-
-select, button{
-  padding:13px;
-  border-radius:8px;
-  border:1px solid #e5e7eb;
-}
-
-button{
-  background:#AFC8A0;
-  border:none;
-  cursor:pointer;
+  gap:18px;
 }
 
 .price{font-weight:600;}
+button{padding:13px;border:none;border-radius:8px;background:#AFC8A0;cursor:pointer;}
 
 .footer{text-align:center;font-size:11px;opacity:0.5;padding-bottom:34px;}
 </style>
@@ -97,21 +89,23 @@ button{
 
 <body>
 
-<!-- 🛒 SEPET -->
+<!-- ÜST BAR -->
 <div class="topbar">
+  <div class="nav-left">
+    <span onclick="history.back()">← Geri</span>
+    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
+  </div>
+
   <div class="cart-btn" onclick="location.href='sepet.html'">
-    🛒
-    <span class="cart-count" id="cartCount">0</span>
+    🛒 <span class="cart-count" id="cartCount">0</span>
   </div>
 </div>
 
 <section class="header">
-  <small>Bursa · İznik</small>
-  <h1>Zeytin & Zeytinyağı</h1>
+  <h1>İznik · Zeytin & Zeytinyağı</h1>
 </section>
 
 <section class="products">
-
   <div class="product" data-price="320">
     <strong>Soğuk Sıkım Zeytinyağı</strong>
     <select onchange="updatePrice(this)">
@@ -121,7 +115,6 @@ button{
     <div class="price">₺320</div>
     <button onclick="addProduct(this,'Soğuk Sıkım Zeytinyağı')">Sepete Ekle</button>
   </div>
-
 </section>
 
 <div class="footer">a piann</div>
@@ -130,9 +123,8 @@ button{
 function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
 function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
 function updateCartCount(){
-  const c=getCart();
-  document.getElementById("cartCount").innerText=
-    c.reduce((s,i)=>s+i.qty,0);
+  document.getElementById("cartCount").innerText =
+    getCart().reduce((s,i)=>s+i.qty,0);
 }
 function updatePrice(s){
   const p=s.closest(".product");
@@ -146,8 +138,7 @@ function addProduct(btn,name){
   const f=cart.find(i=>i.name===name);
   if(f){f.qty+=qty;f.total+=qty*unit;}
   else{cart.push({name,qty,unit,total:qty*unit});}
-  saveCart(cart);
-  updateCartCount();
+  saveCart(cart); updateCartCount();
 }
 updateCartCount();
 </script>
