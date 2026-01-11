@@ -22,6 +22,7 @@ body{
   align-items:center;
   padding:18px 28px;
   z-index:100;
+  background:#F6F8F4;
 }
 
 .nav-left{
@@ -58,15 +59,27 @@ body{
 .header{
   max-width:1100px;
   margin:0 auto;
-  padding:110px clamp(34px,5vw,89px) 55px;
+  padding:110px clamp(34px,5vw,89px) 21px;
+}
+
+.header small{
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  font-size:13px;
+  opacity:0.6;
+}
+
+.header h1{
+  font-size: clamp(34px,5vw,52px);
+  margin:13px 0 0;
 }
 
 .products{
   max-width:1100px;
   margin:0 auto;
-  padding:0 clamp(34px,5vw,89px) 89px;
+  padding:21px clamp(34px,5vw,89px) 55px;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap:34px;
 }
 
@@ -77,71 +90,51 @@ body{
   box-shadow:0 8px 34px rgba(0,0,0,0.04);
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:13px;
 }
 
-.price{font-weight:600;}
-button{padding:13px;border:none;border-radius:8px;background:#AFC8A0;cursor:pointer;}
-
-.footer{text-align:center;font-size:11px;opacity:0.5;padding-bottom:34px;}
-</style>
-</head>
-
-<body>
-
-<!-- ÜST BAR -->
-<div class="topbar">
-  <div class="nav-left">
-    <span onclick="history.back()">← Geri</span>
-    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
-  </div>
-
-  <div class="cart-btn" onclick="location.href='sepet.html'">
-    🛒 <span class="cart-count" id="cartCount">0</span>
-  </div>
-</div>
-
-<section class="header">
-  <h1>İznik · Zeytin & Zeytinyağı</h1>
-</section>
-
-<section class="products">
-  <div class="product" data-price="320">
-    <strong>Soğuk Sıkım Zeytinyağı</strong>
-    <select onchange="updatePrice(this)">
-      <option value="1">1 Litre</option>
-      <option value="2">2 Litre</option>
-    </select>
-    <div class="price">₺320</div>
-    <button onclick="addProduct(this,'Soğuk Sıkım Zeytinyağı')">Sepete Ekle</button>
-  </div>
-</section>
-
-<div class="footer">a piann</div>
-
-<script>
-function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
-function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
-function updateCartCount(){
-  document.getElementById("cartCount").innerText =
-    getCart().reduce((s,i)=>s+i.qty,0);
+.product strong{
+  font-size:18px;
+  letter-spacing:-0.01em;
 }
-function updatePrice(s){
-  const p=s.closest(".product");
-  p.querySelector(".price").innerText="₺"+(p.dataset.price*s.value);
-}
-function addProduct(btn,name){
-  const p=btn.closest(".product");
-  const qty=Number(p.querySelector("select").value);
-  const unit=Number(p.dataset.price);
-  const cart=getCart();
-  const f=cart.find(i=>i.name===name);
-  if(f){f.qty+=qty;f.total+=qty*unit;}
-  else{cart.push({name,qty,unit,total:qty*unit});}
-  saveCart(cart); updateCartCount();
-}
-updateCartCount();
-</script>
 
-</body>
-</html>
+.tagline{
+  font-size:13px;
+  opacity:0.72;
+  font-style:italic;
+}
+
+.desc{
+  font-size:14px;
+  line-height:1.618;
+  opacity:0.86;
+}
+
+select{
+  padding:13px;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+  font-size:15px;
+}
+
+.price{
+  font-size:17px;
+  font-weight:600;
+}
+
+button{
+  padding:13px;
+  border:none;
+  border-radius:8px;
+  background:#AFC8A0;
+  font-size:15px;
+  cursor:pointer;
+}
+
+button:hover{opacity:0.92;}
+
+/* === HİKÂYE BLOKU (SAYFA ALTI) === */
+.story{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 clamp(34px,5
