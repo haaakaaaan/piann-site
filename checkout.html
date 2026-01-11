@@ -6,53 +6,15 @@
 <title>Ödeme · PİANN</title>
 
 <style>
-/* =====================
-   GENEL
-===================== */
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
   background:#F7F8F6;
   color:#0f172a;
 }
-
-/* =====================
-   KAPSAYICI
-===================== */
-.container{
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 55px 21px;
-}
-
-/* =====================
-   BAŞLIK
-===================== */
-header{
-  margin-bottom:34px;
-}
-
-header h1{
-  font-size:32px;
-  margin-bottom:13px;
-}
-
-header p{
-  font-size:14px;
-  opacity:0.7;
-  line-height:1.618;
-}
-
-/* =====================
-   KART
-===================== */
+.container{max-width:420px;margin:0 auto;padding:55px 21px;}
 .card{
-  background:#ffffff;
+  background:#fff;
   border-radius:13px;
   padding:34px;
   box-shadow:0 13px 55px rgba(0,0,0,0.06);
@@ -60,77 +22,20 @@ header p{
   flex-direction:column;
   gap:21px;
 }
-
-/* =====================
-   FORM
-===================== */
-label{
-  font-size:13px;
-  opacity:0.7;
-}
-
-input{
-  width:100%;
-  padding:13px;
-  border-radius:8px;
-  border:1px solid #e5e7eb;
-  font-size:15px;
-}
-
-.row{
-  display:flex;
-  gap:13px;
-}
-
-/* =====================
-   TOPLAM
-===================== */
-.total{
-  display:flex;
-  justify-content:space-between;
-  font-weight:600;
-  margin-top:13px;
-}
-
-/* =====================
-   BUTON
-===================== */
+h1{font-size:32px;}
+.summary{font-size:15px;line-height:1.618;}
+.total{display:flex;justify-content:space-between;font-weight:600;}
+input{padding:13px;border-radius:8px;border:1px solid #e5e7eb;}
 button{
-  margin-top:21px;
   padding:15px;
   border:none;
   border-radius:8px;
   background:#0f172a;
-  color:#ffffff;
+  color:#fff;
   font-size:15px;
   cursor:pointer;
 }
-
-button:hover{
-  opacity:0.9;
-}
-
-/* =====================
-   BİLGİ
-===================== */
-.notice{
-  margin-top:21px;
-  font-size:12px;
-  opacity:0.6;
-  line-height:1.618;
-  text-align:center;
-}
-
-/* =====================
-   ALT
-===================== */
-.footer{
-  margin-top:34px;
-  text-align:center;
-  font-size:11px;
-  letter-spacing:0.18em;
-  opacity:0.5;
-}
+.footer{text-align:center;font-size:11px;letter-spacing:0.18em;opacity:0.5;margin-top:34px;}
 </style>
 </head>
 
@@ -138,56 +43,41 @@ button:hover{
 
 <div class="container">
 
-  <header>
-    <h1>Ödeme</h1>
-    <p>
-      Siparişinizi tamamlamak için kredi kartı bilgilerinizi giriniz.
-    </p>
-  </header>
+<h1>Ödeme</h1>
 
-  <div class="card">
+<div class="card">
 
-    <div>
-      <label>Kart Üzerindeki İsim</label>
-      <input type="text" placeholder="Ad Soyad">
-    </div>
-
-    <div>
-      <label>Kart Numarası</label>
-      <input type="text" placeholder="0000 0000 0000 0000">
-    </div>
-
-    <div class="row">
-      <div style="flex:1">
-        <label>Son Kullanma</label>
-        <input type="text" placeholder="AA / YY">
-      </div>
-      <div style="flex:1">
-        <label>CVC</label>
-        <input type="text" placeholder="123">
-      </div>
-    </div>
-
-    <div class="total">
-      <span>Toplam</span>
-      <span>₺ —</span>
-    </div>
-
-    <button onclick="alert('Ödeme altyapısı aktif edildiğinde kullanılacaktır.')">
-      Ödemeyi Tamamla
-    </button>
-
+  <div class="summary">
+    <strong id="urun"></strong><br>
+    Miktar: <span id="adet"></span><br><br>
   </div>
 
-  <div class="notice">
-    Ödeme altyapısı (iyzico / PayTR vb.) entegrasyonu
-    aktif edildiğinde kredi kartı işlemleri güvenli
-    şekilde gerçekleştirilecektir.
+  <div class="total">
+    <span>Toplam</span>
+    <span>₺<span id="tutar"></span></span>
   </div>
 
-  <div class="footer">a piann</div>
+  <input placeholder="Kart Üzerindeki İsim">
+  <input placeholder="Kart Numarası">
+  <input placeholder="AA / YY">
+  <input placeholder="CVC">
+
+  <button onclick="alert('Ödeme altyapısı aktif edildiğinde kullanılacaktır.')">
+    Ödemeyi Tamamla
+  </button>
 
 </div>
+
+<div class="footer">a piann</div>
+
+</div>
+
+<script>
+const p = new URLSearchParams(location.search);
+document.getElementById("urun").innerText = p.get("urun");
+document.getElementById("adet").innerText = p.get("adet");
+document.getElementById("tutar").innerText = p.get("tutar");
+</script>
 
 </body>
 </html>
