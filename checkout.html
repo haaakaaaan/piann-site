@@ -12,11 +12,39 @@ body{
   background:#F7F8F6;
   color:#0f172a;
 }
+
+/* === ÜST BAR === */
+.topbar{
+  position:fixed;
+  top:0; left:0; right:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 28px;
+  z-index:100;
+  background:#F7F8F6;
+}
+
+.nav-left{
+  display:flex;
+  gap:18px;
+  font-size:14px;
+}
+
+.nav-left span{
+  cursor:pointer;
+  opacity:0.75;
+}
+
+.nav-left span:hover{opacity:1;}
+
+/* === SAYFA === */
 .container{
   max-width:420px;
   margin:0 auto;
-  padding:55px 21px;
+  padding:110px 21px 55px;
 }
+
 .card{
   background:#fff;
   border-radius:13px;
@@ -26,18 +54,22 @@ body{
   flex-direction:column;
   gap:21px;
 }
+
 h1{font-size:32px;}
+
 .total{
   display:flex;
   justify-content:space-between;
-  font-weight:600;
   font-size:18px;
+  font-weight:600;
 }
+
 input{
   padding:13px;
   border-radius:8px;
   border:1px solid #e5e7eb;
 }
+
 button{
   padding:15px;
   border:none;
@@ -47,29 +79,38 @@ button{
   font-size:15px;
   cursor:pointer;
 }
+
 .notice{
+  margin-top:21px;
   font-size:12px;
   opacity:0.6;
-  line-height:1.618;
   text-align:center;
 }
+
 .footer{
+  margin-top:34px;
   text-align:center;
   font-size:11px;
   letter-spacing:0.18em;
   opacity:0.5;
-  margin-top:34px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- ÜST BAR -->
+<div class="topbar">
+  <div class="nav-left">
+    <span onclick="history.back()">← Geri</span>
+    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
+  </div>
+</div>
+
 <div class="container">
   <h1>Ödeme</h1>
 
   <div class="card">
-
     <div class="total">
       <span>Toplam</span>
       <span>₺<span id="toplam">0</span></span>
@@ -83,12 +124,10 @@ button{
     <button onclick="alert('Ödeme altyapısı aktif edildiğinde kullanılacaktır.')">
       Ödemeyi Tamamla
     </button>
-
   </div>
 
   <div class="notice">
-    Kredi kartı ödemeleri iyzico / PayTR entegrasyonu
-    aktif edildiğinde güvenli şekilde alınacaktır.
+    Kredi kartı ödemeleri iyzico / PayTR entegrasyonu aktif edildiğinde alınacaktır.
   </div>
 
   <div class="footer">a piann</div>
