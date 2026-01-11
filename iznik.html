@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İznik · PİANN</title>
+
+<style>
+/* =====================
+   GENEL
+===================== */
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background:#F6F8F4;
+  color:#0f172a;
+}
+
+/* =====================
+   ÜST ALAN
+===================== */
+.header{
+  padding: clamp(34px, 5vw, 89px);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header small{
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  opacity:0.6;
+  font-size:13px;
+}
+
+.header h1{
+  font-size: clamp(42px, 6vw, 68px);
+  margin: 21px 0 13px;
+}
+
+.header p{
+  max-width: 480px;
+  line-height:1.618;
+  font-size:16px;
+  opacity:0.85;
+}
+
+/* =====================
+   ÜRÜNLER
+===================== */
+.products{
+  max-width:1100px;
+  margin:0 auto;
+  padding: 0 clamp(34px, 5vw, 89px) 89px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap:34px;
+}
+
+.product{
+  background:#ffffff;
+  border-radius:13px;
+  padding:34px;
+  box-shadow:0 8px 34px rgba(0,0,0,0.04);
+  display:flex;
+  flex-direction:column;
+  gap:21px;
+}
+
+.product h2{
+  font-size:22px;
+}
+
+.product p{
+  font-size:15px;
+  line-height:1.618;
+  opacity:0.8;
+}
+
+/* =====================
+   SEÇİM
+===================== */
+.select-group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+select{
+  padding:13px;
+  font-size:15px;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+}
+
+/* =====================
+   BUTON
+===================== */
+button{
+  margin-top:auto;
+  padding:13px;
+  border:none;
+  border-radius:8px;
+  background:#AFC8A0;
+  color:#0f172a;
+  font-size:15px;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+/* =====================
+   ALT
+===================== */
+.footer{
+  text-align:center;
+  font-size:12px;
+  letter-spacing:0.18em;
+  opacity:0.5;
+  padding-bottom:34px;
+}
+</style>
+</head>
+
+<body>
+
+<section class="header">
+  <small>Bursa · İznik</small>
+  <h1>Zeytin & Zeytinyağı</h1>
+  <p>
+    Dalından, toprağından.  
+    İznik’te aile bahçesinden toplanan zeytinler ve doğal yöntemlerle
+    elde edilen zeytinyağı.
+  </p>
+</section>
+
+<section class="products">
+
+  <!-- ZEYTİNYAĞI -->
+  <div class="product">
+    <h2>Soğuk Sıkım Zeytinyağı</h2>
+    <p>
+      Organik, katkısız.  
+      Asit oranı düşük, doğal aroması korunmuş.
+    </p>
+
+    <div class="select-group">
+      <label>Litre seçin</label>
+      <select>
+        <option>1 Litre</option>
+        <option>2 Litre</option>
+        <option>5 Litre</option>
+      </select>
+    </div>
+
+    <button>Satın Al</button>
+  </div>
+
+  <!-- ZEYTİN -->
+  <div class="product">
+    <h2>Doğal Siyah Zeytin</h2>
+    <p>
+      Dalında olgunlaşmış, salamura.  
+      Ev yapımı, katkısız.
+    </p>
+
+    <div class="select-group">
+      <label>Kilo seçin</label>
+      <select>
+        <option>1 kg</option>
+        <option>2 kg</option>
+        <option>5 kg</option>
+      </select>
+    </div>
+
+    <button>Satın Al</button>
+  </div>
+
+</section>
+
+<div class="footer">a piann</div>
+
+</body>
+</html>
