@@ -92,7 +92,9 @@ button{
     </div>
 
     <div class="price">₺320</div>
-    <button onclick="goCheckout(this,'Soğuk Sıkım Zeytinyağı')">Satın Al</button>
+    <button onclick="addProduct(this,'Soğuk Sıkım Zeytinyağı')">
+      Sepete Ekle
+    </button>
   </div>
 
   <div class="product" data-price="180">
@@ -109,7 +111,9 @@ button{
     </div>
 
     <div class="price">₺180</div>
-    <button onclick="goCheckout(this,'Doğal Siyah Zeytin')">Satın Al</button>
+    <button onclick="addProduct(this,'Doğal Siyah Zeytin')">
+      Sepete Ekle
+    </button>
   </div>
 
 </section>
@@ -117,17 +121,35 @@ button{
 <div class="footer">a piann</div>
 
 <script>
+/* FİYAT HESABI */
 function updatePrice(select){
   const p = select.closest(".product");
   const total = Number(p.dataset.price) * Number(select.value);
   p.querySelector(".price").innerText = "₺" + total;
 }
 
-function goCheckout(btn, name){
+/* ===== SEPET MOTORU ===== */
+function getCart(){
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+function saveCart(cart){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+function addProduct(btn, name){
   const p = btn.closest(".product");
-  const qty = p.querySelector("select").value;
-  const total = p.querySelector(".price").innerText.replace("₺","");
-  location.href = `checkout.html?urun=${encodeURIComponent(name)}&adet=${qty}&tutar=${total}`;
+  const qty = Number(p.querySelector("select").value);
+  const unit = Number(p.dataset.price);
+  const cart = getCart();
+
+  const found = cart.find(i => i.name === name);
+  if(found){
+    found.qty += qty;
+    found.total += qty * unit;
+  }else{
+    cart.push({ name:name, qty:qty, unit:unit, total:qty*unit });
+  }
+  saveCart(cart);
+  alert("Ürün sepete eklendi");
 }
 </script>
 
