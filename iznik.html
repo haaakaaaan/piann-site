@@ -7,18 +7,16 @@
 
 <style>
 /* =====================
-   GENEL AYARLAR
+   GENEL
 ===================== */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-  background: #f7f8f4;
+  background: radial-gradient(1200px 600px at 50% -200px, #ffffff 0%, #f6f7f2 55%, #f2f3ee 100%);
   color: #0f172a;
 }
 
@@ -38,9 +36,7 @@ html, body {
   color: #475569;
 }
 
-.nav a:hover {
-  text-decoration: underline;
-}
+.nav a:hover { text-decoration: underline; }
 
 /* =====================
    ANA ALAN
@@ -51,31 +47,42 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
+  padding: 36px 20px 40px;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 44px;
 }
 
 .header small {
   display: block;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   font-size: 12px;
   color: #64748b;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .header h1 {
-  font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(34px, 4.4vw, 52px);
   margin: 0;
 }
 
 .header p {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 16px;
   color: #475569;
+}
+
+.header .highlight {
+  margin-top: 10px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #365314;
+  background: linear-gradient(90deg, #e7f2d9, #fff1cc);
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
 }
 
 /* =====================
@@ -83,55 +90,72 @@ html, body {
 ===================== */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 36px;
   width: 100%;
-  max-width: 900px;
+  max-width: 920px;
 }
 
 .card {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 48px 32px;
+  border-radius: 26px;
+  padding: 52px 36px;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1),
+              box-shadow .35s ease,
+              filter .35s ease;
+  box-shadow: 0 18px 36px rgba(0,0,0,.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after{
+  content:"";
+  position:absolute;
+  inset:auto -40% -60% -40%;
+  height:120%;
+  background: radial-gradient(60% 60% at 50% 100%, rgba(255,255,255,.55), transparent 60%);
+  opacity:.6;
 }
 
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 28px 60px rgba(0,0,0,0.08);
+  transform: translateY(-10px);
+  box-shadow: 0 36px 72px rgba(0,0,0,.12);
+  filter: saturate(1.05);
 }
 
+/* KART TİPLERİ */
 .card.zeytin {
-  background: #e6f0dc;
+  background: linear-gradient(180deg, #e2f0d6 0%, #d6e8c8 100%);
 }
 
 .card.yag {
-  background: #eef3e8;
+  background: linear-gradient(180deg, #fff4da 0%, #ffe7b5 100%);
 }
 
 .card h2 {
-  margin: 0 0 12px;
-  font-size: 28px;
+  margin: 0 0 14px;
+  font-size: 30px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .card p {
   margin: 0;
   font-size: 15px;
-  color: #334155;
-  line-height: 1.6;
+  color: #1f2937;
+  line-height: 1.7;
 }
 
 /* =====================
    FOOTER
 ===================== */
 .footer {
-  margin-top: 64px;
+  margin-top: 66px;
   font-size: 12px;
   color: #94a3b8;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
 }
 </style>
 </head>
@@ -151,6 +175,7 @@ html, body {
     <small>BURSA · İZNİK</small>
     <h1>Zeytin & Zeytinyağı</h1>
     <p>Dalından, toprağından. Nesiller boyu aynı ağaçlardan.</p>
+    <div class="highlight">🌳 150+ yıllık ağaçlardan · sınırlı üretim</div>
   </div>
 
   <section class="cards">
@@ -175,9 +200,7 @@ html, body {
 
   </section>
 
-  <div class="footer">
-    a piann
-  </div>
+  <div class="footer">a piann</div>
 
 </main>
 
