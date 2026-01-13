@@ -1,137 +1,183 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Biga · PİANN</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PİANN · Biga</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{
+/* =====================
+   GENEL AYARLAR
+===================== */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-  background:#F4F8FB;
-  color:#0f172a;
+  background: #f5f8fb;
+  color: #0f172a;
 }
 
-/* === ÜST BAR === */
-.topbar{
-  position:fixed;
-  top:0; left:0; right:0;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px 28px;
-  z-index:100;
+/* =====================
+   ÜST NAV
+===================== */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  font-size: 14px;
 }
 
-.nav-left{
-  display:flex;
-  gap:18px;
-  font-size:14px;
+.nav a {
+  text-decoration: none;
+  color: #475569;
 }
 
-.nav-left span{cursor:pointer;opacity:0.75;}
-.nav-left span:hover{opacity:1;}
-
-.cart-btn{
-  position:relative;
-  font-size:20px;
-  cursor:pointer;
+.nav a:hover {
+  text-decoration: underline;
 }
 
-.cart-count{
-  position:absolute;
-  top:-6px;
-  right:-10px;
-  background:#0f172a;
-  color:#fff;
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:50%;
+/* =====================
+   ANA ALAN
+===================== */
+.main {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
 }
 
-.header{
-  max-width:1100px;
-  margin:0 auto;
-  padding:110px clamp(34px,5vw,89px) 55px;
+.header {
+  text-align: center;
+  margin-bottom: 48px;
 }
 
-.products{
-  max-width:1100px;
-  margin:0 auto;
-  padding:0 clamp(34px,5vw,89px) 89px;
+.header small {
+  display: block;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 12px;
 }
 
-.product{
-  background:#fff;
-  border-radius:13px;
-  padding:34px;
-  box-shadow:0 8px 34px rgba(0,0,0,0.04);
-  display:flex;
-  flex-direction:column;
-  gap:18px;
+.header h1 {
+  font-size: clamp(32px, 4vw, 48px);
+  margin: 0;
 }
 
-.price{font-weight:600;}
-button{padding:13px;border:none;border-radius:8px;background:#A9D3EA;cursor:pointer;}
-.footer{text-align:center;font-size:11px;opacity:0.5;padding-bottom:34px;}
+.header p {
+  margin-top: 12px;
+  font-size: 16px;
+  color: #475569;
+}
+
+/* =====================
+   KARTLAR
+===================== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 48px 32px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 60px rgba(0,0,0,0.08);
+}
+
+.card.tursu {
+  background: #e0f2fe;
+}
+
+.card.salca {
+  background: #fee2e2;
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+}
+
+.card p {
+  margin: 0;
+  font-size: 15px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+/* =====================
+   FOOTER
+===================== */
+.footer {
+  margin-top: 64px;
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 0.12em;
+}
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <div class="nav-left">
-    <span onclick="history.back()">← Geri</span>
-    <span onclick="location.href='index.html'">🏠 Ana Sayfa</span>
-  </div>
-
-  <div class="cart-btn" onclick="location.href='sepet.html'">
-    🛒 <span class="cart-count" id="cartCount">0</span>
-  </div>
+<!-- ÜST NAV -->
+<div class="nav">
+  <a href="index.html">← Geri</a>
+  <a href="index.html">Ana Sayfa</a>
 </div>
 
-<section class="header">
-  <h1>Biga · Ev Yapımı Turşular</h1>
-</section>
+<!-- ANA İÇERİK -->
+<main class="main">
 
-<section class="products">
-  <div class="product" data-price="120">
-    <strong>Karışık Köy Turşusu</strong>
-    <select onchange="updatePrice(this)">
-      <option value="1">1 kg</option>
-      <option value="2">2 kg</option>
-    </select>
-    <div class="price">₺120</div>
-    <button onclick="addProduct(this,'Karışık Köy Turşusu')">Sepete Ekle</button>
+  <div class="header">
+    <small>ÇANAKKALE · BİGA</small>
+    <h1>Ev Yapımı Lezzetler</h1>
+    <p>Mevsiminde, katkısız, ev mutfağından.</p>
   </div>
-</section>
 
-<div class="footer">a piann</div>
+  <section class="cards">
 
-<script>
-function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
-function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
-function updateCartCount(){
-  document.getElementById("cartCount").innerText =
-    getCart().reduce((s,i)=>s+i.qty,0);
-}
-function updatePrice(s){
-  const p=s.closest(".product");
-  p.querySelector(".price").innerText="₺"+(p.dataset.price*s.value);
-}
-function addProduct(btn,name){
-  const p=btn.closest(".product");
-  const qty=Number(p.querySelector("select").value);
-  const unit=Number(p.dataset.price);
-  const cart=getCart();
-  const f=cart.find(i=>i.name===name);
-  if(f){f.qty+=qty;f.total+=qty*unit;}
-  else{cart.push({name,qty,unit,total:qty*unit});}
-  saveCart(cart); updateCartCount();
-}
-updateCartCount();
-</script>
+    <!-- TURŞU -->
+    <a href="biga-tursu.html" class="card tursu">
+      <h2>🥒 Turşu</h2>
+      <p>
+        Ev usulü hazırlanır.<br>
+        Doğal fermantasyon, gerçek sebze tadı.
+      </p>
+    </a>
+
+    <!-- SALÇA -->
+    <a href="biga-salca.html" class="card salca">
+      <h2>🍅 Salça</h2>
+      <p>
+        Biga’nın özel hasadından.<br>
+        Güneşte ve yavaş pişirme yöntemiyle.
+      </p>
+    </a>
+
+  </section>
+
+  <div class="footer">
+    a piann
+  </div>
+
+</main>
 
 </body>
 </html>
