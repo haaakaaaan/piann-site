@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İznik · Soğuk Sıkım Zeytinyağı | PİANN</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background:#f7f8f4;
+  color:#0f172a;
+}
+
+/* ÜST BAR */
+.topbar{
+  position:fixed; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 24px;
+  background:#f7f8f4;
+  border-bottom:1px solid rgba(15,23,42,.08);
+  z-index:10;
+}
+.nav-left{
+  display:flex; gap:16px; font-size:14px;
+}
+.nav-left a{
+  text-decoration:none; color:#475569;
+}
+.cart{
+  position:relative; cursor:pointer;
+}
+.cart span{
+  position:absolute; top:-6px; right:-10px;
+  background:#0f172a; color:#fff;
+  font-size:11px; padding:2px 6px; border-radius:50%;
+}
+
+/* SAYFA */
+.page{
+  max-width:1100px;
+  margin:0 auto;
+  padding:110px 24px 80px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:56px;
+}
+
+/* GÖRSEL */
+.image{
+  background:#e5e7eb;
+  border-radius:18px;
+  aspect-ratio:4/5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  color:#64748b;
+}
+
+/* BİLGİ */
+.info{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.info h1{
+  font-size:34px;
+}
+
+.badge{
+  font-size:13px;
+  background:#e6f0dc;
+  padding:6px 12px;
+  border-radius:999px;
+  width:fit-content;
+}
+
+.desc{
+  font-size:15px;
+  line-height:1.7;
+  color:#334155;
+}
+
+/* SATIN ALMA */
+.buy{
+  margin-top:8px;
+  padding:20px;
+  background:#ffffff;
+  border-radius:16px;
+  border:1px solid rgba(15,23,42,.08);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+select{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid rgba(15,23,42,.16);
+  max-width:200px;
+}
+
+.price{
+  font-size:20px;
+  font-weight:600;
+}
+
+button{
+  padding:12px 32px;
+  border:none;
+  border-radius:999px;
+  background:#afc8a0;
+  cursor:pointer;
+  font-size:14px;
+  width:fit-content;
+}
+
+/* ALT HİKÂYE */
+.story{
+  grid-column:1 / -1;
+  margin-top:40px;
+  background:#ffffff;
+  padding:32px;
+  border-radius:18px;
+  border:1px solid rgba(15,23,42,.08);
+}
+
+.story h2{
+  margin-bottom:12px;
+  font-size:18px;
+}
+.story p{
+  font-size:14px;
+  line-height:1.7;
+  color:#334155;
+}
+
+.footer{
+  grid-column:1 / -1;
+  text-align:center;
+  margin-top:48px;
+  font-size:11px;
+  letter-spacing:.15em;
+  color:#94a3b8;
+}
+
+/* MOBİL */
+@media(max-width:900px){
+  .page{
+    grid-template-columns:1fr;
+    gap:40px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ÜST BAR -->
+<div class="topbar">
+  <div class="nav-left">
+    <a href="iznik.html">← İznik</a>
+    <a href="index.html">Ana Sayfa</a>
+  </div>
+  <div class="cart" onclick="location.href='sepet.html'">
+    🛒 <span id="cartCount">0</span>
+  </div>
+</div>
+
+<!-- SAYFA -->
+<main class="page">
+
+  <!-- GÖRSEL -->
+  <div class="image">
+    Ürün görseli eklenecek
+  </div>
+
+  <!-- BİLGİ -->
+  <div class="info">
+    <h1>Soğuk Sıkım Zeytinyağı</h1>
+
+    <div class="badge">🌳 150 yılı aşkın zeytin ağaçlarından</div>
+
+    <div class="desc">
+      Zeytinlerimiz, İznik’te bulunan 150 yılı aşkın zeytin ağaçlarından elde edilir.
+      Dalından toplandıktan sonra bekletilmeden soğuk sıkım yöntemiyle sıkılır.
+      <br><br>
+      Verimi düşük, aroması dengeli ve karakteri oturmuş bu yağ,
+      günlük kullanım ve soğuk tüketim için idealdir.
+    </div>
+
+    <div class="buy">
+      <select onchange="updatePrice(this)">
+        <option value="1">1 Litre</option>
+        <option value="2">2 Litre</option>
+        <option value="5">5 Litre</option>
+      </select>
+
+      <div class="price" id="price">₺320</div>
+
+      <button onclick="addToCart()">Sepete Ekle</button>
+    </div>
+  </div>
+
+  <!-- HİKÂYE -->
+  <section class="story">
+    <h2>🌿 Ağaçlarımız Hakkında</h2>
+    <p>
+      İznik’te bulunan zeytin ağaçlarımızın yaşı 150 yılın üzerindedir.
+      Bu ağaçlar nesiller boyunca aynı toprakta yetişmiş,
+      köklerini toprağın derin katmanlarına salmıştır.
+      <br><br>
+      Bu sayede elde edilen zeytinler daha dengeli aroma,
+      daha stabil kalite ve gerçek zeytin karakteri taşır.
+      Bu ürünler endüstriyel üretime uygun değildir ve
+      sınırlı miktarda hazırlanır.
+    </p>
+  </section>
+
+  <div class="footer">a piann</div>
+
+</main>
+
+<script>
+function getCart(){return JSON.parse(localStorage.getItem("cart"))||[];}
+function saveCart(c){localStorage.setItem("cart",JSON.stringify(c));}
+function updateCartCount(){
+  document.getElementById("cartCount").innerText =
+    getCart().reduce((s,i)=>s+i.qty,0);
+}
+
+function updatePrice(sel){
+  const prices={1:320,2:620,5:1450};
+  document.getElementById("price").innerText="₺"+prices[sel.value];
+}
+
+function addToCart(){
+  const sel=document.querySelector("select").value;
+  const prices={1:320,2:620,5:1450};
+  const name="Soğuk Sıkım Zeytinyağı · "+sel+" Litre";
+  const cart=getCart();
+  const found=cart.find(i=>i.name===name);
+  if(found){
+    found.qty+=1;
+    found.total+=prices[sel];
+  }else{
+    cart.push({name,qty:1,unit:prices[sel],total:prices[sel]});
+  }
+  saveCart(cart);
+  updateCartCount();
+  alert("Ürün sepete eklendi");
+}
+
+updateCartCount();
+</script>
+
+</body>
+</html>
