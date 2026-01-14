@@ -10,112 +10,90 @@
    RESET
 ====================== */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
   height: 100%;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background: #f7f8f5;
+  color: #0f172a;
 }
 
 /* ======================
    ANA SAHNE
 ====================== */
-.wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.stage {
   height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+
+/* ORTA ÇİZGİ */
+.divider {
+  background: rgba(15, 23, 42, 0.08);
 }
 
 /* ======================
-   ORTAK BÖLÜM STİLİ
+   BÖLÜMLER
 ====================== */
-.section {
-  position: relative;
-  padding: 8vh 8vw;
+.panel {
+  padding: 10vh 8vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transition: background .4s ease;
   cursor: pointer;
-  transition: transform .6s ease;
-  overflow: hidden;
-}
-
-.section::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(
-    rgba(0,0,0,0.03) 1px,
-    transparent 1px
-  );
-  background-size: 3px 3px;
-  opacity: .25;
-  pointer-events: none;
-}
-
-.section:hover {
-  transform: scale(1.01);
 }
 
 /* ======================
    METİNLER
 ====================== */
-small {
-  letter-spacing: .35em;
+.panel small {
+  letter-spacing: .4em;
   font-size: 11px;
-  opacity: .65;
+  opacity: .6;
 }
 
-h1 {
-  margin-top: 16px;
-  font-size: clamp(42px, 6vw, 88px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+.panel h1 {
+  margin-top: 24px;
+  font-size: clamp(48px, 6vw, 96px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
-p {
-  margin-top: 18px;
-  max-width: 380px;
-  font-size: 15px;
-  line-height: 1.7;
-  opacity: .85;
+.panel p {
+  margin-top: 22px;
+  max-width: 420px;
+  font-size: 16px;
+  line-height: 1.8;
+  opacity: .8;
 }
 
 /* ======================
    İZNİK
 ====================== */
 .iznik {
-  background: linear-gradient(180deg, #b9d2a8 0%, #aec79c 100%);
-  color: #0f172a;
+  background: #eef4e7;
 }
 
 .iznik:hover {
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+  background: #e5efdc;
 }
 
 /* ======================
    BİGA
 ====================== */
 .biga {
-  background: linear-gradient(180deg, #b9dff1 0%, #acd6ec 100%);
-  color: #0f172a;
-}
-
-.biga h1 {
-  text-align: right;
-}
-
-.biga small,
-.biga p {
-  align-self: flex-end;
+  background: #eaf5fb;
+  align-items: flex-end;
   text-align: right;
 }
 
 .biga:hover {
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+  background: #e1f0f8;
 }
 
 /* ======================
@@ -127,7 +105,7 @@ p {
   left: 50%;
   transform: translateX(-50%);
   font-size: 11px;
-  letter-spacing: .25em;
+  letter-spacing: .3em;
   opacity: .45;
 }
 
@@ -135,15 +113,17 @@ p {
    MOBİL
 ====================== */
 @media (max-width: 900px) {
-  .wrapper {
+  .stage {
     grid-template-columns: 1fr;
   }
 
-  .biga h1,
-  .biga p,
-  .biga small {
+  .divider {
+    display: none;
+  }
+
+  .biga {
+    align-items: flex-start;
     text-align: left;
-    align-self: flex-start;
   }
 }
 </style>
@@ -151,20 +131,30 @@ p {
 
 <body>
 
-<div class="wrapper">
+<div class="stage">
 
   <!-- İZNİK -->
-  <section class="section iznik" onclick="location.href='iznik.html'">
+  <section class="panel iznik" onclick="location.href='iznik.html'">
     <small>BURSA</small>
     <h1>İznik</h1>
-    <p>Dalından, toprağından. Zeytin ve zeytinyağı.</p>
+    <p>
+      Dalından, toprağından.  
+      Zeytin ve zeytinyağı.  
+      Nesiller boyu aynı ağaçlardan.
+    </p>
   </section>
 
+  <div class="divider"></div>
+
   <!-- BİGA -->
-  <section class="section biga" onclick="location.href='biga.html'">
+  <section class="panel biga" onclick="location.href='biga.html'">
     <small>ÇANAKKALE</small>
     <h1>Biga</h1>
-    <p>Mevsiminden, evinden. Karışık köy turşuları ve salça.</p>
+    <p>
+      Mevsiminden, evinden.  
+      Köy turşuları ve salça.  
+      Gerçek ev mutfağından.
+    </p>
   </section>
 
 </div>
