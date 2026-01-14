@@ -155,3 +155,87 @@ html, body {
 
 </body>
 </html>
+/* =========================
+   ANA SAHNE – PREMIUM DOKUNUŞ
+========================= */
+
+/* Genel yumuşatma */
+body {
+  background: #f8faf7;
+}
+
+/* Bölümler */
+.section {
+  position: relative;
+  overflow: hidden;
+  transition: all .6s ease;
+}
+
+/* Hafif doku (noise hissi) */
+.section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(0,0,0,0.03) 1px,
+    transparent 1px
+  );
+  background-size: 3px 3px;
+  opacity: .25;
+  pointer-events: none;
+}
+
+/* Hover ile derinlik */
+.section:hover {
+  transform: scale(1.01);
+}
+
+/* Başlıklar */
+.section h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Alt bölge isimleri (BURSA / ÇANAKKALE) */
+.section small {
+  letter-spacing: .25em;
+  font-size: 11px;
+  opacity: .6;
+}
+
+/* Açıklama metni */
+.section p {
+  max-width: 360px;
+  font-size: 15px;
+  line-height: 1.7;
+  opacity: .85;
+}
+
+/* İznik özel vurgu */
+.iznik {
+  background: linear-gradient(
+    180deg,
+    #b9d2a8 0%,
+    #b1caa0 100%
+  );
+}
+
+/* Biga özel vurgu */
+.biga {
+  background: linear-gradient(
+    180deg,
+    #b9dff1 0%,
+    #acd6ec 100%
+  );
+}
+
+/* Hover’da iç ışık */
+.iznik:hover {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+}
+
+.biga:hover {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+}
+
+
